@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -10,6 +10,13 @@
 [ext_resource type="PackedScene" path="res://blood_bag.glb" id="8_blood"]
 [ext_resource type="PackedScene" path="res://dead_pig.glb" id="9_pig"]
 [ext_resource type="PackedScene" path="res://psx_raw_meat_pack__low-poly_2_types.glb" id="10_meat"]
+[ext_resource type="PackedScene" path="res://horror_butcher_fat_killer_bloody_cleaver.glb" id="11_butcher_prop"]
+[ext_resource type="PackedScene" path="res://butcher_meat_hook_rail_-_cured_ham__sausages.glb" id="12_hook_rail"]
+[ext_resource type="PackedScene" path="res://old_rusty_ceiling_fan.glb" id="13_fan"]
+[ext_resource type="PackedScene" path="res://horror_room.glb" id="14_horror_room"]
+[ext_resource type="Script" path="res://scripts/props/ceiling_fan.gd" id="15_fan_script"]
+[ext_resource type="Script" path="res://scripts/props/flicker_light.gd" id="16_flicker"]
+[ext_resource type="Script" path="res://scripts/props/jump_scare_trigger.gd" id="17_jumpscare"]
 
 [sub_resource type="Environment" id="Environment_l2"]
 background_mode = 1
@@ -29,6 +36,10 @@ roughness = 0.85
 albedo_color = Color(0.22, 0.14, 0.14, 1)
 roughness = 0.9
 
+[sub_resource type="StandardMaterial3D" id="Mat_ceiling"]
+albedo_color = Color(0.12, 0.08, 0.08, 1)
+roughness = 0.95
+
 [sub_resource type="BoxShape3D" id="BoxShape_pickup"]
 size = Vector3(1.2, 1.2, 1.2)
 
@@ -43,6 +54,12 @@ size = Vector3(2.2, 3.0, 0.8)
 
 [sub_resource type="BoxMesh" id="BoxMesh_door"]
 size = Vector3(2.0, 2.8, 0.25)
+
+[sub_resource type="BoxShape3D" id="BoxShape_jumpscare"]
+size = Vector3(3, 2, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape_blood2"]
+size = Vector3(1.2, 1.2, 1.2)
 
 [node name="Level02_Butcher" type="Node3D"]
 script = ExtResource("1_lvl")
@@ -66,6 +83,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(28, 1, 36)
 material = SubResource("Mat_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0, 0)
+use_collision = true
+size = Vector3(28, 0.5, 36)
+material = SubResource("Mat_ceiling")
 
 [node name="WallNorth" type="CSGBox3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -18)
@@ -91,37 +114,105 @@ use_collision = true
 size = Vector3(1, 6, 36)
 material = SubResource("Mat_wall")
 
-[node name="PillarL" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.0, -4)
+[node name="MidDividerA" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.5, 2)
 use_collision = true
-size = Vector3(1.5, 5, 1.5)
+size = Vector3(20, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="PillarR" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.0, -4)
+[node name="MidDividerB" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, -6)
 use_collision = true
-size = Vector3(1.5, 5, 1.5)
+size = Vector3(1, 6, 16)
 material = SubResource("Mat_wall")
 
-[node name="DeadPig" parent="Geometry" instance=ExtResource("9_pig")]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -9, 0.6, 2)
+[node name="BossRoomArch" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -6)
+use_collision = true
+size = Vector3(4, 0.5, 1)
+material = SubResource("Mat_wall")
 
-[node name="RawMeat" parent="Geometry" instance=ExtResource("10_meat")]
+[node name="PillarBossL" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.0, -12)
+use_collision = true
+size = Vector3(1.2, 5, 1.2)
+material = SubResource("Mat_wall")
+
+[node name="PillarBossR" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.0, -12)
+use_collision = true
+size = Vector3(1.2, 5, 1.2)
+material = SubResource("Mat_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="CeilingFan1" parent="Props" instance=ExtResource("14_horror_room")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 4.8, 8)
+script = ExtResource("15_fan_script")
+
+[node name="CeilingFan2" parent="Props" instance=ExtResource("13_fan")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, -8)
+script = ExtResource("15_fan_script")
+
+[node name="MeatHookRail1" parent="Props" instance=ExtResource("12_hook_rail")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -8, 3.5, 2)
+
+[node name="MeatHookRail2" parent="Props" instance=ExtResource("12_hook_rail")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 3.5, -8)
+
+[node name="DeadPig1" parent="Props" instance=ExtResource("9_pig")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -10, 0.4, 4)
+
+[node name="DeadPig2" parent="Props" instance=ExtResource("9_pig")]
+transform = Transform3D(0.7314, 0, 0.5657, 0, 0.8, 0, -0.5657, 0, 0.7314, -5, 0.4, -3)
+
+[node name="RawMeat1" parent="Props" instance=ExtResource("10_meat")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.4, 5)
+
+[node name="RawMeat2" parent="Props" instance=ExtResource("10_meat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.4, -2)
+
+[node name="ButcherProp" parent="Props" instance=ExtResource("11_butcher_prop")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6, 0, -10)
 
 [node name="Lights" type="Node3D" parent="."]
 
-[node name="MeatLight1" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 9)
-light_color = Color(0.9, 0.25, 0.2, 1)
-light_energy = 1.8
+[node name="EntryLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 13)
+light_color = Color(0.9, 0.2, 0.18, 1)
+light_energy = 1.6
 omni_range = 14.0
 
-[node name="MeatLight2" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, -6)
-light_color = Color(0.95, 0.2, 0.18, 1)
+[node name="MeatLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.5, 2)
+light_color = Color(0.95, 0.15, 0.12, 1)
+light_energy = 1.8
+omni_range = 12.0
+
+[node name="StorageLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.5, -4)
+light_color = Color(0.75, 0.4, 0.2, 1)
+light_energy = 1.2
+omni_range = 10.0
+
+[node name="BossLight1" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, -12)
+light_color = Color(0.95, 0.18, 0.15, 1)
 light_energy = 2.0
-omni_range = 16.0
+omni_range = 18.0
+
+[node name="BossLight2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.8, -14)
+light_color = Color(0.6, 0.1, 0.1, 1)
+light_energy = 1.4
+omni_range = 10.0
+
+[node name="FlickerLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.8, -10)
+script = ExtResource("16_flicker")
+light_color = Color(1.0, 0.3, 0.1, 1)
+light_energy = 1.5
+omni_range = 12.0
 
 [node name="Interactables" type="Node3D" parent="."]
 
@@ -196,5 +287,28 @@ shape = SubResource("BoxShape_door")
 [node name="Mesh" type="MeshInstance3D" parent="Interactables/ExitHatch"]
 mesh = SubResource("BoxMesh_door")
 
+[node name="JumpscareZone" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.5, 0)
+script = ExtResource("17_jumpscare")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/JumpscareZone"]
+shape = SubResource("BoxShape_jumpscare")
+
+[node name="SecretBloodBag" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.8, -14)
+script = ExtResource("3_pickup")
+prompt_label = "Take Hidden Blood Bag"
+pickup_type = "blood_bag"
+item_id = "l2_blood_bag2"
+subtitle_speaker = "System"
+subtitle_text = "Found a hidden Blood Bag in the storage room."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/SecretBloodBag"]
+shape = SubResource("BoxShape_blood2")
+
+[node name="Model" parent="Interactables/SecretBloodBag" instance=ExtResource("8_blood")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
+
 [node name="Butcher" parent="." instance=ExtResource("6_butcher")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -12)
+patrol_offsets = [Vector3(-6, 0, 0), Vector3(6, 0, 0), Vector3(0, 0, 4)]

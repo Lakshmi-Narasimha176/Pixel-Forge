@@ -4,6 +4,11 @@ extends "res://scripts/interaction/interactable.gd"
 @export var puzzle_id: String = ""
 @export var switch_index: int = 0
 @export var switch_name: String = "Circuit Breaker"
+@export var required_switches: int = 1
+@export var flag_to_set: String = ""
+@export var objective_id: String = ""
+@export var speaker: String = "System"
+@export var activation_message: String = ""
 
 var _active: bool = false
 
@@ -29,12 +34,17 @@ func interact(_player: Node) -> void:
 	if not puzzle_id.is_empty():
 		var count: int = GameState.puzzle_states.get(puzzle_id, 0) + 1
 		GameState.puzzle_states[puzzle_id] = count
-		GameState.show_subtitle("System", "%s flipped (%d active)." % [switch_name, count], 2.5)
+		var msg := activation_message if activation_message != "" else "%s flipped (%d active)." % [switch_name, count]
+		GameState.show_subtitle(speaker, msg, 2.5)
 
 		# Check for specific puzzle completion
-		if puzzle_id == "puzzle_l3_traps" and count >= 2:
-			GameState.set_flag("l3_traps_disabled", true)
-			GameState.show_subtitle("System", "All breakers activated! Traps disabled.", 4.0)
-		elif puzzle_id == "puzzle_l4_anchors" and count >= 3:
-			GameState.set_flag("l4_portal_unlocked", true)
-			GameState.show_subtitle("System", "All soul anchors aligned! Void rift opened.", 4.0)
+		if puzzle_id == "l3_traps" and count >= required_switches:
+			var flag := flag_to_set if flag_to_set != "" else "l3_traps_disabled"
+			GameState.set_flag(flag, true)
+			GameState.show_subtitle(speaker, "All breakers activated! Traps disabled.", 4.0)
+		elif puzzle_id == "l4_anchors" and count >= required_switches:
+			var flag := flag_to_set if flag_to_set != "" else "l4_portal_unlocked"
+			GameState.set_flag(flag, true)
+			GameState.show_subtitle(speaker, "All soul anchors aligned! Void rift opened.", 4.0)
+		elif not flag_to_set.is_empty() and count >= required_switches:
+			GameState.set_flag(flag_to_set, true)

@@ -1,0 +1,104 @@
+[gd_resource type="Theme" format=3 uid="uid://theme_last_revenge"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.051, 0.051, 0.059, 1)
+border_color = Color(0.545, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.102, 0.039, 0.039, 1)
+border_color = Color(0.545, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.239, 0, 0, 1)
+border_color = Color(0.545, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.545, 0, 0, 1)
+border_color = Color(0.8, 0.1, 0.1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
+bg_color = Color(0.102, 0.039, 0.039, 0)
+border_color = Color(0.8, 0.1, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lineedit"]
+bg_color = Color(0.04, 0.02, 0.02, 1)
+border_color = Color(0.545, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[resource]
+Button/colors/font_color = Color(0.831, 0.812, 0.722, 1)
+Button/colors/font_hover_color = Color(1.0, 0.9, 0.9, 1)
+Button/colors/font_pressed_color = Color(1.0, 1.0, 1.0, 1)
+Button/colors/font_disabled_color = Color(0.5, 0.5, 0.5, 1)
+Button/colors/font_focus_color = Color(0.831, 0.812, 0.722, 1)
+Button/styles/normal = SubResource("StyleBoxFlat_btn_normal")
+Button/styles/hover = SubResource("StyleBoxFlat_btn_hover")
+Button/styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+Button/styles/focus = SubResource("StyleBoxFlat_btn_focus")
+Button/styles/disabled = SubResource("StyleBoxFlat_btn_normal")
+Label/colors/font_color = Color(0.831, 0.812, 0.722, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.5)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Panel/styles/panel = SubResource("StyleBoxFlat_panel")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_panel")
+RichTextLabel/colors/default_color = Color(0.831, 0.812, 0.722, 1)
+RichTextLabel/colors/font_shadow_color = Color(0, 0, 0, 0)
+RichTextLabel/colors/selection_color = Color(0.545, 0, 0, 0.5)
+ItemList/colors/font_color = Color(0.831, 0.812, 0.722, 1)
+ItemList/colors/font_selected_color = Color(1.0, 1.0, 1.0, 1)
+ItemList/colors/guide_color = Color(0.545, 0, 0, 0.3)
+LineEdit/colors/font_color = Color(0.831, 0.812, 0.722, 1)
+LineEdit/colors/font_placeholder_color = Color(0.5, 0.45, 0.4, 1)
+LineEdit/colors/caret_color = Color(0.545, 0, 0, 1)
+LineEdit/styles/normal = SubResource("StyleBoxFlat_lineedit")
+LineEdit/styles/focus = SubResource("StyleBoxFlat_lineedit")
+HSeparator/colors/color = Color(0.545, 0, 0, 0.6)
+VSeparator/colors/color = Color(0.545, 0, 0, 0.6)

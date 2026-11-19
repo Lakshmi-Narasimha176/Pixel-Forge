@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "dialogue": [
+    {
+      "id": "dlg_level_1",
+      "level_id": "level_1",
+      "lines": [
+        {
+          "speaker": "Arin",
+          "text": "I remember the route. I remember the rain. Why can't I remember the face?"
+        },
+        {
+          "speaker": "Warden",
+          "text": "Because memory is not the same as a record. Find what was written about you."
+        },
+        {
+          "speaker": "Arin",
+          "text": "Am I dead?"
+        },
+        {
+          "speaker": "Warden",
+          "text": "Your body is. Your unfinished account is not."
+        }
+      ]
+    },
+    {
+      "id": "dlg_level_2",
+      "level_id": "level_2",
+      "lines": [
+        {
+          "speaker": "Marek",
+          "text": "Your route code was on the order. You helped them reach my sister."
+        },
+        {
+          "speaker": "Arin",
+          "text": "I planned deliveries. I never approved that operation."
+        },
+        {
+          "speaker": "Marek",
+          "text": "The contract names you. That's enough."
+        },
+        {
+          "speaker": "Arin",
+          "text": "Then look at the original dispatch sheet. Someone changed the names."
+        },
+        {
+          "speaker": "Marek",
+          "text": "If they lied to me, I still chose what I did. Don't call that justice."
+        }
+      ]
+    },
+    {
+      "id": "dlg_level_3",
+      "level_id": "level_3",
+      "lines": [
+        {
+          "speaker": "Silas",
+          "text": "People call it a maze when they cannot see the pattern."
+        },
+        {
+          "speaker": "Arin",
+          "text": "You wrote the pattern. You changed Marek's contract."
+        },
+        {
+          "speaker": "Silas",
+          "text": "I corrected a useful man's aim. The Warden's rules are older than its conscience."
+        },
+        {
+          "speaker": "Arin",
+          "text": "The proxy clause says the choice must be free."
+        },
+        {
+          "speaker": "Silas",
+          "text": "Correct. A secret is not consent. Remember that when you ask someone to save you."
+        }
+      ]
+    },
+    {
+      "id": "dlg_level_4",
+      "level_id": "level_4",
+      "lines": [
+        {
+          "speaker": "Warden",
+          "text": "A proxy must know the whole record and choose without threat."
+        },
+        {
+          "speaker": "Arin",
+          "text": "If Dev acts, I return?"
+        },
+        {
+          "speaker": "Warden",
+          "text": "If he acts freely to close the forged contract, yes. I cannot make him choose."
+        },
+        {
+          "speaker": "Arin",
+          "text": "Then send him the evidence. Let him decide with the truth this time."
+        }
+      ]
+    },
+    {
+      "id": "dlg_level_5",
+      "level_id": "level_5",
+      "lines": [
+        {
+          "speaker": "Dev",
+          "text": "I told myself I was buying time for my family. Then I saw the ledger and thought I could bury everything."
+        },
+        {
+          "speaker": "Arin",
+          "text": "You could have told me. You could have walked away."
+        },
+        {
+          "speaker": "Dev",
+          "text": "I was afraid you'd expose me with the others. I chose to kill you. That part was mine."
+        },
+        {
+          "speaker": "Arin",
+          "text": "And the fire?"
+        },
+        {
+          "speaker": "Dev",
+          "text": "I tried to burn the records. The door jammed. I died with the truth I was trying to destroy."
+        },
+        {
+          "speaker": "Arin",
+          "text": "The truth goes out. Your choice stays yours."
+        }
+      ]
+    }
+  ]
+}

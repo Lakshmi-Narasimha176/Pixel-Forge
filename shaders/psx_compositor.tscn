@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://psx_compositor"]
+
+[ext_resource type="Shader" path="res://shaders/psx_effect.gdshader" id="1_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMat_1"]
+shader = ExtResource("1_shader")
+shader_parameter/color_depth = 32.0
+shader_parameter/scanline_opacity = 0.2
+shader_parameter/dither_strength = 0.025
+shader_parameter/pixel_scale = 2.0
+
+[node name="PSXCompositor" type="SubViewportContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="PSXOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+material = SubResource("ShaderMat_1")

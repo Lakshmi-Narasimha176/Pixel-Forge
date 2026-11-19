@@ -537,24 +537,6 @@ export class Level1_Awakening extends LevelEventEmitter {
           console.log('[Level1] Blood bag picked up');
         }
         break;
-          this._removeInteractable(target);
-
-          this._showSubtitle('Flashlight acquired. Click to toggle.', 3000);
-          console.log('[Level1] Flashlight picked up');
-        }
-        if (itemName === 'walkieTalkie' && !this.walkieTalkiePickedUp) {
-          this.walkieTalkiePickedUp = true;
-          this.playerInventory.hasWalkieTalkie = true;
-          this.emit('itemPickup', { item: 'walkieTalkie', model: target });
-
-          target.visible = false;
-          this._removeInteractable(target);
-
-          // Play walkie-talkie message
-          this._playWalkieMessage();
-          console.log('[Level1] Walkie-talkie picked up');
-        }
-        break;
 
       case 'examine':
         if (target.userData.assetKey === 'devilsBible') {

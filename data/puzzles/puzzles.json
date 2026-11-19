@@ -1,27 +1,144 @@
 {
+  "schema_version": "1.0",
   "puzzles": [
     {
-      "id": "puzzle_l1_gate",
-      "level": "level_01",
-      "type": "key_and_door",
-      "required_item": "l1_gate_key",
-      "description": "Find the rusty settlement key to open the gate."
+      "id": "puzzle_01",
+      "level_id": "level_1",
+      "name": "The Transit Sequence",
+      "type": "sequence",
+      "objective": "Open the station archive cabinet.",
+      "inputs": [
+        "ticket route code",
+        "watch time",
+        "ledger index"
+      ],
+      "solution": {
+        "steps": [
+          "Read the route code on the ticket.",
+          "Set the cabinet dial to the watch time 0217.",
+          "Enter the route code suffix 17 as confirmation."
+        ],
+        "answer": "0217-17"
+      },
+      "hint": "The ticket tells you where; the watch tells you when.",
+      "failure_feedback": "The archive lock resets. No penalty."
     },
     {
-      "id": "puzzle_l3_traps",
-      "level": "level_03",
-      "type": "multi_switch",
-      "required_switches": 2,
-      "sets_flag": "l3_traps_disabled",
-      "description": "Flip both facility breaker switches to shut down the corridor traps."
+      "id": "puzzle_02",
+      "level_id": "level_2",
+      "name": "The Original Dispatch",
+      "type": "document_order",
+      "objective": "Prove the contract target list was altered.",
+      "inputs": [
+        "Marek contract copy",
+        "original dispatch sheet",
+        "handler amendment"
+      ],
+      "solution": {
+        "steps": [
+          "Place the original dispatch sheet first.",
+          "Compare its target list with Marek's copy.",
+          "Place the handler amendment last to reveal the inserted name."
+        ],
+        "answer": "original -> contract copy -> amendment"
+      },
+      "hint": "Compare dates before comparing names.",
+      "failure_feedback": "The documents return to the desk."
     },
     {
-      "id": "puzzle_l4_anchors",
-      "level": "level_04",
-      "type": "multi_object_activation",
-      "required_switches": 3,
-      "sets_flag": "l4_portal_unlocked",
-      "description": "Align all 3 Soul Anchors to exploit the resurrection loophole."
+      "id": "puzzle_03",
+      "level_id": "level_3",
+      "name": "The False Route",
+      "type": "logic_grid",
+      "objective": "Choose the only safe path through Silas's map room.",
+      "inputs": [
+        "map symbols",
+        "recorded patrol order",
+        "decoy map"
+      ],
+      "solution": {
+        "steps": [
+          "Reject the route marked with the same symbol as the decoy map.",
+          "Follow the patrol order in reverse because the recording is mirrored.",
+          "Take the route whose exit symbol matches the original ledger."
+        ],
+        "answer": "reverse patrol path to ledger-marked exit"
+      },
+      "hint": "The recording is mirrored, not the map.",
+      "failure_feedback": "A harmless trap resets the room."
+    },
+    {
+      "id": "puzzle_04",
+      "level_id": "level_3",
+      "name": "Proxy Clause",
+      "type": "deduction",
+      "objective": "Identify the exact requirements for a valid proxy to perform a contract's remaining final act.",
+      "inputs": [
+        "contract page",
+        "Warden rule index",
+        "Silas notes"
+      ],
+      "solution": {
+        "steps": [
+          "Select full disclosure as mandatory.",
+          "Select voluntary choice as mandatory.",
+          "Reject coercion and hidden information.",
+          "Confirm the proxy action must close the listed contract, not replace its targets."
+        ],
+        "answer": "complete disclosure + free choice + final act against an original named target"
+      },
+      "hint": "Silas's notes explain the rule; they do not override it.",
+      "failure_feedback": "The archive asks you to review the rule index again."
+    },
+    {
+      "id": "puzzle_05",
+      "level_id": "level_4",
+      "name": "The Return Record",
+      "type": "evidence_chain",
+      "objective": "Send Dev the complete evidence needed to make an informed, voluntary choice about Arin's contract.",
+      "inputs": [
+        "original contract",
+        "handler amendment",
+        "dispatch sheet",
+        "proxy clause",
+        "message gate"
+      ],
+      "solution": {
+        "steps": [
+          "Attach the original contract.",
+          "Attach the amendment and dispatch sheet to prove fraud.",
+          "Attach the proxy clause so Dev understands the consequence.",
+          "Send the complete file through the one-way gate."
+        ],
+        "answer": "complete evidence bundle delivered before Dev's voluntary decision"
+      },
+      "hint": "A request without proof is not informed consent.",
+      "failure_feedback": "The message gate refuses incomplete evidence."
+    },
+    {
+      "id": "puzzle_06",
+      "level_id": "level_5",
+      "name": "The Night Reconstructed",
+      "type": "timeline",
+      "objective": "Determine what happened to Arin and Dev.",
+      "inputs": [
+        "02:17 watch",
+        "route ledger",
+        "witness account",
+        "Dev recording",
+        "fire keycard"
+      ],
+      "solution": {
+        "steps": [
+          "Place Arin's murder at 02:17 using the watch and route record.",
+          "Place Dev's evidence-room entry after the murder using the witness account.",
+          "Place the fire and Dev's death after his entry using the keycard and recording.",
+          "Reject the claim that Dev was only an unwilling witness; his confession states he chose to kill Arin."
+        ],
+        "answer": "Dev killed Arin, later tried to destroy the ledger, and died in the evidence-room fire"
+      },
+      "hint": "Separate the murder timeline from the later evidence-room fire.",
+      "failure_feedback": "The timeline board clears without losing collected clues."
     }
   ]
 }
