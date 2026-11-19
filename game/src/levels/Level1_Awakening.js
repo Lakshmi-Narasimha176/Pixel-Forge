@@ -770,7 +770,8 @@ export class Level1_Awakening extends LevelEventEmitter {
     // Calculate direction to player
     const dollPos = new THREE.Vector3();
     this.cursedDollModel.getWorldPosition(dollPos);
-    const playerPos = camera.position.clone();
+    const playerPos = new THREE.Vector3();
+    camera.getWorldPosition(playerPos);
 
     const direction = new THREE.Vector3()
       .subVectors(playerPos, dollPos)
@@ -797,10 +798,12 @@ export class Level1_Awakening extends LevelEventEmitter {
       return;
     }
 
-    this.interactRaycaster.set(
-      camera.position.clone(),
-      new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    );
+    const origin = new THREE.Vector3();
+    camera.getWorldPosition(origin);
+    const dir = new THREE.Vector3(0, 0, -1);
+    camera.getWorldDirection(dir);
+
+    this.interactRaycaster.set(origin, dir);
 
     const intersects = this.interactRaycaster.intersectObjects(
       this.interactables, true
@@ -825,7 +828,7 @@ export class Level1_Awakening extends LevelEventEmitter {
    * @returns {THREE.Vector3}
    */
   getSpawnPoint() {
-    return new THREE.Vector3(0, 1.6, 3);
+    return new THREE.Vector3(0, 1.6, 2.0);
   }
 
   /**

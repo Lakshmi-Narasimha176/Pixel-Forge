@@ -65,8 +65,9 @@ export class LevelManager extends EventEmitter {
    * @param {THREE.Scene} scene - The main Three.js scene
    * @param {object} assetLoader - AssetLoader instance for loading GLB models
    * @param {object} [audioManager] - AudioManager instance for level audio
+   * @param {object} [physics] - Physics instance
    */
-  constructor(scene, assetLoader, audioManager = null) {
+  constructor(scene, assetLoader, audioManager = null, physics = null) {
     super();
 
     /** @type {THREE.Scene} */
@@ -77,6 +78,9 @@ export class LevelManager extends EventEmitter {
 
     /** @type {object|null} */
     this.audioManager = audioManager;
+
+    /** @type {object|null} */
+    this.physics = physics;
 
     /** @type {LevelState} */
     this.state = 'IDLE';
@@ -303,6 +307,7 @@ export class LevelManager extends EventEmitter {
       // Pass shared state
       level.playerInventory = this.playerInventory;
       level.levelManager = this;
+      level.physics = this.physics;
 
       // Listen for level events
       this._bindLevelEvents(level);
@@ -436,6 +441,9 @@ export class LevelManager extends EventEmitter {
         break;
       case 'walkieTalkie':
         this.playerInventory.hasWalkieTalkie = true;
+        break;
+      case 'bloodBag':
+        this.playerInventory.hasBloodBag = true;
         break;
       case 'baseballBat':
         this.playerInventory.hasBaseballBat = true;

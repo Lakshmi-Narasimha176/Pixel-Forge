@@ -108,7 +108,8 @@ export class HorrorRenderer {
       antialias: false,
       powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const dpr = Math.min(window.devicePixelRatio, 2);
+    this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -121,10 +122,12 @@ export class HorrorRenderer {
     /** @type {HTMLCanvasElement} */
     this.canvas = this.renderer.domElement;
 
-    // ── Render target for scene pass (use logical pixels, not physical) ──
+    // ── Render target for scene pass ──
+    const rtW = Math.floor(window.innerWidth * dpr);
+    const rtH = Math.floor(window.innerHeight * dpr);
     this._rt = new THREE.WebGLRenderTarget(
-      window.innerWidth,
-      window.innerHeight,
+      rtW,
+      rtH,
       { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, colorSpace: THREE.SRGBColorSpace }
     );
 
@@ -234,11 +237,12 @@ export class HorrorRenderer {
 
   /** @private */
   _onResize() {
+    const dpr = Math.min(window.devicePixelRatio, 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
 
     this.renderer.setSize(w, h);
-    this._rt.setSize(w, h);
-    this._postMaterial.uniforms.uResolution.value.set(w, h);
+    this._rt.setSize(Math.floor(w * dpr), Math.floor(h * dpr));
+    this._postMaterial.uniforms.uResolution.value.set(w * dpr, h * dpr);
   }
 }

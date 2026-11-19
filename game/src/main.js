@@ -73,7 +73,7 @@ const lighting       = new LightingSystem(scene, camera);
 const inventory      = new Inventory();
 const horrorEffects  = new HorrorEffects({ camera, audioManager });
 const hud            = new HUD({ inventory, horrorEffects });
-const levelManager   = new LevelManager(scene, assetLoader, audioManager);
+const levelManager   = new LevelManager(scene, assetLoader, audioManager, physics);
 
 let gameStarted = false;
 let isPaused = false;
@@ -306,6 +306,9 @@ levelManager.on('inventoryUpdate', (inv) => {
   if (inv.hasWalkieTalkie && !inventory.hasItem(ItemType.WALKIE_TALKIE)) {
     inventory.addItem(ItemType.WALKIE_TALKIE);
   }
+  if (inv.hasBloodBag && !inventory.hasItem(ItemType.BLOOD_BAG)) {
+    inventory.addItem(ItemType.BLOOD_BAG);
+  }
   if (inv.hasBaseballBat && !inventory.hasItem(ItemType.BASEBALL_BAT)) {
     inventory.addItem(ItemType.BASEBALL_BAT);
   }
@@ -339,6 +342,9 @@ async function startNewGame() {
 
   const spawn = levelManager.getSpawnPoint();
   if (spawn) controls.yaw.position.copy(spawn);
+
+  controls.lock();
+  hud.showSubtitle("Click anywhere to lock mouse view. [WASD] to move, [E] to interact.", 5000);
 }
 
 async function restartCurrentGame() {
@@ -434,8 +440,8 @@ async function boot() {
   // Show Horror Main Menu
   menuSystem.showMain();
 
-  // Click canvas to resume pointer lock during gameplay
-  canvas.addEventListener('click', () => {
+  // Click anywhere to lock pointer during gameplay
+  window.addEventListener('click', () => {
     if (gameStarted && !isPaused && menuSystem.activeScreen === 'none' && !controls.isLocked) {
       controls.lock();
     }
