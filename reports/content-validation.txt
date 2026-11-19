@@ -1,9 +1,19 @@
 CONTENT JSON VALIDATION
-RESULT: FAIL
-CHECKS: 32/34 passed
+RESULT: PASS
+CHECKS: 44/44 passed
 
-[FAIL] JSON syntax: data/characters/characters.json: Expecting value: line 1 column 1 (char 0)
-[FAIL] JSON syntax: data/puzzles/puzzles.json: Expecting value: line 1 column 1 (char 0)
+[PASS] JSON syntax: data/characters/characters.json: valid UTF-8 JSON
+[PASS] Unique id: data/characters/characters.json:$[0]: char_01_protagonist
+[PASS] Unique id: data/characters/characters.json:$[1]: char_02_butcher
+[PASS] Unique id: data/characters/characters.json:$[2]: char_03_strategist
+[PASS] Unique id: data/characters/characters.json:$[3]: char_04_horror_woman
+[PASS] Unique id: data/characters/characters.json:$[4]: char_05_betrayer
+[PASS] JSON syntax: data/puzzles/puzzles.json: valid UTF-8 JSON
+[PASS] Unique id: data/puzzles/puzzles.json:$[0]: puz_01_cell_gate
+[PASS] Unique id: data/puzzles/puzzles.json:$[1]: puz_02_slaughter_keycard
+[PASS] Unique id: data/puzzles/puzzles.json:$[2]: puz_03_generator_breakers
+[PASS] Unique id: data/puzzles/puzzles.json:$[3]: puz_04_witching_clock
+[PASS] Unique id: data/puzzles/puzzles.json:$[4]: puz_05_portal_seal
 [PASS] JSON syntax: data/story/dialogue.json: valid UTF-8 JSON
 [PASS] Unique id: data/story/dialogue.json:$.dialogue[0]: dlg_l1_walkie
 [PASS] Unique id: data/story/dialogue.json:$.dialogue[1]: dlg_l3_strategist

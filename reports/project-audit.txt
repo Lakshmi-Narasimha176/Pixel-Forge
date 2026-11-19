@@ -5,7 +5,7 @@ CHECKS: 7/7 passed
 [PASS] Project directory exists: /Users/malikarjunr/Pixel-Forge
 [PASS] Engine detected: Godot: project.godot found
 [PASS] Godot configuration: project.godot present
-[PASS] Optional Godot folder: scenes: not present (not required)
-[PASS] Optional Godot folder: scripts: not present (not required)
+[PASS] Optional Godot folder: scenes: present
+[PASS] Optional Godot folder: scripts: present
 [PASS] Optional Godot folder: assets: not present (not required)
 [PASS] Project type: Godot
