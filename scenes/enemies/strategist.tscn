@@ -1,13 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://bqdt3x6450eg1"]
 
-[ext_resource type="Script" path="res://scripts/enemies/strategist_boss.gd" id="1_enemy"]
-[ext_resource type="PackedScene" path="res://horror_ghost_character_-_blood_stained_spirit.glb" id="2_model"]
+[ext_resource type="Script" uid="uid://b6oxebsqypumq" path="res://scripts/enemies/strategist_boss.gd" id="1_enemy"]
+[ext_resource type="PackedScene" uid="uid://ch0yds72ka1ey" path="res://assets/horror_ghost_character_-_blood_stained_spirit.glb" id="2_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_strat"]
 radius = 0.45
 height = 1.9
 
-[node name="Strategist" type="CharacterBody3D"]
+[node name="Strategist" type="CharacterBody3D" unique_id=78536569]
 script = ExtResource("1_enemy")
 enemy_name = "The Strategist"
 max_health = 125
@@ -16,16 +16,15 @@ attack_damage = 22
 detect_range = 16.0
 attack_range = 2.2
 ranged_attack = true
-ranged_attack_range = 13.0
-attack_windup = 0.8
 attack_cooldown = 1.1
+attack_windup = 0.8
 death_objective_id = "l3_obj_kill_strategist"
 death_flag = "strategist_defeated"
 boss_defeat_line = "The Strategist collapses: 'You think dying was an accident? Look at the rift...'"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=958642287]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 shape = SubResource("CapsuleShape3D_strat")
 
-[node name="Model" parent="." instance=ExtResource("2_model")]
+[node name="Model" parent="." unique_id=119712095 instance=ExtResource("2_model")]
 transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 0, 0, 0)

@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dbci0quxmuq2c"]
 
-[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_mm"]
+[ext_resource type="Script" uid="uid://cbnycfp1k6kxo" path="res://scripts/ui/main_menu.gd" id="1_mm"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=667485486]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,54 +11,57 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mm")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1142732205]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.04, 0.03, 0.04, 1)
 
-[node name="CenterBox" type="CenterContainer" parent="."]
+[node name="CenterBox" type="CenterContainer" parent="." unique_id=1234917416]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+[node name="VBox" type="VBoxContainer" parent="CenterBox" unique_id=1616739137]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="TitleLabel" type="Label" parent="CenterBox/VBox"]
+[node name="TitleLabel" type="Label" parent="CenterBox/VBox" unique_id=643420639]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.14, 0.14, 1)
-theme_override_font_size = 42
 text = "LONG LASTING REVENGE"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="CenterBox/VBox"]
+[node name="SubtitleLabel" type="Label" parent="CenterBox/VBox" unique_id=1516651844]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.68, 0.72, 1)
 text = "THE DEAD REMEMBER. THE LEDGER KEEPS SCORE."
 horizontal_alignment = 1
 
-[node name="NewGameBtn" type="Button" parent="CenterBox/VBox"]
+[node name="NewGameBtn" type="Button" parent="CenterBox/VBox" unique_id=1279726233]
 layout_mode = 2
 text = "New Game"
 
-[node name="ContinueBtn" type="Button" parent="CenterBox/VBox"]
+[node name="ContinueBtn" type="Button" parent="CenterBox/VBox" unique_id=952518892]
 layout_mode = 2
 text = "Continue"
 
-[node name="SettingsBtn" type="Button" parent="CenterBox/VBox"]
+[node name="SettingsBtn" type="Button" parent="CenterBox/VBox" unique_id=780758975]
 layout_mode = 2
 text = "Settings"
 
-[node name="QuitBtn" type="Button" parent="CenterBox/VBox"]
+[node name="QuitBtn" type="Button" parent="CenterBox/VBox" unique_id=722674460]
 layout_mode = 2
 text = "Quit"
 
-[node name="SettingsPanel" type="PanelContainer" parent="."]
+[node name="SettingsPanel" type="PanelContainer" parent="." unique_id=1495669503]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -70,37 +73,39 @@ offset_left = -180.0
 offset_top = -120.0
 offset_right = 180.0
 offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="SettingsPanel"]
+[node name="VBox" type="VBoxContainer" parent="SettingsPanel" unique_id=1065179271]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" type="Label" parent="SettingsPanel/VBox"]
+[node name="Header" type="Label" parent="SettingsPanel/VBox" unique_id=372536448]
 layout_mode = 2
 text = "Settings"
 horizontal_alignment = 1
 
-[node name="SensLabel" type="Label" parent="SettingsPanel/VBox"]
+[node name="SensLabel" type="Label" parent="SettingsPanel/VBox" unique_id=1794154249]
 layout_mode = 2
 text = "Mouse Sensitivity"
 
-[node name="SensSlider" type="HSlider" parent="SettingsPanel/VBox"]
+[node name="SensSlider" type="HSlider" parent="SettingsPanel/VBox" unique_id=733247649]
 layout_mode = 2
 min_value = 0.5
 max_value = 8.0
 step = 0.25
 value = 2.5
 
-[node name="VolLabel" type="Label" parent="SettingsPanel/VBox"]
+[node name="VolLabel" type="Label" parent="SettingsPanel/VBox" unique_id=1407074067]
 layout_mode = 2
 text = "Master Volume"
 
-[node name="VolSlider" type="HSlider" parent="SettingsPanel/VBox"]
+[node name="VolSlider" type="HSlider" parent="SettingsPanel/VBox" unique_id=1798908956]
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 value = 0.8
 
-[node name="CloseSettingsBtn" type="Button" parent="SettingsPanel/VBox"]
+[node name="CloseSettingsBtn" type="Button" parent="SettingsPanel/VBox" unique_id=1714729626]
 layout_mode = 2
 text = "Close"

@@ -1,6 +1,6 @@
 # Test report — LONG LASTING REVENGE
 
-**Date:** 2026-11-19  
+**Date:** 2026-11-20  
 **Engine:** Godot 4.7.2 stable, Windows x64  
 **Renderer:** GL Compatibility  
 **Offline mode:** No network calls are used by the game.
@@ -10,7 +10,7 @@
 | Check | Result | Notes |
 |---|---|---|
 | Godot editor scan | PASS | Project and GDScript class scan completed. |
-| Headless scene smoke check | PASS | Menu, prologue, five levels and ending loaded and entered `_ready()` (8 scenes). |
+| Headless scene smoke check | PASS | 15 game/support scenes loaded and entered `_ready()` with the campaign autoloads active. |
 | Content JSON validation | PASS | 48/48 checks. |
 | Godot project audit | PASS | 7/7 checks. |
 | Windows export | NOT RUN | Matching export templates were not present in the local Godot data folder. |

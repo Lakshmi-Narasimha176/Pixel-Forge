@@ -1,54 +1,57 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dvnddhhcbyjij"]
 
-[ext_resource type="Script" path="res://scripts/ui/prologue.gd" id="1_prologue"]
+[ext_resource type="Script" uid="uid://djk66k1blua0y" path="res://scripts/ui/prologue.gd" id="1_prologue"]
 
-[node name="Prologue" type="Control"]
+[node name="Prologue" type="Control" unique_id=1046214170]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_prologue")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=407100484]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.012, 0.008, 0.012, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Center" type="CenterContainer" parent="." unique_id=1134532880]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Center"]
+[node name="VBox" type="VBoxContainer" parent="Center" unique_id=425531538]
 custom_minimum_size = Vector2(720, 0)
 layout_mode = 2
 theme_override_constants/separation = 26
 
-[node name="TitleLabel" type="Label" parent="Center/VBox"]
+[node name="TitleLabel" type="Label" parent="Center/VBox" unique_id=1057060485]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.1, 0.11, 1)
-theme_override_font_size = 34
 text = "LONG LASTING REVENGE"
 horizontal_alignment = 1
 
-[node name="ChapterLabel" type="Label" parent="Center/VBox"]
+[node name="ChapterLabel" type="Label" parent="Center/VBox" unique_id=393071583]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.67, 0.62, 1)
-theme_override_font_size = 18
 horizontal_alignment = 1
 
-[node name="StoryLabel" type="Label" parent="Center/VBox"]
+[node name="StoryLabel" type="Label" parent="Center/VBox" unique_id=200215792]
 custom_minimum_size = Vector2(700, 130)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.85, 0.82, 1)
-theme_override_font_size = 24
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="SkipButton" type="Button" parent="Center/VBox"]
+[node name="SkipButton" type="Button" parent="Center/VBox" unique_id=1701539083]
 layout_mode = 2
 text = "Continue  |  Press any key to skip"

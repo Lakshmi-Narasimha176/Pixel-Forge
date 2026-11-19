@@ -1,16 +1,16 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://dh4ugrj1aa6dq"]
 
-[ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
+[ext_resource type="Script" uid="uid://ck8cqli3n3hk8" path="res://scripts/systems/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
-[ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="4_door"]
-[ext_resource type="Script" path="res://scripts/systems/checkpoint_zone.gd" id="5_cp"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/butcher.tscn" id="6_butcher"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/lost_soul.tscn" id="11_soul"]
-[ext_resource type="PackedScene" path="res://baseball_bat_covered_in_blood.glb" id="7_bat"]
-[ext_resource type="PackedScene" path="res://blood_bag.glb" id="8_blood"]
-[ext_resource type="PackedScene" path="res://dead_pig.glb" id="9_pig"]
-[ext_resource type="PackedScene" path="res://psx_raw_meat_pack__low-poly_2_types.glb" id="10_meat"]
+[ext_resource type="Script" uid="uid://3i0wi8ja683j" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
+[ext_resource type="Script" uid="uid://cyarhu70r2pd6" path="res://scripts/interaction/locked_door.gd" id="4_door"]
+[ext_resource type="Script" uid="uid://cxx6bx81x7gsv" path="res://scripts/systems/checkpoint_zone.gd" id="5_cp"]
+[ext_resource type="PackedScene" uid="uid://csarsaka11g4" path="res://scenes/enemies/butcher.tscn" id="6_butcher"]
+[ext_resource type="PackedScene" uid="uid://oxhoyyt62jhn" path="res://assets/baseball_bat_covered_in_blood.glb" id="7_bat"]
+[ext_resource type="PackedScene" uid="uid://bijupk17fawm" path="res://assets/blood_bag.glb" id="8_blood"]
+[ext_resource type="PackedScene" uid="uid://b1xi21w6vxoa1" path="res://assets/dead_pig.glb" id="9_pig"]
+[ext_resource type="PackedScene" uid="uid://cx5gnluoi6v6p" path="res://assets/psx_raw_meat_pack__low-poly_2_types.glb" id="10_meat"]
+[ext_resource type="PackedScene" uid="uid://ds63vp4a6r7ks" path="res://scenes/enemies/lost_soul.tscn" id="11_soul"]
 
 [sub_resource type="Environment" id="Environment_l2"]
 background_mode = 1
@@ -40,183 +40,181 @@ size = Vector3(0.45, 0.15, 0.35)
 size = Vector3(6, 3, 2)
 
 [sub_resource type="BoxShape3D" id="BoxShape_door"]
-size = Vector3(2.2, 3.0, 0.8)
+size = Vector3(2.2, 3, 0.8)
 
 [sub_resource type="BoxMesh" id="BoxMesh_door"]
-size = Vector3(2.0, 2.8, 0.25)
+size = Vector3(2, 2.8, 0.25)
 
-[node name="Level02_Butcher" type="Node3D"]
+[node name="Level02_Butcher" type="Node3D" unique_id=756802962]
 script = ExtResource("1_lvl")
 level_id = "level_02"
 level_title = "Level 2: The Butcher"
 intro_subtitle = "Butcher's Territory. He came for the contract; someone else chose your name."
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1958423496]
 environment = SubResource("Environment_l2")
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=1054607526]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 14)
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=371391838 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 14)
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=1526100430]
 
-[node name="Floor" type="CSGBox3D" parent="Geometry"]
+[node name="Floor" type="CSGBox3D" parent="Geometry" unique_id=1102491717]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(28, 1, 36)
 material = SubResource("Mat_floor")
 
-[node name="WallNorth" type="CSGBox3D" parent="Geometry"]
+[node name="WallNorth" type="CSGBox3D" parent="Geometry" unique_id=1439288591]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -18)
 use_collision = true
 size = Vector3(28, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="WallSouth" type="CSGBox3D" parent="Geometry"]
+[node name="WallSouth" type="CSGBox3D" parent="Geometry" unique_id=307671783]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 18)
 use_collision = true
 size = Vector3(28, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="WallEast" type="CSGBox3D" parent="Geometry"]
+[node name="WallEast" type="CSGBox3D" parent="Geometry" unique_id=2092808031]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2.5, 0)
 use_collision = true
 size = Vector3(1, 6, 36)
 material = SubResource("Mat_wall")
 
-[node name="WallWest" type="CSGBox3D" parent="Geometry"]
+[node name="WallWest" type="CSGBox3D" parent="Geometry" unique_id=2002683625]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2.5, 0)
 use_collision = true
 size = Vector3(1, 6, 36)
 material = SubResource("Mat_wall")
 
-[node name="PillarL" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.0, -4)
+[node name="PillarL" type="CSGBox3D" parent="Geometry" unique_id=1084540731]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, -4)
 use_collision = true
 size = Vector3(1.5, 5, 1.5)
 material = SubResource("Mat_wall")
 
-[node name="PillarR" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.0, -4)
+[node name="PillarR" type="CSGBox3D" parent="Geometry" unique_id=1332686878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, -4)
 use_collision = true
 size = Vector3(1.5, 5, 1.5)
 material = SubResource("Mat_wall")
 
-[node name="DeadPig" parent="Geometry" instance=ExtResource("9_pig")]
+[node name="DeadPig" parent="Geometry" unique_id=1360632801 instance=ExtResource("9_pig")]
 transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -9, 0.6, 2)
 
-[node name="RawMeat" parent="Geometry" instance=ExtResource("10_meat")]
+[node name="RawMeat" parent="Geometry" unique_id=727564064 instance=ExtResource("10_meat")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.4, 5)
 
-[node name="Lights" type="Node3D" parent="."]
+[node name="Lights" type="Node3D" parent="." unique_id=1144323985]
 
-[node name="MeatLight1" type="OmniLight3D" parent="Lights"]
+[node name="MeatLight1" type="OmniLight3D" parent="Lights" unique_id=271109039]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 9)
 light_color = Color(0.9, 0.25, 0.2, 1)
 light_energy = 1.8
 omni_range = 14.0
 
-[node name="MeatLight2" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, -6)
+[node name="MeatLight2" type="OmniLight3D" parent="Lights" unique_id=1910819433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -6)
 light_color = Color(0.95, 0.2, 0.18, 1)
 light_energy = 2.0
 omni_range = 16.0
 
-[node name="Interactables" type="Node3D" parent="."]
+[node name="Interactables" type="Node3D" parent="." unique_id=100077673]
 
-[node name="BaseballBat" type="Area3D" parent="Interactables"]
+[node name="BaseballBat" type="Area3D" parent="Interactables" unique_id=1466220830]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.8, 10)
 script = ExtResource("3_pickup")
-prompt_label = "Equip Bloodied Baseball Bat"
 pickup_type = "weapon"
-weapon_id = "bat"
 item_id = "l2_bat"
 objective_id = "l2_obj_weapon"
+weapon_id = "bat"
 subtitle_speaker = "Combat"
 subtitle_text = "The Ironwood Bat hits hard. Mouse wheel or Tab changes weapons; left click attacks."
+prompt_label = "Equip Bloodied Baseball Bat"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BaseballBat"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BaseballBat" unique_id=2032621216]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Model" parent="Interactables/BaseballBat" instance=ExtResource("7_bat")]
+[node name="Model" parent="Interactables/BaseballBat" unique_id=749894574 instance=ExtResource("7_bat")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
 
-[node name="EvidenceNote" type="Area3D" parent="Interactables"]
+[node name="EvidenceNote" type="Area3D" parent="Interactables" unique_id=1141130269]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.9, 6)
 script = ExtResource("3_pickup")
-prompt_label = "Inspect Butcher's Shipment Evidence"
 pickup_type = "evidence"
 item_id = "l2_evidence"
 objective_id = "l2_obj_evidence"
 subtitle_speaker = "Evidence"
 subtitle_text = "A contract marked by your friend's initials: the Strategist planned your death as a controlled entry into the Ledger."
+prompt_label = "Inspect Butcher's Shipment Evidence"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/EvidenceNote"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/EvidenceNote" unique_id=1754094628]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/EvidenceNote"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/EvidenceNote" unique_id=2126345086]
 mesh = SubResource("BoxMesh_note")
 
-[node name="PistolAmmo" type="Area3D" parent="Interactables"]
+[node name="PistolAmmo" type="Area3D" parent="Interactables" unique_id=1194080893]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.8, -2)
 script = ExtResource("3_pickup")
-prompt_label = "Take Pistol Ammunition"
 pickup_type = "ammo"
 item_id = "l2_pistol_ammo"
-ammo_weapon = "pistol"
-ammo_amount = 24
 subtitle_speaker = "System"
 subtitle_text = "Pistol ammunition recovered (+24)."
+prompt_label = "Take Pistol Ammunition"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/PistolAmmo"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/PistolAmmo" unique_id=1179530844]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/PistolAmmo"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/PistolAmmo" unique_id=2108388874]
 mesh = SubResource("BoxMesh_note")
 
-[node name="BloodBag" type="Area3D" parent="Interactables"]
+[node name="BloodBag" type="Area3D" parent="Interactables" unique_id=267980687]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.8, -1)
 script = ExtResource("3_pickup")
-prompt_label = "Take Blood Bag"
 pickup_type = "blood_bag"
 item_id = "l2_blood_bag"
 subtitle_speaker = "System"
 subtitle_text = "Collected Blood Bag (+1)."
+prompt_label = "Take Blood Bag"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag" unique_id=142653164]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Model" parent="Interactables/BloodBag" instance=ExtResource("8_blood")]
+[node name="Model" parent="Interactables/BloodBag" unique_id=940204098 instance=ExtResource("8_blood")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
 
-[node name="ArenaCheckpoint" type="Area3D" parent="Interactables"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 2)
+[node name="ArenaCheckpoint" type="Area3D" parent="Interactables" unique_id=900170496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
 script = ExtResource("5_cp")
 checkpoint_name = "Slaughterhouse Arena"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ArenaCheckpoint"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ArenaCheckpoint" unique_id=221953430]
 shape = SubResource("BoxShape_cp")
 
-[node name="ExitHatch" type="Area3D" parent="Interactables"]
+[node name="ExitHatch" type="Area3D" parent="Interactables" unique_id=505677968]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -17)
 script = ExtResource("4_door")
-prompt_label = "Descend to Bunker (Level 3)"
 next_level_id = "level_03"
 required_item_id = "l2_bunker_keycard"
 required_flag = "butcher_defeated"
 objective_id = "l2_obj_exit"
 locked_message = "Locked. Defeat The Butcher to take the Bunker Keycard."
+prompt_label = "Descend to Bunker (Level 3)"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ExitHatch"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ExitHatch" unique_id=784159669]
 shape = SubResource("BoxShape_door")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/ExitHatch"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/ExitHatch" unique_id=1637234159]
 mesh = SubResource("BoxMesh_door")
 
-[node name="Butcher" parent="." instance=ExtResource("6_butcher")]
+[node name="Butcher" parent="." unique_id=477400595 instance=ExtResource("6_butcher")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -9)
 
-[node name="LostSoul" parent="." instance=ExtResource("11_soul")]
+[node name="LostSoul" parent="." unique_id=1958174303 instance=ExtResource("11_soul")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.15, -5)

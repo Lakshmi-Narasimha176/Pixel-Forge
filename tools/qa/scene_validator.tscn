@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://1kwvj35b54p1"]
 
-[ext_resource type="Script" path="res://tools/qa/scene_validator.gd" id="1_runner"]
+[ext_resource type="Script" uid="uid://eq1ibet5qie0" path="res://tools/qa/scene_validator.gd" id="1_runner"]
 
-[node name="SceneValidator" type="Node"]
+[node name="SceneValidator" type="Node" unique_id=677965887]
 script = ExtResource("1_runner")

@@ -14,7 +14,7 @@
 ## Validation
 
 - Godot 4.7.2 editor filesystem scan completed.
-- Headless smoke check loaded and entered `_ready()` for the menu, prologue, all five level scenes and ending.
+- Headless smoke check loaded and entered `_ready()` for all 15 game/support scenes with campaign autoloads active.
 - JSON validation: 48/48 checks passed.
 - Godot project marker audit: 7/7 checks passed.
 

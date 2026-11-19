@@ -1,14 +1,14 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://cm4jvx0wruwu4"]
 
-[ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
+[ext_resource type="Script" uid="uid://ck8cqli3n3hk8" path="res://scripts/systems/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
-[ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="4_door"]
-[ext_resource type="Script" path="res://scripts/systems/checkpoint_zone.gd" id="5_cp"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/betrayer.tscn" id="6_betrayer"]
-[ext_resource type="PackedScene" path="res://blood_bag.glb" id="7_blood"]
-[ext_resource type="PackedScene" path="res://old_rusty_ceiling_fan.glb" id="8_fan"]
-[ext_resource type="PackedScene" path="res://abandoned_horror_wall_with_blood_splatter.glb" id="9_bloodwall"]
+[ext_resource type="Script" uid="uid://3i0wi8ja683j" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
+[ext_resource type="Script" uid="uid://cyarhu70r2pd6" path="res://scripts/interaction/locked_door.gd" id="4_door"]
+[ext_resource type="Script" uid="uid://cxx6bx81x7gsv" path="res://scripts/systems/checkpoint_zone.gd" id="5_cp"]
+[ext_resource type="PackedScene" uid="uid://b0ysd3kno0832" path="res://scenes/enemies/betrayer.tscn" id="6_betrayer"]
+[ext_resource type="PackedScene" uid="uid://bijupk17fawm" path="res://assets/blood_bag.glb" id="7_blood"]
+[ext_resource type="PackedScene" uid="uid://bv1gkknuux3kp" path="res://assets/old_rusty_ceiling_fan.glb" id="8_fan"]
+[ext_resource type="PackedScene" uid="uid://jo8b3fexffim" path="res://assets/abandoned_horror_wall_with_blood_splatter.glb" id="9_bloodwall"]
 
 [sub_resource type="Environment" id="Environment_l5"]
 background_mode = 1
@@ -41,163 +41,163 @@ size = Vector3(6, 3, 2)
 size = Vector3(2.4, 3.2, 0.8)
 
 [sub_resource type="BoxMesh" id="BoxMesh_door"]
-size = Vector3(2.2, 3.0, 0.25)
+size = Vector3(2.2, 3, 0.25)
 
-[node name="Level05_Betrayer" type="Node3D"]
+[node name="Level05_Betrayer" type="Node3D" unique_id=946443349]
 script = ExtResource("1_lvl")
 level_id = "level_05"
 level_title = "Level 5: The Betrayer"
 intro_subtitle = "The Ledger returned you to life, but your tether followed. Your old home bleeds into a memory maze; find the truth, then choose your revenge."
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1174375424]
 environment = SubResource("Environment_l5")
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=197693280]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 15)
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=924984966 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 15)
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=1674057872]
 
-[node name="Floor" type="CSGBox3D" parent="Geometry"]
+[node name="Floor" type="CSGBox3D" parent="Geometry" unique_id=2103047719]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(30, 1, 38)
 material = SubResource("Mat_floor")
 
-[node name="WallNorth" type="CSGBox3D" parent="Geometry"]
+[node name="WallNorth" type="CSGBox3D" parent="Geometry" unique_id=1199394397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -19)
 use_collision = true
 size = Vector3(30, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="WallSouth" type="CSGBox3D" parent="Geometry"]
+[node name="WallSouth" type="CSGBox3D" parent="Geometry" unique_id=1694975174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 19)
 use_collision = true
 size = Vector3(30, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="WallEast" type="CSGBox3D" parent="Geometry"]
+[node name="WallEast" type="CSGBox3D" parent="Geometry" unique_id=900949233]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.5, 0)
 use_collision = true
 size = Vector3(1, 6, 38)
 material = SubResource("Mat_wall")
 
-[node name="WallWest" type="CSGBox3D" parent="Geometry"]
+[node name="WallWest" type="CSGBox3D" parent="Geometry" unique_id=1234627491]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.5, 0)
 use_collision = true
 size = Vector3(1, 6, 38)
 material = SubResource("Mat_wall")
 
-[node name="CeilingFan" parent="Geometry" instance=ExtResource("8_fan")]
+[node name="CeilingFan" parent="Geometry" unique_id=236123789 instance=ExtResource("8_fan")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
 
-[node name="BloodWall" parent="Geometry" instance=ExtResource("9_bloodwall")]
+[node name="BloodWall" parent="Geometry" unique_id=1701819827 instance=ExtResource("9_bloodwall")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -2)
 
-[node name="Lights" type="Node3D" parent="."]
+[node name="Lights" type="Node3D" parent="." unique_id=105054110]
 
-[node name="MansionLight1" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 10)
+[node name="MansionLight1" type="OmniLight3D" parent="Lights" unique_id=339954653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 10)
 light_color = Color(0.95, 0.65, 0.35, 1)
 light_energy = 1.6
 omni_range = 15.0
 
-[node name="MansionLight2" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, -8)
+[node name="MansionLight2" type="OmniLight3D" parent="Lights" unique_id=1082198945]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -8)
 light_color = Color(0.9, 0.25, 0.25, 1)
 light_energy = 1.8
 omni_range = 18.0
 
-[node name="Interactables" type="Node3D" parent="."]
+[node name="Interactables" type="Node3D" parent="." unique_id=1251481521]
 
-[node name="MemoryFragment" type="Area3D" parent="Interactables"]
+[node name="MemoryFragment" type="Area3D" parent="Interactables" unique_id=381033549]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.9, 10)
 script = ExtResource("3_pickup")
-prompt_label = "Examine Memory Fragment"
 pickup_type = "memory"
 item_id = "l5_memory"
 objective_id = "l5_obj_memory"
 subtitle_speaker = "Memory"
 subtitle_text = "A memory returns: your friend knew the Ledger would claim you. He killed you deliberately to force a controlled crossing and keep the hidden force from taking your soul. He never asked you."
+prompt_label = "Examine Memory Fragment"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryFragment"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryFragment" unique_id=1102272632]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/MemoryFragment"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/MemoryFragment" unique_id=1539408989]
 mesh = SubResource("BoxMesh_note")
 
-[node name="BetrayalConfession" type="Area3D" parent="Interactables"]
+[node name="BetrayalConfession" type="Area3D" parent="Interactables" unique_id=1695120311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.9, 6)
 script = ExtResource("3_pickup")
-prompt_label = "Read Final Confession"
 pickup_type = "evidence"
 item_id = "l5_confession"
 objective_id = "l5_obj_betrayal_proof"
 subtitle_speaker = "Confession"
 subtitle_text = "'I knew what the Ledger would do to you. I chose a controlled death so you could enter the dead world and break its claim. I killed you without your consent, then hid behind the lie that it was protection. The contract tethered us both. I did it for you, and because I was afraid to die too. I cannot ask you to forgive me.'"
+prompt_label = "Read Final Confession"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalConfession"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalConfession" unique_id=1140626892]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/BetrayalConfession"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/BetrayalConfession" unique_id=77226739]
 mesh = SubResource("BoxMesh_note")
 
-[node name="BloodBag" type="Area3D" parent="Interactables"]
+[node name="BloodBag" type="Area3D" parent="Interactables" unique_id=888484908]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.8, 3)
 script = ExtResource("3_pickup")
-prompt_label = "Take Blood Bag"
 pickup_type = "blood_bag"
 item_id = "l5_blood_bag"
 subtitle_speaker = "System"
 subtitle_text = "Collected Blood Bag (+1)."
+prompt_label = "Take Blood Bag"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag" unique_id=1966487656]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Model" parent="Interactables/BloodBag" instance=ExtResource("7_blood")]
+[node name="Model" parent="Interactables/BloodBag" unique_id=2065857715 instance=ExtResource("7_blood")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
 
-[node name="MemoryShotgun" type="Area3D" parent="Interactables"]
+[node name="MemoryShotgun" type="Area3D" parent="Interactables" unique_id=41336074]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.9, 9)
 script = ExtResource("3_pickup")
-prompt_label = "Take Memory Shotgun"
 pickup_type = "weapon"
 item_id = "l5_shotgun"
 weapon_id = "shotgun"
 subtitle_speaker = "The Returned"
 subtitle_text = "A pump shotgun. Six close-range rounds, with spare shells nearby."
+prompt_label = "Take Memory Shotgun"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryShotgun"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryShotgun" unique_id=569048841]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/MemoryShotgun"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/MemoryShotgun" unique_id=1502958504]
 mesh = SubResource("BoxMesh_note")
 
-[node name="FinalCheckpoint" type="Area3D" parent="Interactables"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 1)
+[node name="FinalCheckpoint" type="Area3D" parent="Interactables" unique_id=1846758365]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1)
 script = ExtResource("5_cp")
 checkpoint_name = "Mansion Hall"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/FinalCheckpoint"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/FinalCheckpoint" unique_id=570030921]
 shape = SubResource("BoxShape_cp")
 
-[node name="DawnSanctuaryDoor" type="Area3D" parent="Interactables"]
+[node name="DawnSanctuaryDoor" type="Area3D" parent="Interactables" unique_id=202237798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -18)
 script = ExtResource("4_door")
-prompt_label = "Step into Dawn Sanctuary (Ending)"
 next_level_id = "ending"
 required_flag = "betrayer_defeated"
 require_all_objectives = true
 objective_id = "l5_obj_ending"
 locked_message = "Locked. Uncover the betrayal and defeat The Betrayer."
+prompt_label = "Step into Dawn Sanctuary (Ending)"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DawnSanctuaryDoor"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DawnSanctuaryDoor" unique_id=1371163430]
 shape = SubResource("BoxShape_door")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/DawnSanctuaryDoor"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/DawnSanctuaryDoor" unique_id=1266386755]
 mesh = SubResource("BoxMesh_door")
 
-[node name="Betrayer" parent="." instance=ExtResource("6_betrayer")]
+[node name="Betrayer" parent="." unique_id=265977834 instance=ExtResource("6_betrayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -10)

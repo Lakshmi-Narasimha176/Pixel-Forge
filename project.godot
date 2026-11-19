@@ -8,14 +8,19 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="LONG LASTING REVENGE"
-config/description="A single-player third-person action-horror story. Fully playable offline."
+config/description="A single-player third-person action-horror campaign. Fully playable offline."
 run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 run/max_fps=60
 run/low_processor_mode=true
+boot_splash/bg_color=Color(0.015, 0.02, 0.028, 1)
 
 [autoload]
 
@@ -25,7 +30,7 @@ DataLoader="*res://autoload/data_loader.gd"
 ObjectiveManager="*res://autoload/objective_manager.gd"
 SaveManager="*res://autoload/save_manager.gd"
 LevelManager="*res://autoload/level_manager.gd"
-GameManager="*uid://dra3q53fgodrk"
+GameManager="*res://autoload/game_manager.gd"
 
 [display]
 
@@ -35,6 +40,13 @@ window/size/window_width_override=1152
 window/size/window_height_override=648
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[importer_defaults]
+
+scene={
+"gltf/embedded_image_handling": 3,
+"meshes/generate_lods": false
+}
 
 [physics]
 

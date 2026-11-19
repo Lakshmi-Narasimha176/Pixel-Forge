@@ -1,13 +1,13 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://dqh3flxeulvhl"]
 
-[ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
+[ext_resource type="Script" uid="uid://ck8cqli3n3hk8" path="res://scripts/systems/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
-[ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="4_door"]
-[ext_resource type="PackedScene" path="res://psx-style_horror_walkie-talkie.glb" id="5_walkie"]
-[ext_resource type="PackedScene" path="res://devils_bible_-_dark_fantasy_book.glb" id="6_book"]
-[ext_resource type="PackedScene" path="res://blood_bag.glb" id="7_blood"]
-[ext_resource type="PackedScene" path="res://old_wooden_toilet_house_2.glb" id="8_outhouse"]
+[ext_resource type="Script" uid="uid://3i0wi8ja683j" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
+[ext_resource type="Script" uid="uid://cyarhu70r2pd6" path="res://scripts/interaction/locked_door.gd" id="4_door"]
+[ext_resource type="PackedScene" uid="uid://ciofy078bpsxw" path="res://assets/psx-style_horror_walkie-talkie.glb" id="5_walkie"]
+[ext_resource type="PackedScene" uid="uid://dfewbnuciaawv" path="res://assets/devils_bible_-_dark_fantasy_book.glb" id="6_book"]
+[ext_resource type="PackedScene" uid="uid://bijupk17fawm" path="res://assets/blood_bag.glb" id="7_blood"]
+[ext_resource type="PackedScene" uid="uid://c2f2q3w0ekg7g" path="res://assets/old_wooden_toilet_house_2.glb" id="8_outhouse"]
 
 [sub_resource type="Environment" id="Environment_l1"]
 background_mode = 1
@@ -34,203 +34,198 @@ size = Vector3(1.1, 1.1, 1.1)
 size = Vector3(0.45, 0.2, 0.35)
 
 [sub_resource type="BoxShape3D" id="BoxShape_door"]
-size = Vector3(2.2, 3.0, 0.8)
+size = Vector3(2.2, 3, 0.8)
 
 [sub_resource type="BoxMesh" id="BoxMesh_door"]
-size = Vector3(2.0, 2.8, 0.25)
+size = Vector3(2, 2.8, 0.25)
 
-[node name="Level01_Awakening" type="Node3D"]
+[node name="Level01_Awakening" type="Node3D" unique_id=1253849975]
 script = ExtResource("1_lvl")
-level_id = "level_01"
 level_title = "Level 1: The Awakening"
 intro_subtitle = "A shot in the dark. Your friend's face above you. Then the grave opens."
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=598727084]
 environment = SubResource("Environment_l1")
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=617254362]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 8)
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=138869094 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 8)
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=832249198]
 
-[node name="Ground" type="CSGBox3D" parent="Geometry"]
+[node name="Ground" type="CSGBox3D" parent="Geometry" unique_id=488845008]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(32, 1, 32)
 material = SubResource("Mat_ground")
 
-[node name="WallNorth" type="CSGBox3D" parent="Geometry"]
+[node name="WallNorth" type="CSGBox3D" parent="Geometry" unique_id=114081821]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -16)
 use_collision = true
 size = Vector3(32, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="WallSouth" type="CSGBox3D" parent="Geometry"]
+[node name="WallSouth" type="CSGBox3D" parent="Geometry" unique_id=1215454139]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 16)
 use_collision = true
 size = Vector3(32, 6, 1)
 material = SubResource("Mat_wall")
 
-[node name="WallEast" type="CSGBox3D" parent="Geometry"]
+[node name="WallEast" type="CSGBox3D" parent="Geometry" unique_id=998089761]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2.5, 0)
 use_collision = true
 size = Vector3(1, 6, 32)
 material = SubResource("Mat_wall")
 
-[node name="WallWest" type="CSGBox3D" parent="Geometry"]
+[node name="WallWest" type="CSGBox3D" parent="Geometry" unique_id=794606038]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.5, 0)
 use_collision = true
 size = Vector3(1, 6, 32)
 material = SubResource("Mat_wall")
 
-[node name="ShackWallA" type="CSGBox3D" parent="Geometry"]
+[node name="ShackWallA" type="CSGBox3D" parent="Geometry" unique_id=1041814308]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.8, -2)
 use_collision = true
 size = Vector3(6, 3.6, 0.4)
 material = SubResource("Mat_wall")
 
-[node name="ShackWallB" type="CSGBox3D" parent="Geometry"]
+[node name="ShackWallB" type="CSGBox3D" parent="Geometry" unique_id=1254705240]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.8, -4)
 use_collision = true
 size = Vector3(0.4, 3.6, 8)
 material = SubResource("Mat_wall")
 
-[node name="OuthouseProp" parent="Geometry" instance=ExtResource("8_outhouse")]
+[node name="OuthouseProp" parent="Geometry" unique_id=309501202 instance=ExtResource("8_outhouse")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 5)
 
-[node name="Lights" type="Node3D" parent="."]
+[node name="Lights" type="Node3D" parent="." unique_id=999568271]
 
-[node name="Lantern1" type="OmniLight3D" parent="Lights"]
+[node name="Lantern1" type="OmniLight3D" parent="Lights" unique_id=1522332021]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 4)
 light_color = Color(0.85, 0.72, 0.55, 1)
 light_energy = 1.6
 omni_range = 12.0
 
-[node name="Lantern2" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.0, -5)
+[node name="Lantern2" type="OmniLight3D" parent="Lights" unique_id=340286492]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3, -5)
 light_color = Color(0.8, 0.35, 0.25, 1)
 light_energy = 1.4
 omni_range = 10.0
 
-[node name="Lantern3" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.0, -8)
+[node name="Lantern3" type="OmniLight3D" parent="Lights" unique_id=827074422]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -8)
 light_color = Color(0.55, 0.7, 0.85, 1)
 light_energy = 1.4
 omni_range = 10.0
 
-[node name="Interactables" type="Node3D" parent="."]
+[node name="Interactables" type="Node3D" parent="." unique_id=215738815]
 
-[node name="WalkieTalkie" type="Area3D" parent="Interactables"]
+[node name="WalkieTalkie" type="Area3D" parent="Interactables" unique_id=1495169650]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 4)
 script = ExtResource("3_pickup")
-prompt_label = "Pick up Walkie-Talkie"
-pickup_type = "note"
 item_id = "l1_walkie"
 objective_id = "l1_obj_walkie"
 subtitle_speaker = "Static Voice"
 subtitle_text = "'You're dead. I know that voice: someone you trusted put the gun against your chest. Find the Ledger.'"
+prompt_label = "Pick up Walkie-Talkie"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/WalkieTalkie"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/WalkieTalkie" unique_id=1811317921]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Model" parent="Interactables/WalkieTalkie" instance=ExtResource("5_walkie")]
+[node name="Model" parent="Interactables/WalkieTalkie" unique_id=1679105071 instance=ExtResource("5_walkie")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 
-[node name="ServicePistol" type="Area3D" parent="Interactables"]
+[node name="ServicePistol" type="Area3D" parent="Interactables" unique_id=934748855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.9, 5)
 script = ExtResource("3_pickup")
-prompt_label = "Take Service Pistol"
 pickup_type = "weapon"
 item_id = "l1_pistol"
 objective_id = "l1_obj_pistol"
-weapon_id = "pistol"
 subtitle_speaker = "The Returned"
 subtitle_text = "A service pistol, still loaded. The dead can bleed. Left click to fire; R to reload."
+prompt_label = "Take Service Pistol"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ServicePistol"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ServicePistol" unique_id=1014210411]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/ServicePistol"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/ServicePistol" unique_id=510070060]
 mesh = SubResource("BoxMesh_small")
 
-[node name="DeathLedger" type="Area3D" parent="Interactables"]
+[node name="DeathLedger" type="Area3D" parent="Interactables" unique_id=1211076467]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.9, -4)
 script = ExtResource("3_pickup")
-prompt_label = "Inspect Victim Ledger"
 pickup_type = "evidence"
 item_id = "l1_death_ledger"
 objective_id = "l1_obj_death_clue"
-subtitle_speaker = "Thought"
 subtitle_text = "The death ledger names me. Beneath it: a witness signed with my closest friend's initials. He was there."
+prompt_label = "Inspect Victim Ledger"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DeathLedger"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DeathLedger" unique_id=1812360893]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/DeathLedger"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/DeathLedger" unique_id=2028727024]
 mesh = SubResource("BoxMesh_small")
 
-[node name="DarkTome" type="Area3D" parent="Interactables"]
+[node name="DarkTome" type="Area3D" parent="Interactables" unique_id=180234849]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.9, -2)
 script = ExtResource("3_pickup")
-prompt_label = "Read Dark Tome (Resurrection Rule)"
 pickup_type = "resurrection_rule"
 item_id = "l1_dark_tome"
 objective_id = "l1_obj_resurrection_rule"
 flag_to_set = "resurrection_rule_discovered"
 subtitle_speaker = "The Pact"
 subtitle_text = "A torn contract: 'At least one claimant must be defeated.' Someone scratched out the words 'at least'."
+prompt_label = "Read Dark Tome (Resurrection Rule)"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DarkTome"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DarkTome" unique_id=1715015494]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Model" parent="Interactables/DarkTome" instance=ExtResource("6_book")]
+[node name="Model" parent="Interactables/DarkTome" unique_id=1046008120 instance=ExtResource("6_book")]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 
-[node name="GateKey" type="Area3D" parent="Interactables"]
+[node name="GateKey" type="Area3D" parent="Interactables" unique_id=1340024321]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.9, -10)
 script = ExtResource("3_pickup")
-prompt_label = "Take Settlement Gate Key"
 pickup_type = "key"
 item_id = "l1_gate_key"
 objective_id = "l1_obj_key"
-subtitle_speaker = "Thought"
 subtitle_text = "Got the rusty Settlement Gate Key. Now to the north gate."
+prompt_label = "Take Settlement Gate Key"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/GateKey"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/GateKey" unique_id=1228806940]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/GateKey"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/GateKey" unique_id=1742532677]
 mesh = SubResource("BoxMesh_small")
 
-[node name="BloodBag" type="Area3D" parent="Interactables"]
+[node name="BloodBag" type="Area3D" parent="Interactables" unique_id=2008087221]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.8, 2)
 script = ExtResource("3_pickup")
-prompt_label = "Take Blood Bag"
 pickup_type = "blood_bag"
 item_id = "l1_blood_bag"
 subtitle_speaker = "System"
 subtitle_text = "Picked up a Blood Bag. Press [Q] anytime to heal."
+prompt_label = "Take Blood Bag"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag" unique_id=2115978410]
 shape = SubResource("BoxShape_pickup")
 
-[node name="Model" parent="Interactables/BloodBag" instance=ExtResource("7_blood")]
+[node name="Model" parent="Interactables/BloodBag" unique_id=683419303 instance=ExtResource("7_blood")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
 
-[node name="ExitGate" type="Area3D" parent="Interactables"]
+[node name="ExitGate" type="Area3D" parent="Interactables" unique_id=868205997]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -15)
 script = ExtResource("4_door")
-prompt_label = "Enter Slaughterhouse (Level 2)"
 next_level_id = "level_02"
 required_item_id = "l1_gate_key"
 require_all_objectives = true
 locked_message = "Locked. Discover the truth and find the Settlement Gate Key."
+prompt_label = "Enter Slaughterhouse (Level 2)"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ExitGate"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ExitGate" unique_id=289348241]
 shape = SubResource("BoxShape_door")
 
-[node name="Mesh" type="MeshInstance3D" parent="Interactables/ExitGate"]
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/ExitGate" unique_id=1318803772]
 mesh = SubResource("BoxMesh_door")

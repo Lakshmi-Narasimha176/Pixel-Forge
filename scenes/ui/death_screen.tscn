@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://ur2s3rpm0b4g"]
 
-[ext_resource type="Script" path="res://scripts/ui/death_screen.gd" id="1_ds"]
+[ext_resource type="Script" uid="uid://oi2s3rsrg8jp" path="res://scripts/ui/death_screen.gd" id="1_ds"]
 
-[node name="DeathScreen" type="Control"]
+[node name="DeathScreen" type="Control" unique_id=2037490029]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 15
@@ -12,32 +12,35 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ds")
 
-[node name="BloodOverlay" type="ColorRect" parent="."]
+[node name="BloodOverlay" type="ColorRect" parent="." unique_id=1582118330]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.2, 0.02, 0.02, 0.9)
 
-[node name="CenterBox" type="CenterContainer" parent="."]
+[node name="CenterBox" type="CenterContainer" parent="." unique_id=1004909877]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+[node name="VBox" type="VBoxContainer" parent="CenterBox" unique_id=429721005]
 custom_minimum_size = Vector2(380, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="CenterBox/VBox"]
+[node name="Title" type="Label" parent="CenterBox/VBox" unique_id=223526721]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.1, 0.1, 1)
-theme_override_font_size = 40
 text = "YOU HAVE FALLEN"
 horizontal_alignment = 1
 
-[node name="RuleLabel" type="Label" parent="CenterBox/VBox"]
+[node name="RuleLabel" type="Label" parent="CenterBox/VBox" unique_id=565953398]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "THE RESURRECTION RULE:
@@ -45,10 +48,10 @@ Death is not an escape. The entity brings you back."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="ResurrectBtn" type="Button" parent="CenterBox/VBox"]
+[node name="ResurrectBtn" type="Button" parent="CenterBox/VBox" unique_id=1165525361]
 layout_mode = 2
 text = "Resurrect At Checkpoint"
 
-[node name="MainMenuBtn" type="Button" parent="CenterBox/VBox"]
+[node name="MainMenuBtn" type="Button" parent="CenterBox/VBox" unique_id=683517500]
 layout_mode = 2
 text = "Main Menu"
