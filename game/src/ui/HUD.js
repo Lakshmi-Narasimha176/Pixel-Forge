@@ -30,6 +30,7 @@ export class HUD {
     this._buildCrosshair();
     this._buildInteractionPrompt();
     this._buildInventoryBar();
+    this._buildControlsHelper();
     this._buildSanityIndicator();
     this._buildSubtitles();
   }
@@ -39,7 +40,7 @@ export class HUD {
   _buildHealthBar() {
     const wrap = document.createElement('div');
     wrap.style.cssText =
-      'position:absolute;bottom:24px;left:24px;width:180px;';
+      'position:absolute;bottom:34px;left:24px;width:180px;';
     wrap.innerHTML = `
       <div style="font-size:0.65rem;color:#888;letter-spacing:0.1rem;margin-bottom:4px;">HEALTH</div>
       <div id="hud-health-bg" style="width:100%;height:6px;background:#1a1a1a;border:1px solid #333;border-radius:3px;overflow:hidden;">
@@ -55,7 +56,7 @@ export class HUD {
   _buildBatteryIndicator() {
     const wrap = document.createElement('div');
     wrap.style.cssText =
-      'position:absolute;bottom:24px;left:220px;width:100px;';
+      'position:absolute;bottom:34px;left:220px;width:100px;';
     wrap.innerHTML = `
       <div style="font-size:0.65rem;color:#888;letter-spacing:0.1rem;margin-bottom:4px;">🔦 BATTERY</div>
       <div style="width:100%;height:6px;background:#1a1a1a;border:1px solid #333;border-radius:3px;overflow:hidden;">
@@ -95,7 +96,7 @@ export class HUD {
     const bar = document.createElement('div');
     bar.id = 'hud-inventory-bar';
     bar.style.cssText =
-      'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);' +
+      'position:absolute;bottom:34px;left:50%;transform:translateX(-50%);' +
       'display:flex;gap:4px;';
 
     this._invSlots = [];
@@ -117,6 +118,32 @@ export class HUD {
       bar.appendChild(slot);
       this._invSlots.push(slot);
     }
+    this.root.appendChild(bar);
+  }
+
+  /* ────────────────── Controls Helper Bar ────────────────── */
+
+  _buildControlsHelper() {
+    const bar = document.createElement('div');
+    bar.id = 'hud-controls-helper';
+    bar.style.cssText =
+      'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);' +
+      'display:flex;gap:10px;align-items:center;font-size:0.72rem;color:#ccc;' +
+      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace;' +
+      'background:rgba(10,8,8,0.92);padding:5px 18px;border-radius:6px;' +
+      'border:1px solid rgba(255,255,255,0.2);pointer-events:none;white-space:nowrap;' +
+      'box-shadow:0 4px 14px rgba(0,0,0,0.85);backdrop-filter:blur(4px);z-index:1000;';
+    bar.innerHTML = `
+      <span><b style="background:#221a10;border:1px solid #e0a030;border-radius:3px;padding:1px 5px;color:#ffbb33;font-size:0.7rem;margin-right:2px;">WASD</b> Move</span>
+      <span><b style="background:#221a10;border:1px solid #e0a030;border-radius:3px;padding:1px 5px;color:#ffbb33;font-size:0.7rem;margin-right:2px;">Mouse/Drag</b> Look</span>
+      <span><b style="background:#1a1a24;border:1px solid #6688cc;border-radius:3px;padding:1px 5px;color:#88bbff;font-size:0.7rem;margin-right:2px;">Shift</b> Sprint</span>
+      <span><b style="background:#1a1a24;border:1px solid #6688cc;border-radius:3px;padding:1px 5px;color:#88bbff;font-size:0.7rem;margin-right:2px;">C</b> Crouch</span>
+      <span><b style="background:#281010;border:1px solid #ff4444;border-radius:3px;padding:1px 5px;color:#ff5555;font-size:0.7rem;margin-right:2px;">E</b> Interact</span>
+      <span><b style="background:#242010;border:1px solid #ffd700;border-radius:3px;padding:1px 5px;color:#ffea55;font-size:0.7rem;margin-right:2px;">F</b> Flashlight</span>
+      <span><b style="background:#2c0c0c;border:1px solid #ff2222;border-radius:3px;padding:1px 5px;color:#ff4444;font-size:0.7rem;margin-right:2px;">Q</b> Blood Bag (Heal)</span>
+      <span><b style="background:#1a1a1a;border:1px solid #666;border-radius:3px;padding:1px 5px;color:#ccc;font-size:0.7rem;margin-right:2px;">1-8</b> Items</span>
+      <span><b style="background:#1a1a1a;border:1px solid #555;border-radius:3px;padding:1px 5px;color:#aaa;font-size:0.7rem;margin-right:2px;">Esc</b> Pause</span>
+    `;
     this.root.appendChild(bar);
   }
 

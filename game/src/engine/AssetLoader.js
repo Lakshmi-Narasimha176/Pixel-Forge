@@ -92,11 +92,21 @@ export class AssetLoader {
 
           gltf.scene.traverse((child) => {
             if (child.isMesh) {
-              child.castShadow    = castShadow;
+              child.castShadow = castShadow;
               child.receiveShadow = receiveShadow;
-              if (child.material) {
-                child.material.roughness = Math.min(child.material.roughness ?? 0.8, 0.95);
-              }
+              const materials = Array.isArray(child.material) ? child.material : [child.material];
+              materials.forEach((mat) => {
+                if (mat) {
+                  mat.side = THREE.DoubleSide;
+                  // Prevent pure black reflection when no HDR environment map is present
+                  if (mat.metalness > 0.4) {
+                    mat.metalness = 0.15;
+                  }
+                  if (mat.roughness !== undefined) {
+                    mat.roughness = Math.max(0.4, Math.min(mat.roughness, 0.95));
+                  }
+                }
+              });
             }
           });
 

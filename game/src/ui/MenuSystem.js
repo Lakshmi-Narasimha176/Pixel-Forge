@@ -74,7 +74,18 @@ export class MenuSystem {
           <button id="btn-new-game" class="menu-btn">NEW GAME</button>
           <button id="btn-settings-main" class="menu-btn">SETTINGS</button>
         </div>
-        <p class="menu-footer">— A tale of darkness —</p>
+        <div class="menu-controls-box" style="margin-top:28px;padding:10px 22px;background:rgba(12,10,10,0.85);border:1px solid rgba(255,255,255,0.18);border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,monospace;font-size:0.8rem;color:#ccc;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:760px;box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+          <span><b style="background:#221a10;border:1px solid #e0a030;border-radius:3px;padding:1px 6px;color:#ffbb33;font-size:0.75rem;margin-right:3px;">WASD</b> Move</span>
+          <span><b style="background:#221a10;border:1px solid #e0a030;border-radius:3px;padding:1px 6px;color:#ffbb33;font-size:0.75rem;margin-right:3px;">Mouse/Drag</b> Look</span>
+          <span><b style="background:#1a1a24;border:1px solid #6688cc;border-radius:3px;padding:1px 6px;color:#88bbff;font-size:0.75rem;margin-right:3px;">Shift</b> Sprint</span>
+          <span><b style="background:#1a1a24;border:1px solid #6688cc;border-radius:3px;padding:1px 6px;color:#88bbff;font-size:0.75rem;margin-right:3px;">C</b> Crouch</span>
+          <span><b style="background:#281010;border:1px solid #ff4444;border-radius:3px;padding:1px 6px;color:#ff5555;font-size:0.75rem;margin-right:3px;">E</b> Interact</span>
+          <span><b style="background:#242010;border:1px solid #ffd700;border-radius:3px;padding:1px 6px;color:#ffea55;font-size:0.75rem;margin-right:3px;">F</b> Flashlight</span>
+          <span><b style="background:#2c0c0c;border:1px solid #ff2222;border-radius:3px;padding:1px 6px;color:#ff4444;font-size:0.75rem;margin-right:3px;">Q</b> Blood Bag (Heal)</span>
+          <span><b style="background:#1a1a1a;border:1px solid #666;border-radius:3px;padding:1px 6px;color:#ccc;font-size:0.75rem;margin-right:3px;">1-8</b> Items</span>
+          <span><b style="background:#1a1a1a;border:1px solid #555;border-radius:3px;padding:1px 6px;color:#aaa;font-size:0.75rem;margin-right:3px;">Esc</b> Pause</span>
+        </div>
+        <p class="menu-footer" style="margin-top:14px;">— A tale of darkness —</p>
       </div>`;
     this._container.appendChild(this._mainMenu);
 

@@ -118,12 +118,12 @@ async function buildAmbientScene() {
   rightWall.rotation.y = Math.PI / 2;
   ambientSceneGroup.add(rightWall);
 
-  // Load original Soviet Room model into ambient background
+  // Load original Soviet Room model into ambient background (1:1 scale)
   try {
     const gltf = await assetLoader.load('/horror_soviet_room.glb');
     const model = gltf.scene || gltf;
     model.position.set(0, 0, -2);
-    model.scale.set(0.025, 0.025, 0.025);
+    model.scale.set(1.0, 1.0, 1.0);
     model.traverse((c) => {
       if (c.isMesh) {
         c.castShadow = true;
@@ -136,12 +136,12 @@ async function buildAmbientScene() {
     console.warn('[Game] Soviet room fallback:', err.message);
   }
 
-  // Load original wall clock model
+  // Load original wall clock model (realistic 51cm wall clock)
   try {
     const clockGltf = await assetLoader.load('/vintage_wooden_wall_clock_-.glb');
     const clock = clockGltf.scene || clockGltf;
     clock.position.set(0, 2.4, -7.6);
-    clock.scale.set(0.015, 0.015, 0.015);
+    clock.scale.set(0.6, 0.6, 0.6);
     ambientSceneGroup.add(clock);
   } catch (e) {}
 
@@ -149,35 +149,12 @@ async function buildAmbientScene() {
   const mainLight = new THREE.PointLight(0xcc2200, 4.0, 18, 1.5);
   mainLight.position.set(0, 4.0, 0);
   mainLight.castShadow = true;
-  mainLight.shadow.mapSize.set(512, 512);
-  mainLight.shadow.bias = -0.002;
   ambientSceneGroup.add(mainLight);
 
   // ── Secondary eerie blue-purple fill light ──
   const fillLight = new THREE.PointLight(0x2244aa, 2.0, 14, 1.5);
   fillLight.position.set(-4, 3.5, -5);
   ambientSceneGroup.add(fillLight);
-
-  // ── Add to flicker system for atmospheric animation ──
-  lighting.addFlickerLight(new THREE.Vector3(0, 4.0, 0), {
-    intensity: 4.0,
-    color: 0xcc2200,
-    flickerAmount: 0.3,
-    flickerSpeed: 3,
-    distance: 18
-  });
-
-  lighting.addFlickerLight(new THREE.Vector3(-4, 3.5, -5), {
-    intensity: 2.0,
-    color: 0x2244aa,
-    flickerAmount: 0.5,
-    flickerSpeed: 6,
-    distance: 14
-  });
-
-  // ── Remove the static lights we added (flicker system owns them now) ──
-  ambientSceneGroup.remove(mainLight);
-  ambientSceneGroup.remove(fillLight);
 
   // Lighter ambient fog so the menu room is visible
   scene.fog = new THREE.FogExp2(0x080204, 0.018);

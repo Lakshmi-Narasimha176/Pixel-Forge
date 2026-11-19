@@ -697,15 +697,15 @@ export class Level1_Awakening extends LevelEventEmitter {
     if (this.lightActivated && this.overheadLight) {
       this.flickerTimer += delta;
       // Random micro-flicker
-      if (Math.random() < 0.01) {
-        const flicker = 0.8 + Math.random() * 0.4;
-        this.overheadLight.intensity = 1.2 * flicker;
+      if (Math.random() < 0.02) {
+        const flicker = 0.85 + Math.random() * 0.3;
+        this.overheadLight.intensity = 3.2 * flicker;
       }
     }
 
     // --- Red accent light pulsing ---
     if (this.accentLight && this.lightActivated) {
-      this.accentLight.intensity = 0.3 + Math.sin(this.elapsedTime * 0.5) * 0.15;
+      this.accentLight.intensity = 1.2 + Math.sin(this.elapsedTime * 0.5) * 0.3;
     }
   }
 
@@ -721,14 +721,14 @@ export class Level1_Awakening extends LevelEventEmitter {
       // Flicker effect — random on/off
       const flickerRate = Math.min(flickerElapsed / this.flickerDuration, 1);
       if (Math.random() < flickerRate * 0.6) {
-        this.overheadLight.intensity = 0.5 + Math.random() * 1.0;
+        this.overheadLight.intensity = 1.5 + Math.random() * 2.0;
       } else {
-        this.overheadLight.intensity = 0;
+        this.overheadLight.intensity = 0.3;
       }
     } else {
       // Light stabilizes
-      this.overheadLight.intensity = 1.2;
-      this.ambientLight.intensity = 0.15;
+      this.overheadLight.intensity = 3.2;
+      this.ambientLight.intensity = 0.65;
       this.lightActivated = true;
       console.log('[Level1] Light flickered on');
       this.emit('triggerScare', { type: 'lightOn', intensity: 0.3 });

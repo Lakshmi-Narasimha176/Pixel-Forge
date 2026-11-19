@@ -334,9 +334,9 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
       }
     }
 
-    // The Butcher
+    // The Butcher (scaled to imposing 1.9m tall killer)
     this.butcherModel = await load('butcher', ASSETS.butcher,
-      this.patrolPoints[0].clone(), null, 1.0);
+      this.patrolPoints[0].clone(), null, 1.9);
 
     // Exit door
     this.exitDoor = await load('exitDoor', ASSETS.door,
@@ -402,10 +402,11 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
   _tryInteract() {
     const camera = this.scene.getObjectByProperty('isCamera', true);
     if (!camera) return;
-    this.interactRaycaster.set(
-      camera.position.clone(),
-      new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    );
+    const origin = new THREE.Vector3();
+    camera.getWorldPosition(origin);
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    this.interactRaycaster.set(origin, dir);
     const intersects = this.interactRaycaster.intersectObjects(this.interactables, true);
     if (intersects.length === 0) return;
     let target = intersects[0].object;
@@ -537,7 +538,8 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
     const camera = this.scene.getObjectByProperty('isCamera', true);
     if (!camera) return;
 
-    const playerPos = camera.position.clone();
+    const playerPos = new THREE.Vector3();
+    camera.getWorldPosition(playerPos);
     const canSee = this._butcherCanSeePlayer(playerPos);
 
     switch (this.butcherState) {
@@ -748,10 +750,11 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
       this._hideInteractPrompt();
       return;
     }
-    this.interactRaycaster.set(
-      camera.position.clone(),
-      new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    );
+    const origin = new THREE.Vector3();
+    camera.getWorldPosition(origin);
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    this.interactRaycaster.set(origin, dir);
     const intersects = this.interactRaycaster.intersectObjects(this.interactables, true);
     if (intersects.length > 0) {
       let target = intersects[0].object;

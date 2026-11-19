@@ -12,6 +12,7 @@ const ASSETS = {
   corridor: '/horror_corridor_5.glb',
   ghost: '/horror_ghost_character_-_blood_stained_spirit.glb',
   baseballBat: '/baseball_bat_covered_in_blood.glb',
+  bloodBag: '/blood_bag.glb',
   rat: '/street_rat.glb',
   door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb'
 };
@@ -293,13 +294,13 @@ export class Level2_Corridor extends LevelEventEmitter {
       }
     };
 
-    // Corridor environment — scaled to realistic 4.8m height
+    // Corridor environment — scaled to realistic 3.14m ceiling height
     await load('corridor', ASSETS.corridor,
-      new THREE.Vector3(0, 0, -10), null, 0.0025);
+      new THREE.Vector3(0, 0, -10), null, 1.0);
 
     // Ghost — initially hidden far away
     this.ghostModel = await load('ghost', ASSETS.ghost,
-      new THREE.Vector3(0, 0, -30), null, 1.2);
+      new THREE.Vector3(0, 0, -28), null, 1.8);
     if (this.ghostModel) {
       this.ghostModel.visible = false;
       // Make ghost semi-transparent
@@ -314,24 +315,30 @@ export class Level2_Corridor extends LevelEventEmitter {
       });
     }
 
-    // Baseball bat on the ground
+    // Baseball bat on the ground (realistic 81cm bat)
     this.batModel = await load('baseballBat', ASSETS.baseballBat,
-      new THREE.Vector3(1.2, 0.1, -12),
+      new THREE.Vector3(1.2, 0.05, -12),
       { x: 0, y: 0.5, z: Math.PI / 2 },
-      0.8);
+      0.055);
+
+    // Blood bag collectible in corridor alcove (realistic ~29cm IV bag)
+    this.bloodBagModel = await load('bloodBag', ASSETS.bloodBag,
+      new THREE.Vector3(-1.0, 0.05, -16),
+      { x: Math.PI / 2, y: 0, z: 0 },
+      0.01);
 
     // Rat template (will be cloned for spawning)
     this.ratTemplate = await load('ratTemplate', ASSETS.rat,
-      new THREE.Vector3(100, -100, 100), null, 0.3);
+      new THREE.Vector3(100, -100, 100), null, 1.5);
     if (this.ratTemplate) {
       this.ratTemplate.visible = false;
     }
 
     // Exit door at end of corridor
     this.exitDoor = await load('exitDoor', ASSETS.door,
-      new THREE.Vector3(0, 0, -32),
+      new THREE.Vector3(0, 0, -22),
       { x: 0, y: Math.PI, z: 0 },
-      1.2);
+      1.0);
   }
 
   /**
@@ -362,6 +369,14 @@ export class Level2_Corridor extends LevelEventEmitter {
       this.interactables.push(this.batModel);
     }
 
+    if (this.bloodBagModel) {
+      this.bloodBagModel.userData.interactable = true;
+      this.bloodBagModel.userData.interactType = 'pickup';
+      this.bloodBagModel.userData.interactLabel = 'Take Blood Bag (+25 HP) [E]';
+      this.bloodBagModel.userData.itemName = 'bloodBag';
+      this.interactables.push(this.bloodBagModel);
+    }
+
     if (this.exitDoor) {
       this.exitDoor.userData.interactable = true;
       this.exitDoor.userData.interactType = 'exit';
@@ -384,10 +399,12 @@ export class Level2_Corridor extends LevelEventEmitter {
     const camera = this.scene.getObjectByProperty('isCamera', true);
     if (!camera) return;
 
-    this.interactRaycaster.set(
-      camera.position.clone(),
-      new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    );
+    const origin = new THREE.Vector3();
+    camera.getWorldPosition(origin);
+    const dir = new THREE.Vector3(0, 0, -1);
+    camera.getWorldDirection(dir);
+
+    this.interactRaycaster.set(origin, dir);
 
     const intersects = this.interactRaycaster.intersectObjects(this.interactables, true);
     if (intersects.length === 0) return;
@@ -413,6 +430,15 @@ export class Level2_Corridor extends LevelEventEmitter {
           this._removeInteractable(target);
           this._showSubtitle('Baseball bat acquired. You feel slightly safer.', 3000);
           console.log('[Level2] Baseball bat picked up');
+        }
+        if (target.userData.itemName === 'bloodBag' && !this.bloodBagPickedUp) {
+          this.bloodBagPickedUp = true;
+          this.playerInventory.hasBloodBag = true;
+          this.emit('itemPickup', { item: 'bloodBag', model: target });
+          target.visible = false;
+          this._removeInteractable(target);
+          this._showSubtitle('Blood bag collected (+25 HP). Press [Q] to heal.', 3000);
+          console.log('[Level2] Blood bag picked up');
         }
         break;
 
@@ -709,11 +735,14 @@ export class Level2_Corridor extends LevelEventEmitter {
     const camera = this.scene.getObjectByProperty('isCamera', true);
     if (!camera) return;
 
-    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    const camPos = new THREE.Vector3();
+    camera.getWorldPosition(camPos);
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
 
     // Player has progressed past halfway point
-    if (camera.position.z < -15) {
-      this.playerProgress = Math.abs(camera.position.z);
+    if (camPos.z < -10) {
+      this.playerProgress = Math.abs(camPos.z);
 
       // Check if player is looking backward (positive Z — toward start)
       if (forward.z > 0.5 && !this.hasLookedBack) {
@@ -737,10 +766,11 @@ export class Level2_Corridor extends LevelEventEmitter {
       return;
     }
 
-    this.interactRaycaster.set(
-      camera.position.clone(),
-      new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    );
+    const origin = new THREE.Vector3();
+    camera.getWorldPosition(origin);
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    this.interactRaycaster.set(origin, dir);
 
     const intersects = this.interactRaycaster.intersectObjects(this.interactables, true);
     if (intersects.length > 0) {

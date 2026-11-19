@@ -26,6 +26,7 @@ export class FPSControls {
 
     /** Camera holder — move this, camera is a child. */
     this.yaw = new THREE.Object3D();
+    this.yaw.name = 'PlayerYaw';
     this.yaw.add(camera);
     camera.position.set(0, 0, 0); // local offset handled by headBob
 

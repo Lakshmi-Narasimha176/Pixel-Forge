@@ -15,7 +15,8 @@ const ASSETS = {
   ghost: '/horror_ghost_character_-_blood_stained_spirit.glb',
   butcher: '/horror_butcher_fat_killer_bloody_cleaver.glb',
   jason: '/jeson_horror_fan_art.glb',
-  outhouse: '/old_wooden_toilet_house_2.glb'
+  outhouse: '/old_wooden_toilet_house_2.glb',
+  bloodBag: '/blood_bag.glb'
 };
 
 /** EventEmitter base */
@@ -212,13 +213,13 @@ export class Level5_Escape extends LevelEventEmitter {
       return null;
     };
 
-    // Tunnel model
+    // Tunnel model (58.9m long, 3.66m high)
     this.tunnelModel = await loadModel('tunnel', ASSETS.tunnel,
       new THREE.Vector3(0, 0, -25), null, 1.0);
 
-    // Weathered Red Farmhouse at exterior
+    // Weathered Red Farmhouse at exterior (scaled to realistic 7.4m x 7.0m x 7.6m house)
     this.farmhouseModel = await loadModel('farmhouse', ASSETS.farmhouse,
-      new THREE.Vector3(0, 0, -72), { x: 0, y: Math.PI, z: 0 }, 1.2);
+      new THREE.Vector3(0, 0, -72), { x: 0, y: Math.PI, z: 0 }, 4.0);
     if (!this.farmhouseModel) {
       const house = new THREE.Mesh(new THREE.BoxGeometry(10, 7, 10), new THREE.MeshStandardMaterial({ color: 0x5a1a1a }));
       house.position.set(0, 3.5, -72);
@@ -226,13 +227,43 @@ export class Level5_Escape extends LevelEventEmitter {
       this.farmhouseModel = house;
     }
 
+    // Abandoned Swamp Shack on side of foggy woods (10m x 10m x 4.5m)
+    await loadModel('shack', ASSETS.shack,
+      new THREE.Vector3(14, 0, -62), { x: 0, y: -0.4, z: 0 }, 0.5);
+
+    // Old wooden outhouse next to farmhouse
+    await loadModel('outhouse', ASSETS.outhouse,
+      new THREE.Vector3(-8, 0, -68), { x: 0, y: 0.3, z: 0 }, 1.3);
+
     // Chasing Ghost spirit behind player
     this.ghostModel = await loadModel('ghost', ASSETS.ghost,
-      new THREE.Vector3(0, 1.2, 8), null, 1.1);
+      new THREE.Vector3(0, 1.2, 8), null, 1.8);
 
-    // Chasing Butcher
+    // Chasing Butcher (1.9m tall)
     this.butcherModel = await loadModel('butcher', ASSETS.butcher,
-      new THREE.Vector3(-2, 0, 12), null, 1.0);
+      new THREE.Vector3(-2.2, 0, 12), null, 1.9);
+
+    // Chasing Jason stalker (1.92m tall)
+    this.jasonModel = await loadModel('jason', ASSETS.jason,
+      new THREE.Vector3(2.2, 0, 14), null, 0.11);
+
+    // Emergency blood bags along tunnel
+    const bag1 = await loadModel('bloodBag1', ASSETS.bloodBag,
+      new THREE.Vector3(1.2, 0.4, -15), { x: Math.PI / 2, y: 0, z: 0 }, 0.01);
+    const bag2 = await loadModel('bloodBag2', ASSETS.bloodBag,
+      new THREE.Vector3(-1.2, 0.4, -35), { x: Math.PI / 2, y: 0, z: 0 }, 0.01);
+    this.bloodBags = [bag1, bag2].filter(Boolean);
+    this.bloodBags.forEach(b => {
+      b.userData.interactable = true;
+      b.userData.prompt = 'Take Blood Bag (+25 HP) [E]';
+      b.userData.onInteract = () => {
+        if (this.playerInventory.health !== undefined) {
+          this.playerInventory.health = Math.min(100, (this.playerInventory.health || 75) + 25);
+        }
+        b.visible = false;
+        this.showSubtitle('+25 HP restored from Blood Bag.', 2500);
+      };
+    });
   }
 
   showSubtitle(text, duration = 3000) {
@@ -255,7 +286,10 @@ export class Level5_Escape extends LevelEventEmitter {
     });
 
     // Player position
-    const playerPos = this.scene?.getObjectByName('PlayerYaw')?.position || new THREE.Vector3(0, 1.7, 0);
+    const cam = this.scene?.getObjectByProperty('isCamera', true);
+    const playerPos = new THREE.Vector3();
+    if (cam) cam.getWorldPosition(playerPos);
+    else playerPos.set(0, 1.7, 0);
 
     // Ghost floating pursuit
     if (this.ghostModel) {
@@ -270,6 +304,14 @@ export class Level5_Escape extends LevelEventEmitter {
     if (this.butcherModel) {
       this.butcherModel.position.z -= 3.8 * delta;
       if (this.butcherModel.position.distanceTo(playerPos) < 1.5 && !this.escaped) {
+        this.emit('playerDeath');
+      }
+    }
+
+    // Jason pursuit
+    if (this.jasonModel) {
+      this.jasonModel.position.z -= 4.0 * delta;
+      if (this.jasonModel.position.distanceTo(playerPos) < 1.5 && !this.escaped) {
         this.emit('playerDeath');
       }
     }
@@ -293,7 +335,19 @@ export class Level5_Escape extends LevelEventEmitter {
   }
 
   _onKeyDown(e) {
-    // Escape interactions if needed
+    if (e.code === 'KeyE') {
+      const cam = this.scene?.getObjectByProperty('isCamera', true);
+      const playerPos = new THREE.Vector3();
+      if (cam) cam.getWorldPosition(playerPos);
+      if (this.bloodBags) {
+        for (const bag of this.bloodBags) {
+          if (bag && bag.visible && bag.position.distanceTo(playerPos) < 3.2) {
+            bag.userData.onInteract();
+            break;
+          }
+        }
+      }
+    }
   }
 
   getSpawnPoint() {

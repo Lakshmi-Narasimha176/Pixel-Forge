@@ -17,6 +17,7 @@ const ASSETS = {
   clock: '/vintage_wooden_wall_clock_-.glb',
   devilsBible: '/devils_bible_-_dark_fantasy_book.glb',
   ceilingFan: '/old_rusty_ceiling_fan.glb',
+  bloodBag: '/blood_bag.glb',
   door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb',
   wall: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb',
   floor: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_floor.glb'
@@ -217,13 +218,13 @@ export class Level4_SovietRoom extends LevelEventEmitter {
       return null;
     };
 
-    // Soviet Room (scaled to realistic 4.5m height)
+    // Soviet Room (1:1 scale, 5.31m x 2.80m x 3.89m)
     this.sovietRoomModel = await loadModel('sovietRoom', ASSETS.sovietRoom,
-      new THREE.Vector3(0, 0, 0), null, 0.025);
+      new THREE.Vector3(0, 0, 0), null, 1.0);
 
-    // Horror Woman (Apparition)
+    // Horror Woman (Apparition, 1.8m height)
     this.horrorWomanModel = await loadModel('horrorWoman', ASSETS.horrorWoman,
-      new THREE.Vector3(-3.5, 0, -4), { x: 0, y: Math.PI / 3, z: 0 }, 1.0);
+      new THREE.Vector3(-1.5, 0, -1.0), { x: 0, y: Math.PI / 3, z: 0 }, 0.9);
     if (this.horrorWomanModel) {
       this.horrorWomanModel.visible = false;
     } else {
@@ -231,52 +232,68 @@ export class Level4_SovietRoom extends LevelEventEmitter {
       const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.45, 1.7, 8), new THREE.MeshStandardMaterial({ color: 0x334444, transparent: true, opacity: 0.8 }));
       body.position.y = 0.85;
       g.add(body);
-      g.position.set(-3.5, 0, -4);
+      g.position.set(-1.5, 0, -1.0);
       g.visible = false;
       this.levelGroup.add(g);
       this.horrorWomanModel = g;
     }
 
-    // Jason Stalker (scaled to realistic 1.95m human height)
+    // Jason Stalker (scaled to realistic 1.92m height: 0.11 * 17.47m)
     this.jasonModel = await loadModel('jasonStalker', ASSETS.jasonStalker,
-      new THREE.Vector3(7, 0, -8), { x: 0, y: -Math.PI / 4, z: 0 }, 0.035);
+      new THREE.Vector3(2.0, 0, -2.5), { x: 0, y: -Math.PI / 4, z: 0 }, 0.11);
     if (!this.jasonModel) {
       const jg = new THREE.Group();
       const jb = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.9, 0.4), new THREE.MeshStandardMaterial({ color: 0x1a261a }));
       jb.position.y = 0.95;
       jg.add(jb);
-      jg.position.set(7, 0, -8);
+      jg.position.set(2.0, 0, -2.5);
       this.levelGroup.add(jg);
       this.jasonModel = jg;
     }
 
-    // Horror Girl in corner
+    // Horror Girl in corner (height ~1.7m)
     this.girlModel = await loadModel('horrorGirl', ASSETS.horrorGirl,
-      new THREE.Vector3(-8, 0, 8), { x: 0, y: Math.PI * 0.75, z: 0 }, 0.85);
+      new THREE.Vector3(-2.0, 0, 1.4), { x: 0, y: Math.PI * 0.75, z: 0 }, 0.85);
     if (!this.girlModel) {
       const gg = new THREE.Group();
       const gb = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.35, 1.3, 8), new THREE.MeshStandardMaterial({ color: 0x111111 }));
       gb.position.y = 0.65;
       gg.add(gb);
-      gg.position.set(-8, 0, 8);
+      gg.position.set(-2.0, 0, 1.4);
       this.levelGroup.add(gg);
       this.girlModel = gg;
     }
 
-    // Vintage wall clock (The Puzzle - scaled realistically)
+    // Vintage wall clock (The Puzzle - 51cm wall clock mounted on north wall)
     this.clockModel = await loadModel('clock', ASSETS.clock,
-      new THREE.Vector3(0, 2.2, -9.8), { x: 0, y: 0, z: 0 }, 0.015);
+      new THREE.Vector3(0, 1.8, -1.9), { x: 0, y: 0, z: 0 }, 0.6);
 
-    // Ceiling fan
+    // Ceiling fan (1.5m diameter, mounted at ceiling 2.7m)
     this.ceilingFanModel = await loadModel('ceilingFan', ASSETS.ceilingFan,
-      new THREE.Vector3(0, 3.6, 0), null, 0.25);
+      new THREE.Vector3(0, 2.7, 0), null, 0.9);
 
-    // Secret passage door
+    // Blood Bag Health Pickup on desk
+    this.bloodBagModel = await loadModel('bloodBag', ASSETS.bloodBag,
+      new THREE.Vector3(-1.8, 0.7, 0.5), { x: Math.PI / 2, y: 0, z: 0.3 }, 0.01);
+    if (this.bloodBagModel) {
+      this.bloodBagModel.userData.interactable = true;
+      this.bloodBagModel.userData.prompt = 'Take Blood Bag (+25 HP) [E]';
+      this.bloodBagModel.userData.onInteract = () => {
+        if (this.playerInventory.health !== undefined) {
+          this.playerInventory.health = Math.min(100, (this.playerInventory.health || 75) + 25);
+        }
+        this.bloodBagModel.visible = false;
+        this.showSubtitle('+25 HP restored from Blood Bag.', 2500);
+      };
+      this.interactables.push(this.bloodBagModel);
+    }
+
+    // Secret passage door on east wall
     this.exitDoor = await loadModel('door', ASSETS.door,
-      new THREE.Vector3(8.5, 0, 0), { x: 0, y: -Math.PI / 2, z: 0 }, 1.0);
+      new THREE.Vector3(2.55, 0, 0), { x: 0, y: -Math.PI / 2, z: 0 }, 1.0);
     if (!this.exitDoor) {
       const dm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.4, 1.4), new THREE.MeshStandardMaterial({ color: 0x222a30 }));
-      dm.position.set(8.5, 1.2, 0);
+      dm.position.set(2.55, 1.2, 0);
       this.levelGroup.add(dm);
       this.exitDoor = dm;
     }
@@ -362,7 +379,11 @@ export class Level4_SovietRoom extends LevelEventEmitter {
     }
 
     // Girl head-tracking player
-    const playerPos = this.scene?.getObjectByName('PlayerYaw')?.position || new THREE.Vector3(0, 1.7, 5);
+    const cam = this.scene?.getObjectByProperty('isCamera', true);
+    const playerPos = new THREE.Vector3();
+    if (cam) cam.getWorldPosition(playerPos);
+    else playerPos.set(0, 1.6, 1.0);
+
     if (this.girlModel) {
       const distToGirl = this.girlModel.position.distanceTo(playerPos);
       if (distToGirl < 6.0) {
@@ -388,7 +409,11 @@ export class Level4_SovietRoom extends LevelEventEmitter {
 
   _onKeyDown(e) {
     if (e.code === 'KeyE') {
-      const playerPos = this.scene?.getObjectByName('PlayerYaw')?.position || new THREE.Vector3(0, 1.7, 5);
+      const cam = this.scene?.getObjectByProperty('isCamera', true);
+      const playerPos = new THREE.Vector3();
+      if (cam) cam.getWorldPosition(playerPos);
+      else playerPos.set(0, 1.6, 1.0);
+
       for (const item of this.interactables) {
         if (item && item.userData?.interactable && item.position.distanceTo(playerPos) < 3.2) {
           if (typeof item.userData.onInteract === 'function') {
@@ -401,7 +426,7 @@ export class Level4_SovietRoom extends LevelEventEmitter {
   }
 
   getSpawnPoint() {
-    return new THREE.Vector3(0, 1.7, 6);
+    return new THREE.Vector3(0, 1.6, 1.0);
   }
 
   dispose() {
