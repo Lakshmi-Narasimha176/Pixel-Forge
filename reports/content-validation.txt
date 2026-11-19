@@ -1,12 +1,8 @@
 CONTENT JSON VALIDATION
 RESULT: FAIL
-CHECKS: 34/36 passed
+CHECKS: 32/34 passed
 
-[PASS] JSON syntax: data/characters/characters.json: valid UTF-8 JSON
-[PASS] Unique id: data/characters/characters.json:$.characters[0]: char_protagonist
-[PASS] Unique id: data/characters/characters.json:$.characters[1]: char_butcher
-[PASS] Unique id: data/characters/characters.json:$.characters[2]: char_strategist
-[PASS] Unique id: data/characters/characters.json:$.characters[3]: char_betrayer
+[FAIL] JSON syntax: data/characters/characters.json: Expecting value: line 1 column 1 (char 0)
 [FAIL] JSON syntax: data/puzzles/puzzles.json: Expecting value: line 1 column 1 (char 0)
 [PASS] JSON syntax: data/story/dialogue.json: valid UTF-8 JSON
 [PASS] Unique id: data/story/dialogue.json:$.dialogue[0]: dlg_l1_walkie
@@ -37,4 +33,6 @@ CHECKS: 34/36 passed
 [PASS] Unique id: data/story/levels.json:$.levels[4].objectives[1]: l5_obj_betrayal_proof
 [PASS] Unique id: data/story/levels.json:$.levels[4].objectives[2]: l5_obj_kill_betrayer
 [PASS] Unique id: data/story/levels.json:$.levels[4].objectives[3]: l5_obj_ending
-[FAIL] JSON syntax: data/story/lore_clues.json: Expecting value: line 1 column 1 (char 0)
+[PASS] JSON syntax: data/story/lore_clues.json: valid UTF-8 JSON
+[PASS] Unique id: data/story/lore_clues.json:$.lore_clues[0]: lore_resurrection_rule
+[PASS] Unique id: data/story/lore_clues.json:$.lore_clues[1]: lore_resurrection_loophole
