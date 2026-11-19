@@ -145,4 +145,3 @@ func _update_all() -> void:
 	_update_bag_label(GameManager.blood_bags, GameManager.has_weapon)
 	if ObjectiveManager.current_objective:
 		_on_objective_updated(ObjectiveManager.current_objective)
-

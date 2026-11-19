@@ -301,38 +301,8 @@ export class LevelManager extends EventEmitter {
     this._showLoadingScreen(levelIndex);
 
     try {
-      // Create level instance
-      const level = new LevelClass();
 
-      // Pass shared state
-      level.playerInventory = this.playerInventory;
-      level.levelManager = this;
       level.physics = this.physics;
-
-      // Listen for level events
-      this._bindLevelEvents(level);
-
-      // Initialize the level (loads assets, builds scene)
-      await level.init(this.scene, this.assetLoader);
-
-      this.currentLevel = level;
-      this.currentLevelIndex = levelIndex;
-
-      // Hide loading, fade in
-      this._hideLoadingScreen();
-      await this._fadeFromBlack();
-
-      this.state = 'PLAYING';
-      this.emit('levelStarted', { levelIndex, name: this._getLevelName(levelIndex) });
-
-      console.log(`[LevelManager] Level ${levelIndex} started: ${this._getLevelName(levelIndex)}`);
-    } catch (err) {
-      console.error(`[LevelManager] Failed to load level ${levelIndex}:`, err);
-      this._hideLoadingScreen();
-      this.state = 'IDLE';
-      this.emit('levelError', { levelIndex, error: err });
-    }
-  }
 
   /**
    * Transition to the next level
