@@ -166,14 +166,14 @@ export class Level1_Awakening extends LevelEventEmitter {
     // Set up ambient environment
     this._setupEnvironment();
 
+    // Add level group to scene immediately so lights and floor are active
+    this.scene.add(this.levelGroup);
+
     // Load all assets
     await this._loadAssets();
 
     // Set up interactables
     this._setupInteractables();
-
-    // Add level group to scene
-    this.scene.add(this.levelGroup);
 
     // Keyboard listener for interactions
     document.addEventListener('keydown', this._onKeyDown);

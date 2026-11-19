@@ -170,11 +170,12 @@ export class Level2_Corridor extends LevelEventEmitter {
 
     this._createUI();
     this._setupEnvironment();
+    this.scene.add(this.levelGroup);
+
     await this._loadAssets();
     this._setupInteractables();
     this._setupRatPaths();
 
-    this.scene.add(this.levelGroup);
     document.addEventListener('keydown', this._onKeyDown);
 
     console.log('[Level2] The Corridor initialized');

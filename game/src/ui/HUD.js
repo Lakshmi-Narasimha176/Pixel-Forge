@@ -22,7 +22,7 @@ export class HUD {
     this.root = document.createElement('div');
     this.root.id = 'game-hud';
     this.root.style.cssText =
-      'position:fixed;inset:0;z-index:95;pointer-events:none;font-family:"Special Elite",monospace;';
+      'position:fixed;inset:0;z-index:950;pointer-events:none;font-family:"Special Elite",monospace;';
     document.body.appendChild(this.root);
 
     this._buildHealthBar();

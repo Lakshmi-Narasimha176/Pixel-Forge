@@ -1,10 +1,11 @@
 extends Node3D
-## THE LAST REVENGE - first-person survival horror in the Hollis house.
-## Built only from the GLB files in the repository root + the PSX Anomaly kit house pieces.
-## Goal: find the brass key, unlock the slaughter room, take the Devil's Bible, escape by the front door.
-## The Butcher hunts by sight and sound. Run = loud, crouch = quiet, flashlight = visible.
-## G (menu) opens the asset gallery with every character and environment.
+## THE LAST REVENGE - an 8-part survival-horror campaign built from the Pixel-Forge GLB assets.
+## Story + chapters: horror/story.gd.  Gallery of every model: press G in the menu.
+##
+## Core rules: the Butcher hunts by SIGHT (light makes you visible) and SOUND (running is loud, crouching is quiet).
+## Your flashlight SLOWS him when you keep it on him. Throw the bat (T) to pull him away.
 
+const Story = preload("res://horror/story.gd")
 const KIT := "res://PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/"
 const CELL := 2.0
 const MODELS := {
@@ -15,6 +16,7 @@ const MODELS := {
 	"rat": "res://street_rat.glb",
 	"doll": "res://cursed_porcelain_doll_-_antique_horror_prop.glb",
 	"flashlight": "res://horror_game_flashlight_download_game-ready.glb",
+	"walkie": "res://psx-style_horror_walkie-talkie.glb",
 	"bible": "res://devils_bible_-_dark_fantasy_book.glb",
 	"pig": "res://dead_pig.glb",
 	"meat": "res://psx_raw_meat_pack__low-poly_2_types.glb",
@@ -24,6 +26,16 @@ const MODELS := {
 	"fan": "res://old_rusty_ceiling_fan.glb",
 	"bat": "res://baseball_bat_covered_in_blood.glb",
 	"toilet": "res://old_wooden_toilet_house_2.glb",
+	"swamp": "res://abandoned_shack_in_the_swamp.glb",
+	"farm": "res://weathered_red_saltbox_farmhouse.glb",
+	"corridor": "res://horror_corridor_5.glb",
+	"parlor": "res://modular_vintage_living_room_-_game_ready_pbr.glb",
+	"diorama": "res://textured_game_environment.glb",
+	"room": "res://horror_room.glb",
+	"tunnel": "res://tunnel.glb",
+	"soviet": "res://horror_soviet_room.glb",
+	"hook": "res://butcher_meat_hook_rail_-_cured_ham__sausages.glb",
+	"mask": "res://jeson_horror_fan_art.glb",
 }
 
 # ---------------------------------------------------------------- floor plan
@@ -69,7 +81,7 @@ const SIDE := {
 	"W": {"dx": -1, "dz": 0, "rot": PI / 2.0, "axis": "z"},
 }
 
-class Door extends RefCounted:
+class MainDoor extends RefCounted:
 	var pivot: Node3D
 	var body: StaticBody3D
 	var amount := 0.0
@@ -390,7 +402,7 @@ func _build_level() -> void:
 				add_box(pc, Vector3(0.63, 3, 0.26) if e.axis == "x" else Vector3(0.26, 3, 0.63))
 			add_box(cp + Vector3(0, 2.65, 0), Vector3(1.0, 0.7, 0.26) if e.axis == "x" else Vector3(0.26, 0.7, 1.0))
 			if e.type == "door":
-				var d := Door.new()
+				var d := MainDoor.new()
 				d.kind = "door"
 				d.label = e.def.n
 				d.lock = e.def.get("lock", "")
@@ -868,7 +880,7 @@ func _interact() -> void:
 	if it == null: return
 	match it.kind:
 		"door":
-			var d: Door = it.door
+			var d: MainDoor = it.door
 			if d.locked:
 				if d.lock == "slaughter" and has_key:
 					d.locked = false
@@ -996,7 +1008,7 @@ func _update_ui(dt: float) -> void:
 	var f = _find_focus()
 	if f == null: hud_prompt.text = ""
 	elif f.kind == "door":
-		var d: Door = f.door
+		var d: MainDoor = f.door
 		hud_prompt.text = "[E] %s %s%s" % ["Close" if d.target > 0.0 else "Open", d.label, "  (locked)" if d.locked else ""]
 	else: hud_prompt.text = "[E] " + f.label
 	if msg_t > 0.0:

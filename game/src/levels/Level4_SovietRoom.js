@@ -93,10 +93,11 @@ export class Level4_SovietRoom extends LevelEventEmitter {
 
     this._createUI();
     this._setupEnvironment();
+    this.scene.add(this.levelGroup);
+
     await this._loadAssets();
     this._setupInteractables();
 
-    this.scene.add(this.levelGroup);
     document.addEventListener('keydown', this._onKeyDown);
 
     this.showSubtitle("LEVEL 4: SOVIET FACILITY. The wall clock is ticking backward... solve the riddle to escape.", 5000);

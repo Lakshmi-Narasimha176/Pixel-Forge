@@ -79,9 +79,10 @@ export class Level5_Escape extends LevelEventEmitter {
 
     this._createUI();
     this._setupEnvironment();
+    this.scene.add(this.levelGroup);
+
     await this._loadAssets();
 
-    this.scene.add(this.levelGroup);
     document.addEventListener('keydown', this._onKeyDown);
 
     this.showSubtitle("THE ESCAPE! THE TUNNEL IS COLLAPSING! RUN TOWARD THE LIGHT!", 6000);

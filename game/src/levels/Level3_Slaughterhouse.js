@@ -149,11 +149,12 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
 
     this._createUI();
     this._setupEnvironment();
+    this.scene.add(this.levelGroup);
+
     await this._loadAssets();
     this._createKeycard();
     this._setupInteractables();
 
-    this.scene.add(this.levelGroup);
     document.addEventListener('keydown', this._onKeyDown);
 
     console.log('[Level3] The Slaughterhouse initialized');

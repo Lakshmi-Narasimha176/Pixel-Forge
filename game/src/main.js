@@ -301,12 +301,6 @@ async function startNewGame() {
   menuSystem.hide();
   hud.show();
 
-  // Remove ambient backdrop geometry to load Chapter 1
-  if (ambientSceneGroup) {
-    scene.remove(ambientSceneGroup);
-    ambientSceneGroup = null;
-  }
-
   await audioManager.resume();
   audioManager.generateReverb(2.8, 3.5);
 
@@ -316,6 +310,12 @@ async function startNewGame() {
 
   // Load Level 1: The Awakening
   await levelManager.loadLevel(1);
+
+  // Remove ambient backdrop geometry only AFTER Level 1 has loaded
+  if (ambientSceneGroup) {
+    scene.remove(ambientSceneGroup);
+    ambientSceneGroup = null;
+  }
 
   const spawn = levelManager.getSpawnPoint();
   if (spawn) controls.yaw.position.copy(spawn);
