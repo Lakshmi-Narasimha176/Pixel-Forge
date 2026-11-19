@@ -47,7 +47,7 @@ size = Vector3(2.2, 3.0, 0.25)
 script = ExtResource("1_lvl")
 level_id = "level_05"
 level_title = "Level 5: The Betrayer"
-intro_subtitle = "Your old mansion, twisted by guilt. Uncover your friend's betrayal and end the pact."
+intro_subtitle = "The Ledger returned you to life, but your tether followed. Your old home bleeds into a memory maze; find the truth, then choose your revenge."
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_l5")
@@ -120,7 +120,7 @@ pickup_type = "memory"
 item_id = "l5_memory"
 objective_id = "l5_obj_memory"
 subtitle_speaker = "Memory"
-subtitle_text = "Your friend owed the syndicate everything—and traded your life to buy their own."
+subtitle_text = "A memory returns: your friend knew the Ledger would claim you. He killed you deliberately to force a controlled crossing and keep the hidden force from taking your soul. He never asked you."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryFragment"]
 shape = SubResource("BoxShape_pickup")
@@ -136,7 +136,7 @@ pickup_type = "evidence"
 item_id = "l5_confession"
 objective_id = "l5_obj_betrayal_proof"
 subtitle_speaker = "Confession"
-subtitle_text = "'I sealed the pact so neither of us could leave. Forgive me—or end me.'"
+subtitle_text = "'I knew what the Ledger would do to you. I chose a controlled death so you could enter the dead world and break its claim. I killed you without your consent, then hid behind the lie that it was protection. The contract tethered us both. I did it for you, and because I was afraid to die too. I cannot ask you to forgive me.'"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalConfession"]
 shape = SubResource("BoxShape_pickup")
@@ -158,6 +158,22 @@ shape = SubResource("BoxShape_pickup")
 
 [node name="Model" parent="Interactables/BloodBag" instance=ExtResource("7_blood")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
+
+[node name="MemoryShotgun" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.9, 9)
+script = ExtResource("3_pickup")
+prompt_label = "Take Memory Shotgun"
+pickup_type = "weapon"
+item_id = "l5_shotgun"
+weapon_id = "shotgun"
+subtitle_speaker = "The Returned"
+subtitle_text = "A pump shotgun. Six close-range rounds, with spare shells nearby."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryShotgun"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/MemoryShotgun"]
+mesh = SubResource("BoxMesh_note")
 
 [node name="FinalCheckpoint" type="Area3D" parent="Interactables"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 1)

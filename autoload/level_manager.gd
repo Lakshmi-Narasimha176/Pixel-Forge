@@ -3,6 +3,7 @@ extends Node
 
 const LEVEL_SCENES := {
 	"main_menu": "res://scenes/ui/main_menu.tscn",
+	"prologue": "res://scenes/ui/prologue.tscn",
 	"level_01": "res://scenes/levels/level_01/level_01.tscn",
 	"level_02": "res://scenes/levels/level_02/level_02.tscn",
 	"level_03": "res://scenes/levels/level_03/level_03.tscn",
@@ -68,7 +69,7 @@ func go_to_level(level_id: String, reset_checkpoint: bool = true) -> void:
 func start_new_game() -> void:
 	GameState.reset_for_new_game()
 	ObjectiveManager.completed_objectives.clear()
-	await go_to_level("level_01", true)
+	await go_to_level("prologue", true)
 
 
 func continue_game() -> void:

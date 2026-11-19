@@ -1,58 +1,122 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=11 format=3]
 
-[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_pc"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="2_hud"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.35
 height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+radius = 0.31
+height = 1.12
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_leg"]
+radius = 0.13
+height = 0.75
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereMesh" id="SphereMesh_head"]
+radius = 0.22
+height = 0.44
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_weapon"]
+size = Vector3(0.12, 0.13, 0.52)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grip"]
+size = Vector3(0.08, 0.22, 0.11)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bat"]
 top_radius = 0.035
 bottom_radius = 0.022
-height = 0.75
+height = 0.78
+radial_segments = 8
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bat"]
-albedo_color = Color(0.38, 0.2, 0.14, 1)
+[sub_resource type="StandardMaterial3D" id="Material_coat"]
+albedo_color = Color(0.12, 0.15, 0.18, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="Material_skin"]
+albedo_color = Color(0.43, 0.38, 0.34, 1)
+roughness = 0.9
 
 [node name="Player" type="CharacterBody3D"]
-script = ExtResource("1_pc")
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_player")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-shape = SubResource("CapsuleShape3D_1")
+position = Vector3(0, 0.9, 0)
+shape = SubResource("CapsuleShape_player")
 
-[node name="Head" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+[node name="Visual" type="Node3D" parent="."]
 
-[node name="Camera3D" type="Camera3D" parent="Head"]
-current = true
-fov = 75.0
-far = 120.0
+[node name="Body" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0, 1.12, 0)
+mesh = SubResource("CapsuleMesh_body")
+surface_material_override/0 = SubResource("Material_coat")
 
-[node name="Flashlight" type="SpotLight3D" parent="Head/Camera3D"]
-light_color = Color(1, 0.95, 0.85, 1)
-light_energy = 2.0
-spot_range = 24.0
-spot_angle = 36.0
-shadow_enabled = false
+[node name="Head" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0, 1.86, 0)
+mesh = SubResource("SphereMesh_head")
+surface_material_override/0 = SubResource("Material_skin")
 
-[node name="InteractRay" type="RayCast3D" parent="Head/Camera3D"]
-target_position = Vector3(0, 0, -3.5)
-collide_with_areas = true
-collide_with_bodies = true
+[node name="LeftLeg" type="MeshInstance3D" parent="Visual"]
+position = Vector3(-0.16, 0.47, 0)
+mesh = SubResource("CapsuleMesh_leg")
+surface_material_override/0 = SubResource("Material_coat")
 
-[node name="AttackRay" type="RayCast3D" parent="Head/Camera3D"]
-target_position = Vector3(0, 0, -2.6)
-collide_with_areas = false
-collide_with_bodies = true
+[node name="RightLeg" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0.16, 0.47, 0)
+mesh = SubResource("CapsuleMesh_leg")
+surface_material_override/0 = SubResource("Material_coat")
 
-[node name="WeaponPivot" type="Node3D" parent="Head/Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0.35, -0.32, -0.5)
+[node name="WeaponRoot" type="Node3D" parent="Visual"]
+position = Vector3(0.38, 1.18, -0.16)
+rotation = Vector3(-0.08, 0, 0)
+
+[node name="WeaponModel" type="Node3D" parent="Visual/WeaponRoot"]
 visible = false
+rotation = Vector3(0, 0, 0.15)
 
-[node name="BatMesh" type="MeshInstance3D" parent="Head/Camera3D/WeaponPivot"]
+[node name="WeaponMesh" type="MeshInstance3D" parent="Visual/WeaponRoot/WeaponModel"]
+mesh = SubResource("BoxMesh_weapon")
+
+[node name="Grip" type="MeshInstance3D" parent="Visual/WeaponRoot/WeaponModel"]
+position = Vector3(0, -0.13, 0.14)
+mesh = SubResource("BoxMesh_grip")
+surface_material_override/0 = SubResource("Material_coat")
+
+[node name="Bat" type="MeshInstance3D" parent="Visual/WeaponRoot/WeaponModel"]
+visible = false
+rotation = Vector3(1.15, 0, 0.1)
 mesh = SubResource("CylinderMesh_bat")
-surface_material_override/0 = SubResource("StandardMaterial3D_bat")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+position = Vector3(0, 1.38, 0)
+rotation = Vector3(0.16, 0, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+spring_length = 4.2
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
+current = true
+fov = 72.0
+near = 0.08
+far = 65.0
+
+[node name="Flashlight" type="SpotLight3D" parent="CameraPivot/SpringArm3D/Camera3D"]
+position = Vector3(0.25, -0.1, 0.05)
+light_color = Color(0.86, 0.9, 1, 1)
+light_energy = 1.1
+spot_range = 18.0
+spot_angle = 42.0
+shadow_enabled = false
 
 [node name="HUD" parent="." instance=ExtResource("2_hud")]

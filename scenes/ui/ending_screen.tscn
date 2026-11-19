@@ -25,21 +25,38 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="VBox" type="VBoxContainer" parent="CenterBox"]
-custom_minimum_size = Vector2(520, 0)
+custom_minimum_size = Vector2(720, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="CenterBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.2, 0.2, 1)
-text = "THE LAST REVENGE — ENDING"
+text = "LONG LASTING REVENGE"
 horizontal_alignment = 1
 
 [node name="SummaryLabel" type="Label" parent="CenterBox/VBox"]
 layout_mode = 2
-text = "The betrayal is exposed. The pact is broken."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="ChoiceLabel" type="Label" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(680, 100)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RevengeBtn" type="Button" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "Choose Revenge"
+
+[node name="ReleaseBtn" type="Button" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "Release Your Friend"
+
+[node name="BreakLedgerBtn" type="Button" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "Break the Ledger"
 
 [node name="ReplayBtn" type="Button" parent="CenterBox/VBox"]
 layout_mode = 2

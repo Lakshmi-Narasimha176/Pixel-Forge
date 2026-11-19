@@ -121,7 +121,7 @@ item_id = "l4_loophole"
 objective_id = "l4_obj_loophole"
 flag_to_set = "resurrection_loophole_found"
 subtitle_speaker = "Loophole"
-subtitle_text = "LOOPHOLE: If the Betrayer's own anchor is inverted, the pact turns back on its maker."
+subtitle_text = "THE LEDGER'S ORIGINAL WORDING: 'At least one claimant must be defeated.' The Butcher and Strategist were both claimants. Defeating both fulfills the contract."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/LoopholeInscription"]
 shape = SubResource("BoxShape_pickup")

@@ -3,14 +3,32 @@
     {
       "id": "lore_resurrection_rule",
       "level": "level_01",
-      "title": "The Resurrection Rule",
-      "text": "While the Betrayer lives, death returns you to your last anchor—until your soul fractures."
+      "title": "Contract Fragment",
+      "text": "At least one claimant must be defeated. The copied version removes the words 'at least'."
+    },
+    {
+      "id": "lore_criminal_operation",
+      "level": "level_02",
+      "title": "Shipment Ledger",
+      "text": "The Butcher enforced a contract operation designed by the Strategist. Your friend had already been named as a witness and participant."
+    },
+    {
+      "id": "lore_friend_knew",
+      "level": "level_03",
+      "title": "Betrayal Dossier",
+      "text": "Your friend knew the Ledger would claim you and deliberately arranged a controlled death."
     },
     {
       "id": "lore_resurrection_loophole",
       "level": "level_04",
-      "title": "The Resurrection Loophole",
-      "text": "If the Betrayer's own anchor is inverted, the pact turns back on its maker."
+      "title": "The Original Clause",
+      "text": "At least one claimant must be defeated - not exactly one. Defeating the Butcher and Strategist both fulfills the contract."
+    },
+    {
+      "id": "lore_final_confession",
+      "level": "level_05",
+      "title": "The Friend's Confession",
+      "text": "He killed you to force a controlled crossing and keep the hidden force from claiming you. He hoped you would break the contract, but denied you the choice and acted from fear as well as care."
     }
   ]
 }

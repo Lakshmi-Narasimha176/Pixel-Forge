@@ -1,19 +1,26 @@
-# PROGRESS LOG — THE LAST REVENGE (GODOT 4.x)
+# Development progress — LONG LASTING REVENGE
 
-## Completed Tasks
-- [x] Phase 1: Inspected repository structure, Git status, asset sizes, and Godot availability (`GODOT_NOT_FOUND`).
-- [x] Phase 1: Created `docs/PROJECT_AUDIT.md`.
-- [x] Phase 2: Configured `project.godot` (`gl_compatibility`, input map, autoloads) and `icon.svg`.
-- [x] Phase 4: Implemented all 6 autoloads (`GameState`, `DataLoader`, `AudioManager`, `ObjectiveManager`, `SaveManager`, `LevelManager`).
-- [x] Phase 4: Implemented Player (`player_controller.gd`, `player.tscn`), Interaction (`interactable.gd`, `story_pickup.gd`, `locked_door.gd`, `puzzle_switch.gd`), Enemy AI (`base_enemy.gd`, `butcher.tscn`, `strategist.tscn`, `betrayer.tscn`), Traps (`hazard_trap.gd`), Checkpoints (`checkpoint_zone.gd`), and UI (`main_menu`, `hud`, `ending_screen`).
-- [x] Phase 3/5/6: Built all 5 connected levels (`level_01` through `level_05`) and populated `data/story/`, `data/puzzles/`, `data/characters/` JSON files.
-- [x] Phase 9/10: Ran `tools/qa/qa.py` checks, created `docs/TEST_REPORT.md` and `export_presets.cfg`, and updated `README.md`.
+## Implemented
 
-## Current Task
-- [x] All implementation and static QA tasks complete; pushing final changes to GitHub.
+- Godot 4.7.2 project startup, main menu, correct autoload registrations and Compatibility renderer.
+- Skippable betrayal prologue and five playable campaign zones with checkpoints and gated progression.
+- Third-person player, camera-relative movement, run/sprint/crouch/jump, aim, flashlight, health, blood bags, Last Chance and interaction prompts.
+- Pistol, rifle, shotgun and melee bat with pickups, ammo, reloading, weapon selection, hitscan and enemy damage.
+- Patrol, line-of-sight, search, chase, telegraphed attacks and death; heavy Butcher, ranged Strategist, and fast enraging Betrayer profiles.
+- Contract fragments, evidence and memories in a persistent journal with a visited-zone map; three final choices.
+- Local save/load for checkpoint, inventory, ammo, evidence, puzzles, flags, visited zones and settings.
+- Offline low-cost audio, a 60 FPS cap, Compatibility rendering, no gameplay network requests, and selected-scene Windows export configuration.
 
-## Test Results
-- `tools/qa/qa.py audit-project`: PASS (7/7 checks).
-- `tools/qa/qa.py validate-json`: PASS.
-- `res://` reference integrity scan: PASS (0 missing paths in root Godot project).
-- Godot runtime & Windows `.exe` export: NOT RUN (Godot binary & export templates not installed on host macOS).
+## Validation
+
+- Godot 4.7.2 editor filesystem scan completed.
+- Headless smoke check loaded and entered `_ready()` for the menu, prologue, all five level scenes and ending.
+- JSON validation: 48/48 checks passed.
+- Godot project marker audit: 7/7 checks passed.
+
+## Remaining release work
+
+- Install matching Windows export templates, export and launch the executable from a clean folder.
+- Manually play the full campaign and tune boss difficulty, camera feel and encounter placement.
+- Measure frame rate, peak memory and battery use on low-end target hardware; none are claimed as measured.
+- The project uses five compact zones and four weapon families. It does not yet implement the brief's optional machine gun, sniper rifle, sword/katana, axe/hammer, knife, controller remapping, or full NavMesh/pathfinding.

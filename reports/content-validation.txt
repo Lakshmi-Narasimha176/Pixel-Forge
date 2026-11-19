@@ -1,45 +1,52 @@
 CONTENT JSON VALIDATION
 RESULT: PASS
-CHECKS: 41/41 passed
+CHECKS: 48/48 passed
 
-[PASS] JSON syntax: data/characters/characters.json: valid UTF-8 JSON
-[PASS] Unique id: data/characters/characters.json:$.characters[0]: char_protagonist
-[PASS] Unique id: data/characters/characters.json:$.characters[1]: char_butcher
-[PASS] Unique id: data/characters/characters.json:$.characters[2]: char_strategist
-[PASS] Unique id: data/characters/characters.json:$.characters[3]: char_betrayer
-[PASS] JSON syntax: data/puzzles/puzzles.json: valid UTF-8 JSON
-[PASS] Unique id: data/puzzles/puzzles.json:$.puzzles[0]: puzzle_l1_gate
-[PASS] Unique id: data/puzzles/puzzles.json:$.puzzles[1]: puzzle_l3_traps
-[PASS] Unique id: data/puzzles/puzzles.json:$.puzzles[2]: puzzle_l4_anchors
-[PASS] JSON syntax: data/story/dialogue.json: valid UTF-8 JSON
-[PASS] Unique id: data/story/dialogue.json:$.dialogue[0]: dlg_l1_walkie
-[PASS] Unique id: data/story/dialogue.json:$.dialogue[1]: dlg_l3_strategist
-[PASS] Unique id: data/story/dialogue.json:$.dialogue[2]: dlg_l5_betrayer
-[PASS] JSON syntax: data/story/levels.json: valid UTF-8 JSON
-[PASS] Unique id: data/story/levels.json:$.levels[0]: level_01
-[PASS] Unique id: data/story/levels.json:$.levels[0].objectives[0]: l1_obj_walkie
-[PASS] Unique id: data/story/levels.json:$.levels[0].objectives[1]: l1_obj_death_clue
-[PASS] Unique id: data/story/levels.json:$.levels[0].objectives[2]: l1_obj_resurrection_rule
-[PASS] Unique id: data/story/levels.json:$.levels[0].objectives[3]: l1_obj_key
-[PASS] Unique id: data/story/levels.json:$.levels[1]: level_02
-[PASS] Unique id: data/story/levels.json:$.levels[1].objectives[0]: l2_obj_weapon
-[PASS] Unique id: data/story/levels.json:$.levels[1].objectives[1]: l2_obj_evidence
-[PASS] Unique id: data/story/levels.json:$.levels[1].objectives[2]: l2_obj_kill_butcher
-[PASS] Unique id: data/story/levels.json:$.levels[1].objectives[3]: l2_obj_exit
-[PASS] Unique id: data/story/levels.json:$.levels[2]: level_03
-[PASS] Unique id: data/story/levels.json:$.levels[2].objectives[0]: l3_obj_switches
-[PASS] Unique id: data/story/levels.json:$.levels[2].objectives[1]: l3_obj_evidence
-[PASS] Unique id: data/story/levels.json:$.levels[2].objectives[2]: l3_obj_kill_strategist
-[PASS] Unique id: data/story/levels.json:$.levels[2].objectives[3]: l3_obj_exit
-[PASS] Unique id: data/story/levels.json:$.levels[3]: level_04
-[PASS] Unique id: data/story/levels.json:$.levels[3].objectives[0]: l4_obj_loophole
-[PASS] Unique id: data/story/levels.json:$.levels[3].objectives[1]: l4_obj_anchors
-[PASS] Unique id: data/story/levels.json:$.levels[3].objectives[2]: l4_obj_exit
-[PASS] Unique id: data/story/levels.json:$.levels[4]: level_05
-[PASS] Unique id: data/story/levels.json:$.levels[4].objectives[0]: l5_obj_memory
-[PASS] Unique id: data/story/levels.json:$.levels[4].objectives[1]: l5_obj_betrayal_proof
-[PASS] Unique id: data/story/levels.json:$.levels[4].objectives[2]: l5_obj_kill_betrayer
-[PASS] Unique id: data/story/levels.json:$.levels[4].objectives[3]: l5_obj_ending
-[PASS] JSON syntax: data/story/lore_clues.json: valid UTF-8 JSON
-[PASS] Unique id: data/story/lore_clues.json:$.lore_clues[0]: lore_resurrection_rule
-[PASS] Unique id: data/story/lore_clues.json:$.lore_clues[1]: lore_resurrection_loophole
+[PASS] JSON syntax: data\characters\characters.json: valid UTF-8 JSON
+[PASS] Unique id: data\characters\characters.json:$.characters[0]: char_protagonist
+[PASS] Unique id: data\characters\characters.json:$.characters[1]: char_butcher
+[PASS] Unique id: data\characters\characters.json:$.characters[2]: char_strategist
+[PASS] Unique id: data\characters\characters.json:$.characters[3]: char_betrayer
+[PASS] JSON syntax: data\puzzles\puzzles.json: valid UTF-8 JSON
+[PASS] Unique id: data\puzzles\puzzles.json:$.puzzles[0]: puzzle_l1_gate
+[PASS] Unique id: data\puzzles\puzzles.json:$.puzzles[1]: puzzle_l3_traps
+[PASS] Unique id: data\puzzles\puzzles.json:$.puzzles[2]: puzzle_l4_anchors
+[PASS] JSON syntax: data\story\dialogue.json: valid UTF-8 JSON
+[PASS] Unique id: data\story\dialogue.json:$.dialogue[0]: dlg_l1_walkie
+[PASS] Unique id: data\story\dialogue.json:$.dialogue[1]: dlg_l2_butcher
+[PASS] Unique id: data\story\dialogue.json:$.dialogue[2]: dlg_l3_strategist
+[PASS] Unique id: data\story\dialogue.json:$.dialogue[3]: dlg_l4_ledger
+[PASS] Unique id: data\story\dialogue.json:$.dialogue[4]: dlg_l5_betrayer
+[PASS] JSON syntax: data\story\levels.json: valid UTF-8 JSON
+[PASS] Unique id: data\story\levels.json:$.levels[0]: level_01
+[PASS] Unique id: data\story\levels.json:$.levels[0].objectives[0]: l1_obj_walkie
+[PASS] Unique id: data\story\levels.json:$.levels[0].objectives[1]: l1_obj_pistol
+[PASS] Unique id: data\story\levels.json:$.levels[0].objectives[2]: l1_obj_death_clue
+[PASS] Unique id: data\story\levels.json:$.levels[0].objectives[3]: l1_obj_resurrection_rule
+[PASS] Unique id: data\story\levels.json:$.levels[0].objectives[4]: l1_obj_key
+[PASS] Unique id: data\story\levels.json:$.levels[1]: level_02
+[PASS] Unique id: data\story\levels.json:$.levels[1].objectives[0]: l2_obj_weapon
+[PASS] Unique id: data\story\levels.json:$.levels[1].objectives[1]: l2_obj_evidence
+[PASS] Unique id: data\story\levels.json:$.levels[1].objectives[2]: l2_obj_kill_butcher
+[PASS] Unique id: data\story\levels.json:$.levels[1].objectives[3]: l2_obj_exit
+[PASS] Unique id: data\story\levels.json:$.levels[2]: level_03
+[PASS] Unique id: data\story\levels.json:$.levels[2].objectives[0]: l3_obj_switches
+[PASS] Unique id: data\story\levels.json:$.levels[2].objectives[1]: l3_obj_evidence
+[PASS] Unique id: data\story\levels.json:$.levels[2].objectives[2]: l3_obj_rifle
+[PASS] Unique id: data\story\levels.json:$.levels[2].objectives[3]: l3_obj_kill_strategist
+[PASS] Unique id: data\story\levels.json:$.levels[2].objectives[4]: l3_obj_exit
+[PASS] Unique id: data\story\levels.json:$.levels[3]: level_04
+[PASS] Unique id: data\story\levels.json:$.levels[3].objectives[0]: l4_obj_loophole
+[PASS] Unique id: data\story\levels.json:$.levels[3].objectives[1]: l4_obj_anchors
+[PASS] Unique id: data\story\levels.json:$.levels[3].objectives[2]: l4_obj_exit
+[PASS] Unique id: data\story\levels.json:$.levels[4]: level_05
+[PASS] Unique id: data\story\levels.json:$.levels[4].objectives[0]: l5_obj_memory
+[PASS] Unique id: data\story\levels.json:$.levels[4].objectives[1]: l5_obj_betrayal_proof
+[PASS] Unique id: data\story\levels.json:$.levels[4].objectives[2]: l5_obj_kill_betrayer
+[PASS] Unique id: data\story\levels.json:$.levels[4].objectives[3]: l5_obj_ending
+[PASS] JSON syntax: data\story\lore_clues.json: valid UTF-8 JSON
+[PASS] Unique id: data\story\lore_clues.json:$.lore_clues[0]: lore_resurrection_rule
+[PASS] Unique id: data\story\lore_clues.json:$.lore_clues[1]: lore_criminal_operation
+[PASS] Unique id: data\story\lore_clues.json:$.lore_clues[2]: lore_friend_knew
+[PASS] Unique id: data\story\lore_clues.json:$.lore_clues[3]: lore_resurrection_loophole
+[PASS] Unique id: data\story\lore_clues.json:$.lore_clues[4]: lore_final_confession

@@ -8,6 +8,8 @@ extends Node3D
 
 func _ready() -> void:
 	GameState.current_level_id = level_id
+	if not GameState.visited_levels.has(level_id):
+		GameState.visited_levels.append(level_id)
 	ObjectiveManager.load_level_objectives(level_id)
 
 	var spawn := get_node_or_null("SpawnPoint") as Node3D
@@ -22,3 +24,4 @@ func _ready() -> void:
 
 	if not intro_subtitle.is_empty():
 		GameState.show_subtitle(level_title, intro_subtitle, 5.5)
+	SaveManager.save_game()

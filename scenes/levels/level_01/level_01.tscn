@@ -43,7 +43,7 @@ size = Vector3(2.0, 2.8, 0.25)
 script = ExtResource("1_lvl")
 level_id = "level_01"
 level_title = "Level 1: The Awakening"
-intro_subtitle = "You wake in cold fog. Your chest is numb—no pulse. Find out where you are."
+intro_subtitle = "A shot in the dark. Your friend's face above you. Then the grave opens."
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_l1")
@@ -131,13 +131,30 @@ pickup_type = "note"
 item_id = "l1_walkie"
 objective_id = "l1_obj_walkie"
 subtitle_speaker = "Static Voice"
-subtitle_text = "'You're already dead, friend. The Butcher and the Strategist buried you—yet the pact drags you back.'"
+subtitle_text = "'You're dead. I know that voice: someone you trusted put the gun against your chest. Find the Ledger.'"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/WalkieTalkie"]
 shape = SubResource("BoxShape_pickup")
 
 [node name="Model" parent="Interactables/WalkieTalkie" instance=ExtResource("5_walkie")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="ServicePistol" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.9, 5)
+script = ExtResource("3_pickup")
+prompt_label = "Take Service Pistol"
+pickup_type = "weapon"
+item_id = "l1_pistol"
+objective_id = "l1_obj_pistol"
+weapon_id = "pistol"
+subtitle_speaker = "The Returned"
+subtitle_text = "A service pistol, still loaded. The dead can bleed. Left click to fire; R to reload."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ServicePistol"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/ServicePistol"]
+mesh = SubResource("BoxMesh_small")
 
 [node name="DeathLedger" type="Area3D" parent="Interactables"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.9, -4)
@@ -147,7 +164,7 @@ pickup_type = "evidence"
 item_id = "l1_death_ledger"
 objective_id = "l1_obj_death_clue"
 subtitle_speaker = "Thought"
-subtitle_text = "My name is crossed out in dried blood. Date of death: three nights ago."
+subtitle_text = "The death ledger names me. Beneath it: a witness signed with my closest friend's initials. He was there."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DeathLedger"]
 shape = SubResource("BoxShape_pickup")
@@ -164,7 +181,7 @@ item_id = "l1_dark_tome"
 objective_id = "l1_obj_resurrection_rule"
 flag_to_set = "resurrection_rule_discovered"
 subtitle_speaker = "The Pact"
-subtitle_text = "RESURRECTION RULE: While the Betrayer lives, death returns you to your last anchor—until your soul fractures."
+subtitle_text = "A torn contract: 'At least one claimant must be defeated.' Someone scratched out the words 'at least'."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DarkTome"]
 shape = SubResource("BoxShape_pickup")

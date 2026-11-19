@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/enemies/base_enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/enemies/butcher_boss.gd" id="1_enemy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_butcher"]
 radius = 0.55
@@ -20,12 +20,14 @@ size = Vector3(0.12, 0.45, 0.7)
 [node name="Butcher" type="CharacterBody3D"]
 script = ExtResource("1_enemy")
 enemy_name = "The Butcher"
-max_health = 100
-move_speed = 3.4
-attack_damage = 25
+max_health = 180
+move_speed = 2.6
+attack_damage = 28
+damage_resistance = 0.15
 detect_range = 14.0
-attack_range = 2.3
-attack_cooldown = 1.3
+attack_range = 2.5
+attack_windup = 1.0
+attack_cooldown = 1.6
 death_objective_id = "l2_obj_kill_butcher"
 death_flag = "butcher_defeated"
 reward_item_id = "l2_bunker_keycard"

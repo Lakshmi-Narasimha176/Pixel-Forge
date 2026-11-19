@@ -9,6 +9,10 @@
           "description": "Pick up the crackling walkie-talkie."
         },
         {
+          "id": "l1_obj_pistol",
+          "description": "Take the service pistol and learn to defend yourself."
+        },
+        {
           "id": "l1_obj_death_clue",
           "description": "Inspect the ledger to learn what happened to you."
         },
@@ -55,6 +59,10 @@
         {
           "id": "l3_obj_evidence",
           "description": "Recover the encrypted betrayal dossier."
+        },
+        {
+          "id": "l3_obj_rifle",
+          "description": "Collect the Bunker Service Rifle before confronting the Strategist."
         },
         {
           "id": "l3_obj_kill_strategist",

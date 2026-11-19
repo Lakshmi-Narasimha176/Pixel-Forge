@@ -21,12 +21,18 @@ func save_game() -> bool:
 		"health": GameState.health,
 		"blood_bags": GameState.blood_bags,
 		"has_weapon": GameState.has_weapon,
+		"current_weapon": GameState.current_weapon,
+		"owned_weapons": GameState.owned_weapons,
+		"weapon_ammo": GameState.weapon_ammo,
 		"flashlight_battery": GameState.flashlight_battery,
+		"flashlight_enabled": GameState.flashlight_enabled,
 		"resurrection_count": GameState.resurrection_count,
 		"resurrection_rule_discovered": GameState.resurrection_rule_discovered,
 		"resurrection_loophole_found": GameState.resurrection_loophole_found,
 		"progression_flags": GameState.progression_flags,
 		"collected_items": GameState.collected_items,
+		"story_journal": GameState.story_journal,
+		"visited_levels": GameState.visited_levels,
 		"completed_objectives": ObjectiveManager.completed_objectives,
 		"puzzle_states": GameState.puzzle_states,
 		"mouse_sensitivity": GameState.mouse_sensitivity,
@@ -60,7 +66,10 @@ func load_game() -> bool:
 		return false
 
 	var data: Dictionary = json.data
-	GameState.current_level_id = str(data.get("current_level_id", "level_01"))
+	var level_id := str(data.get("current_level_id", "level_01"))
+	if not LevelManager.LEVEL_SCENES.has(level_id) or not level_id.begins_with("level_"):
+		level_id = "level_01"
+	GameState.current_level_id = level_id
 	GameState.has_checkpoint = bool(data.get("has_checkpoint", false))
 	var cp: Variant = data.get("checkpoint_position", [0.0, 1.0, 0.0])
 	if cp is Array and cp.size() == 3:
@@ -68,10 +77,29 @@ func load_game() -> bool:
 	GameState.health = int(data.get("health", GameState.MAX_HEALTH))
 	GameState.blood_bags = int(data.get("blood_bags", 1))
 	GameState.has_weapon = bool(data.get("has_weapon", false))
+	GameState.current_weapon = str(data.get("current_weapon", ""))
+	GameState.owned_weapons.clear()
+	var owned: Variant = data.get("owned_weapons", [])
+	if owned is Array:
+		for weapon: Variant in owned:
+			if GameState.WEAPONS.has(str(weapon)) and not GameState.owned_weapons.has(str(weapon)):
+				GameState.owned_weapons.append(str(weapon))
+	var ammo_data: Variant = data.get("weapon_ammo", {})
+	GameState.weapon_ammo = ammo_data.duplicate(true) if ammo_data is Dictionary else {}
+	if GameState.owned_weapons.is_empty() and bool(data.get("has_weapon", false)):
+		GameState.owned_weapons.append("bat")
+		GameState.weapon_ammo["bat"] = {"mag": 0, "reserve": 0}
+	if not GameState.owned_weapons.has(GameState.current_weapon):
+		GameState.current_weapon = GameState.owned_weapons[0] if not GameState.owned_weapons.is_empty() else ""
+	GameState.has_weapon = not GameState.current_weapon.is_empty()
+	if not GameState.current_weapon.is_empty():
+		GameState.weapon_damage = int(GameState.WEAPONS[GameState.current_weapon]["damage"])
 	GameState.flashlight_battery = float(data.get("flashlight_battery", 100.0))
+	GameState.flashlight_enabled = bool(data.get("flashlight_enabled", true)) and GameState.flashlight_battery > 0.0
 	GameState.resurrection_count = int(data.get("resurrection_count", 0))
 	GameState.resurrection_rule_discovered = bool(data.get("resurrection_rule_discovered", false))
 	GameState.resurrection_loophole_found = bool(data.get("resurrection_loophole_found", false))
+	GameState.is_dead = false
 
 	var flags: Variant = data.get("progression_flags", {})
 	if flags is Dictionary:
@@ -82,6 +110,13 @@ func load_game() -> bool:
 	if items is Array:
 		for item in items:
 			GameState.collected_items.append(str(item))
+	var journal: Variant = data.get("story_journal", {})
+	GameState.story_journal = journal.duplicate(true) if journal is Dictionary else {}
+	GameState.visited_levels.clear()
+	var visited: Variant = data.get("visited_levels", [])
+	if visited is Array:
+		for region: Variant in visited:
+			GameState.visited_levels.append(str(region))
 
 	ObjectiveManager.completed_objectives.clear()
 	var objs: Variant = data.get("completed_objectives", [])

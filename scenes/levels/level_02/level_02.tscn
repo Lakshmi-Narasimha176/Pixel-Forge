@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="4_door"]
 [ext_resource type="Script" path="res://scripts/systems/checkpoint_zone.gd" id="5_cp"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/butcher.tscn" id="6_butcher"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/lost_soul.tscn" id="11_soul"]
 [ext_resource type="PackedScene" path="res://baseball_bat_covered_in_blood.glb" id="7_bat"]
 [ext_resource type="PackedScene" path="res://blood_bag.glb" id="8_blood"]
 [ext_resource type="PackedScene" path="res://dead_pig.glb" id="9_pig"]
@@ -48,7 +49,7 @@ size = Vector3(2.0, 2.8, 0.25)
 script = ExtResource("1_lvl")
 level_id = "level_02"
 level_title = "Level 2: The Butcher"
-intro_subtitle = "The slaughterhouse reeks of iron. Find a weapon before The Butcher finds you."
+intro_subtitle = "Butcher's Territory. He came for the contract; someone else chose your name."
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_l2")
@@ -130,10 +131,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.8, 10)
 script = ExtResource("3_pickup")
 prompt_label = "Equip Bloodied Baseball Bat"
 pickup_type = "weapon"
+weapon_id = "bat"
 item_id = "l2_bat"
 objective_id = "l2_obj_weapon"
 subtitle_speaker = "Combat"
-subtitle_text = "Baseball Bat equipped! Left-click to strike enemies."
+subtitle_text = "The Ironwood Bat hits hard. Mouse wheel or Tab changes weapons; left click attacks."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BaseballBat"]
 shape = SubResource("BoxShape_pickup")
@@ -149,12 +151,29 @@ pickup_type = "evidence"
 item_id = "l2_evidence"
 objective_id = "l2_obj_evidence"
 subtitle_speaker = "Evidence"
-subtitle_text = "Manifest signed by 'The Strategist'—someone paid The Butcher to silence you."
+subtitle_text = "A contract marked by your friend's initials: the Strategist planned your death as a controlled entry into the Ledger."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/EvidenceNote"]
 shape = SubResource("BoxShape_pickup")
 
 [node name="Mesh" type="MeshInstance3D" parent="Interactables/EvidenceNote"]
+mesh = SubResource("BoxMesh_note")
+
+[node name="PistolAmmo" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.8, -2)
+script = ExtResource("3_pickup")
+prompt_label = "Take Pistol Ammunition"
+pickup_type = "ammo"
+item_id = "l2_pistol_ammo"
+ammo_weapon = "pistol"
+ammo_amount = 24
+subtitle_speaker = "System"
+subtitle_text = "Pistol ammunition recovered (+24)."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/PistolAmmo"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/PistolAmmo"]
 mesh = SubResource("BoxMesh_note")
 
 [node name="BloodBag" type="Area3D" parent="Interactables"]
@@ -198,3 +217,6 @@ mesh = SubResource("BoxMesh_door")
 
 [node name="Butcher" parent="." instance=ExtResource("6_butcher")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -9)
+
+[node name="LostSoul" parent="." instance=ExtResource("11_soul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.15, -5)

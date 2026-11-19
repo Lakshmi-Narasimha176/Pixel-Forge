@@ -1,6 +1,6 @@
-# THE LAST REVENGE
+# LONG LASTING REVENGE
 
-A first-person 3D horror-adventure created for PixelForge 2026. Theme: THE UNKNOWN.
+A third-person 3D action-horror campaign created for PixelForge 2026. Theme: THE UNKNOWN.
 
 ## Requirements
 - Windows [version]
@@ -20,9 +20,13 @@ A first-person 3D horror-adventure created for PixelForge 2026. Theme: THE UNKNO
 | Move | WASD |
 | Look | Mouse |
 | Interact | E |
+| Aim | Right mouse |
+| Fire / melee | Left mouse |
+| Reload | R |
+| Journal | J |
 | Pause | Esc |
-| Sprint | [confirm with team] |
-| Crouch | [confirm with team] |
+| Sprint | Shift |
+| Crouch | C |
 
 Replace this table with the final tested bindings.
 

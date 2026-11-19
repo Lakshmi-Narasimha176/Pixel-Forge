@@ -1,56 +1,58 @@
-# THE LAST REVENGE (Godot 4.x — Compatibility Renderer)
+# LONG LASTING REVENGE
 
-**Theme:** THE UNKNOWN  
-**Genre:** First-Person Supernatural Horror Adventure  
-**Target Platform:** Windows PC (4 GB RAM, Compatibility Renderer, Offline-First)
+A single-player, third-person action-horror campaign built with Godot 4 and GDScript. Explore a dead world, fight the Butcher and the Strategist, uncover why your friend killed you, and decide what to do with the truth.
 
----
+## Run
 
-## Running & Exporting in Godot 4.x
+1. Open the repository's `project.godot` in Godot 4.7.2 (or a compatible Godot 4 release).
+2. Let Godot import the included assets, then press **F6** to play the current scene or **F5** to launch the main menu.
+3. Choose **New Game**. The opening story cards can be skipped with any key or mouse click.
 
-1. Install **Godot 4.2+** (Standard edition, GDScript).
-2. Open Godot Project Manager -> **Import** -> select `project.godot` at the repository root.
-3. Press **F5** to launch from `res://scenes/ui/main_menu.tscn`.
-4. **Windows `.exe` Export:**
-   - In Godot: **Editor -> Manage Export Templates -> Download and Install** for your Godot 4.x version.
-   - Go to **Project -> Export...**, select **Windows Desktop** (`export_presets.cfg`), and export to `build/windows/TheLastRevenge.exe`.
-
----
+The project is offline-first. It makes no network requests and all story, save, audio and gameplay data are local. The Windows export preset is `export_presets.cfg`; install matching Godot export templates before exporting.
 
 ## Controls
 
-| Key / Input | Action |
+| Input | Action |
 |---|---|
-| **W, A, S, D** | Move |
-| **Mouse** | Look around |
-| **Shift** | Sprint |
-| **C** | Toggle Crouch |
-| **Space** | Jump |
-| **E** | Interact (pick up items, read clues, flip switches, open doors) |
-| **F** | Toggle Flashlight |
-| **Left Mouse** | Melee Attack (once Baseball Bat is equipped) |
-| **Q** | Use Blood Bag (+35 HP) |
-| **Esc** | Pause Menu (Resume, Restart Checkpoint, Save, Main Menu) |
+| W / A / S / D | Move relative to the camera |
+| Mouse | Look |
+| Right mouse | Aim |
+| Left mouse | Fire or melee attack |
+| Shift | Sprint |
+| Ctrl | Run |
+| C | Crouch |
+| Space | Jump |
+| E | Interact, pick up, or read |
+| R | Reload |
+| 1 / 2 / 3, Tab, mouse wheel up | Select or cycle weapons |
+| F | Toggle flashlight |
+| Q | Use a blood bag |
+| V | Last Chance (available below 31 health; 40-second cooldown) |
+| J | Open journal and discovered-region map |
+| Esc | Pause, or close the journal |
 
----
+## Campaign
 
-## Five Connected Levels
+The five compact, connected-by-story zones cover the 12 story beats in the design brief: the betrayal prologue and dead settlement; the Butcher's territory; the Strategist's bunker; the Ledger and resurrection loophole; and the Memory Labyrinth and final confrontation. Evidence is kept in the **J** journal. After the confrontation, choose revenge, release your friend, or break the Ledger.
 
-1. **Level 1 — The Awakening (`scenes/levels/level_01/level_01.tscn`)**: Wake in the foggy abandoned settlement, pick up the walkie-talkie, discover you are dead, read the Dark Tome for the **Resurrection Rule**, and unlock the Settlement Gate.
-2. **Level 2 — The Butcher (`scenes/levels/level_02/level_02.tscn`)**: Equip the bloodied baseball bat, gather shipment evidence, defeat **The Butcher**, and take the Bunker Keycard.
-3. **Level 3 — The Strategist (`scenes/levels/level_03/level_03.tscn`)**: Flip both breaker switches to disable corridor shock traps, recover the betrayal dossier, and defeat **The Strategist**.
-4. **Level 4 — The Impossible Return (`scenes/levels/level_04/level_04.tscn`)**: Discover the **Resurrection Loophole** in the distorted afterlife and align all 3 Soul Anchors.
-5. **Level 5 — The Betrayer (`scenes/levels/level_05/level_05.tscn`)**: Examine your dead friend's memory and confession, defeat **The Betrayer**, and step into the Dawn Sanctuary (`scenes/ui/ending_screen.tscn`).
+## Performance and saves
 
----
+The project uses Godot's Compatibility renderer, simple low-poly character meshes, limited scene lights with shadows off, short view distance, 60 FPS cap, and a small audio loop generated once at startup. These choices reduce GPU and CPU load and work offline. They do not guarantee a specific frame rate or memory use on every low-end PC; the project has not yet been measured on the target range of hardware.
 
-## Documentation & QA
+Save data is stored locally by Godot under `user://` (the platform's application-data folder). Checkpoints, collected evidence, weapons/ammo, puzzle states, visited regions and story flags are saved.
 
-- `docs/PROJECT_AUDIT.md` — Initial repository, asset size, and hardware audit.
-- `docs/PROGRESS.md` — Development log.
-- `docs/TEST_REPORT.md` — Static QA checks and runtime test status.
-- Offline QA check:
-  ```bash
-  python3 tools/qa/qa.py validate-json data --id-field id --out reports/content-validation.txt
-  python3 tools/qa/qa.py audit-project . --out reports/project-audit.txt
-  ```
+## Validation
+
+With Godot 4.7.2 installed, run the scene smoke check from PowerShell:
+
+```powershell
+& "$env:USERPROFILE\Desktop\Godot_v4.7.2-stable_win64.exe" --headless --path . --scene res://tools/qa/scene_validator.tscn
+```
+
+Run the JSON checks with:
+
+```powershell
+python tools/qa/qa.py validate-json data --id-field id --out reports/content-validation.txt
+```
+
+The smoke check enters the menu, all five levels, and the ending in the actual engine. A Windows executable has not been exported or launch-tested yet.

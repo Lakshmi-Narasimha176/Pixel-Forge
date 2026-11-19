@@ -175,6 +175,23 @@ shape = SubResource("BoxShape_trap")
 mesh = SubResource("BoxMesh_trap")
 surface_material_override/0 = SubResource("Mat_trap")
 
+[node name="BunkerRifle" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.9, 0)
+script = ExtResource("3_pickup")
+prompt_label = "Take Bunker Service Rifle"
+pickup_type = "weapon"
+item_id = "l3_rifle"
+objective_id = "l3_obj_rifle"
+weapon_id = "rifle"
+subtitle_speaker = "The Returned"
+subtitle_text = "A service rifle with one full magazine. Hold left click for controlled bursts; press R to reload."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BunkerRifle"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/BunkerRifle"]
+mesh = SubResource("BoxMesh_box")
+
 [node name="BetrayalDossier" type="Area3D" parent="Interactables"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.9, -2)
 script = ExtResource("3_pickup")
@@ -183,7 +200,7 @@ pickup_type = "evidence"
 item_id = "l3_dossier"
 objective_id = "l3_obj_evidence"
 subtitle_speaker = "Dossier"
-subtitle_text = "Your closest friend—already dead—sold you out to fund the resurrection pact."
+subtitle_text = "The dossier proves your friend knew you were marked by the contract. He accepted a role in the ritual, then crossed out the Strategist's order."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalDossier"]
 shape = SubResource("BoxShape_pickup")

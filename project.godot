@@ -10,17 +10,38 @@ config_version=5
 
 [application]
 
-config/features=PackedStringArray("4.7")
+config/name="LONG LASTING REVENGE"
+config/description="A single-player third-person action-horror story. Fully playable offline."
+run/main_scene="res://scenes/ui/main_menu.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+run/max_fps=60
+run/low_processor_mode=true
+
+[autoload]
+
+GameState="*res://autoload/game_state.gd"
+AudioManager="*res://autoload/audio_manager.gd"
+DataLoader="*res://autoload/data_loader.gd"
+ObjectiveManager="*res://autoload/objective_manager.gd"
+SaveManager="*res://autoload/save_manager.gd"
+LevelManager="*res://autoload/level_manager.gd"
+GameManager="*uid://dra3q53fgodrk"
 
 [display]
 
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1152
+window/size/window_height_override=648
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [physics]
 
-3d/physics_engine="Jolt Physics"
+3d/physics_engine="GodotPhysics3D"
 
 [rendering]
 
-rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.015, 0.02, 0.028, 1)

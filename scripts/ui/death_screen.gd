@@ -12,12 +12,12 @@ func _ready() -> void:
 	if main_menu_btn:
 		main_menu_btn.pressed.connect(_on_main_menu)
 	if rule_label:
-		rule_label.text = "THE RESURRECTION RULE:\nDeath is not an escape. The entity brings you back."
+		rule_label.text = "THE RESURRECTION RULE:\nDeath returns you to your last checkpoint."
 
 func _on_resurrect() -> void:
 	get_tree().paused = false
-	GameManager.resurrect()
+	GameState.trigger_resurrection()
 
 func _on_main_menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+	LevelManager.go_to_level("main_menu", false)

@@ -4,19 +4,31 @@
       "id": "dlg_l1_walkie",
       "speaker": "Static Voice",
       "level": "level_01",
-      "text": "You're already dead, friend. The Butcher and the Strategist buried you—yet the pact drags you back."
+      "text": "You are dead. Someone you trusted put the gun against your chest. Find the Ledger."
+    },
+    {
+      "id": "dlg_l2_butcher",
+      "speaker": "The Butcher",
+      "level": "level_02",
+      "text": "The man who hired me said the contract could bring the dead back. He knew your name before I did."
     },
     {
       "id": "dlg_l3_strategist",
       "speaker": "The Strategist",
       "level": "level_03",
-      "text": "You think dying was an accident? Look at the rift..."
+      "text": "Your friend knew the Ledger had marked you. He crossed out my order, but still pulled the trigger."
+    },
+    {
+      "id": "dlg_l4_ledger",
+      "speaker": "Ledger Keeper",
+      "level": "level_04",
+      "text": "At least one claimant must be defeated. Two names are crossed out. The passage is paid."
     },
     {
       "id": "dlg_l5_betrayer",
       "speaker": "The Betrayer",
       "level": "level_05",
-      "text": "I sealed the pact so neither of us could leave. Forgive me—or end me."
+      "text": "I chose your death as a controlled crossing, hoping you could break the claim. I did not ask you. I was afraid, too."
     }
   ]
 }

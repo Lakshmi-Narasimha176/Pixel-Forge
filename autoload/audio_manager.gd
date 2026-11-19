@@ -3,41 +3,41 @@ extends Node
 
 var _sfx_player: AudioStreamPlayer
 var _ambient_player: AudioStreamPlayer
-var _ambient_gen: AudioStreamGenerator
-var _ambient_playback: AudioStreamGeneratorPlayback
-var _phase: float = 0.0
-
-
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_sfx_player = AudioStreamPlayer.new()
 	_sfx_player.bus = "Master"
 	add_child(_sfx_player)
-
 	_ambient_player = AudioStreamPlayer.new()
 	_ambient_player.bus = "Master"
-	_ambient_player.volume_db = -18.0
-	_ambient_gen = AudioStreamGenerator.new()
-	_ambient_gen.mix_rate = 22050.0
-	_ambient_gen.buffer_length = 0.25
-	_ambient_player.stream = _ambient_gen
+	_ambient_player.volume_db = -26.0
+	_ambient_player.stream = _make_ambient_loop()
 	add_child(_ambient_player)
 	_ambient_player.play()
-	_ambient_playback = _ambient_player.get_stream_playback() as AudioStreamGeneratorPlayback
 	apply_volume(GameState.master_volume)
 
 
-func _process(_delta: float) -> void:
-	if _ambient_playback == null:
-		return
-	var frames := _ambient_playback.get_frames_available()
-	var mix_rate := _ambient_gen.mix_rate
+func _make_ambient_loop() -> AudioStreamWAV:
+	# A tiny precomputed-in-memory loop avoids per-frame synthesis and external audio downloads.
+	var rate := 8000
+	var frames := rate * 3
+	var data := PackedByteArray()
+	data.resize(frames)
 	for i in range(frames):
-		_phase += 55.0 / mix_rate
-		if _phase > 1.0:
-			_phase -= 1.0
-		var sample := sin(_phase * TAU) * 0.12 + sin(_phase * TAU * 1.5) * 0.06
-		_ambient_playback.push_frame(Vector2(sample, sample))
+		var time := float(i) / float(rate)
+		var low := sin(time * TAU * 43.0) * 0.34
+		var overtone := sin(time * TAU * 47.0) * 0.12
+		var breath := 0.65 + 0.35 * sin(time * TAU / 3.0)
+		data[i] = clampi(int(((low + overtone) * breath * 0.5 + 0.5) * 255.0), 0, 255)
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_8_BITS
+	stream.mix_rate = rate
+	stream.stereo = false
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_begin = 0
+	stream.loop_end = frames
+	stream.data = data
+	return stream
 
 
 func apply_volume(linear: float) -> void:
@@ -62,6 +62,12 @@ func play_sfx(sfx_name: String) -> void:
 		"attack":
 			freq = 140.0
 			duration = 0.12
+		"fire":
+			freq = 95.0
+			duration = 0.09
+		"reload":
+			freq = 360.0
+			duration = 0.16
 		"hit":
 			freq = 110.0
 			duration = 0.14
