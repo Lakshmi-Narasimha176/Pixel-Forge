@@ -52,3 +52,4 @@ text = "Resurrect At Checkpoint"
 [node name="MainMenuBtn" type="Button" parent="CenterBox/VBox"]
 layout_mode = 2
 text = "Main Menu"
+
