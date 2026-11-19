@@ -52,10 +52,13 @@ func _physics_process(delta: float) -> void:
 
 	if _player and not GameState.is_dead:
 		var dist := global_position.distance_to(_player.global_position)
+		var old_state := state
 		if dist <= attack_range:
 			state = State.ATTACK
 		elif dist <= detect_range:
 			state = State.CHASE
+			if old_state != State.CHASE and old_state != State.ATTACK:
+				AudioManager.play_enemy_sfx(enemy_name, "growl")
 		elif not _patrol_points.is_empty():
 			state = State.PATROL
 		else:

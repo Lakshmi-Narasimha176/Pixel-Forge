@@ -24,6 +24,8 @@ var _attack_cooldown: float = 0.0
 var _flicker_timer: float = 0.0
 var _current_interactable: Node = null
 var _spawn_position: Vector3 = Vector3.ZERO
+var _footstep_timer: float = 0.0
+var _was_on_floor: bool = false
 
 
 func _ready() -> void:
@@ -95,15 +97,17 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= gravity * delta
 	elif Input.is_action_just_pressed("jump") and not _is_crouching:
 		velocity.y = jump_velocity
+		AudioManager.play_sfx("jump")
 
 	# Movement
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)).normalized()
 
+	var is_sprint := Input.is_action_pressed("sprint") and input_dir.y < 0.0
 	var speed := walk_speed
 	if _is_crouching:
 		speed = crouch_speed
-	elif Input.is_action_pressed("sprint") and input_dir.y < 0.0:
+	elif is_sprint:
 		speed = sprint_speed
 
 	if direction:
@@ -114,8 +118,43 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0.0, speed * delta * 10.0)
 
 	move_and_slide()
+
+	# Landing audio
+	if is_on_floor() and not _was_on_floor:
+		AudioManager.play_sfx("land")
+	_was_on_floor = is_on_floor()
+
+	# Footstep audio with surface detection
+	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
+	if is_on_floor() and horizontal_speed > 0.5:
+		var step_interval := 0.45
+		if _is_crouching:
+			step_interval = 0.65
+		elif is_sprint:
+			step_interval = 0.30
+		_footstep_timer += delta
+		if _footstep_timer >= step_interval:
+			_footstep_timer = 0.0
+			var surface := _detect_surface()
+			AudioManager.play_footstep(surface, is_sprint, _is_crouching)
+	else:
+		_footstep_timer = 0.0
+
 	_update_flashlight(delta)
 	_update_interaction_ray()
+
+
+func _detect_surface() -> String:
+	if get_slide_collision_count() > 0:
+		var col := get_slide_collision(0)
+		var collider := col.get_collider()
+		if collider:
+			if collider.is_in_group("wood"): return "wood"
+			if collider.is_in_group("grass"): return "grass"
+			if collider.is_in_group("dirt"): return "dirt"
+			if collider.is_in_group("carpet"): return "carpet"
+			if collider.is_in_group("metal"): return "metal"
+	return "concrete"
 
 
 func _toggle_flashlight() -> void:
