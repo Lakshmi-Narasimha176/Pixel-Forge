@@ -103,9 +103,14 @@ func _update_bag_label(count: int, has_wep: bool) -> void:
 		var wep_text = "Baseball Bat (LMB)" if has_wep else "Unarmed"
 		bag_label.text = "Blood Bags [Q]: %d  |  %s" % [count, wep_text]
 
-func _on_objective_updated(text: String) -> void:
+func _on_objective_updated(obj: Variant) -> void:
 	if objective_label:
-		objective_label.text = "Objective:\n" + text
+		var desc: String = ""
+		if obj is Dictionary:
+			desc = obj.get("description", "")
+		elif obj is String:
+			desc = obj
+		objective_label.text = "Objective:\n" + desc
 
 func _on_player_died() -> void:
 	get_tree().paused = true

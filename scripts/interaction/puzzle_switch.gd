@@ -1,4 +1,4 @@
-extends Interactable
+extends "res://scripts/interaction/interactable.gd"
 ## Interactive puzzle switch or breaker lever.
 
 @export var puzzle_id: String = ""
