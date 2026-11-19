@@ -41,5 +41,12 @@ func load_json(relative_path: String, required_keys: Array[String] = []) -> Vari
 	return data
 
 
+func get_levels() -> Array:
+	var data = load_json("res://data/story/levels.json", ["levels"])
+	if data == null:
+		return []
+	return data.get("levels", [])
+
+
 func clear_cache() -> void:
 	_cache.clear()

@@ -72,7 +72,7 @@ func _on_restart() -> void:
 
 func _on_save() -> void:
 	SaveSystem.save_game()
-	show_subtitle("Progress saved.", 2.0)
+	show_subtitle("System", "Progress saved.", 2.0)
 
 func _on_menu() -> void:
 	get_tree().paused = false
@@ -116,9 +116,9 @@ func set_prompt(text: String) -> void:
 	if prompt_label:
 		prompt_label.text = text
 
-func show_subtitle(text: String, duration: float = 3.5) -> void:
+func show_subtitle(speaker: String, text: String, duration: float = 3.5) -> void:
 	if subtitle_label and subtitle_panel:
-		subtitle_label.text = text
+		subtitle_label.text = "[%s]: %s" % [speaker, text]
 		subtitle_panel.visible = true
 		subtitle_timer = duration
 
