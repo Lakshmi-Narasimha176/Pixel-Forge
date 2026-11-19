@@ -9,11 +9,11 @@ import * as THREE from 'three';
 
 /** Asset paths relative to game/ directory */
 const ASSETS = {
-  corridor: '../horror_corridor_5.glb',
-  ghost: '../horror_ghost_character_-_blood_stained_spirit.glb',
-  baseballBat: '../baseball_bat_covered_in_blood.glb',
-  rat: '../street_rat.glb',
-  door: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb'
+  corridor: '/horror_corridor_5.glb',
+  ghost: '/horror_ghost_character_-_blood_stained_spirit.glb',
+  baseballBat: '/baseball_bat_covered_in_blood.glb',
+  rat: '/street_rat.glb',
+  door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb'
 };
 
 /** Ghost behavior states */

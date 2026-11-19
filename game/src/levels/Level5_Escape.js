@@ -9,13 +9,13 @@ import * as THREE from 'three';
 
 /** Asset paths relative to game/ directory */
 const ASSETS = {
-  tunnel: '../tunnel.glb',
-  farmhouse: '../weathered_red_saltbox_farmhouse.glb',
-  shack: '../abandoned_shack_in_the_swamp.glb',
-  ghost: '../horror_ghost_character_-_blood_stained_spirit.glb',
-  butcher: '../horror_butcher_fat_killer_bloody_cleaver.glb',
-  jason: '../jeson_horror_fan_art.glb',
-  outhouse: '../old_wooden_toilet_house_2.glb'
+  tunnel: '/tunnel.glb',
+  farmhouse: '/weathered_red_saltbox_farmhouse.glb',
+  shack: '/abandoned_shack_in_the_swamp.glb',
+  ghost: '/horror_ghost_character_-_blood_stained_spirit.glb',
+  butcher: '/horror_butcher_fat_killer_bloody_cleaver.glb',
+  jason: '/jeson_horror_fan_art.glb',
+  outhouse: '/old_wooden_toilet_house_2.glb'
 };
 
 /** EventEmitter base */

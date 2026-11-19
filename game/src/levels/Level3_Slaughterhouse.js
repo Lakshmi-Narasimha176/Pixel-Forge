@@ -9,15 +9,15 @@ import * as THREE from 'three';
 
 /** Asset paths relative to game/ directory */
 const ASSETS = {
-  meatHook: '../butcher_meat_hook_rail_-_cured_ham__sausages.glb',
-  butcher: '../horror_butcher_fat_killer_bloody_cleaver.glb',
-  deadPig: '../dead_pig.glb',
-  rawMeat: '../psx_raw_meat_pack__low-poly_2_types.glb',
-  bloodBag: '../blood_bag.glb',
-  bloodWall: '../abandoned_horror_wall_with_blood_splatter.glb',
-  door: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb',
-  wall: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb',
-  floor: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_floor.glb'
+  meatHook: '/butcher_meat_hook_rail_-_cured_ham__sausages.glb',
+  butcher: '/horror_butcher_fat_killer_bloody_cleaver.glb',
+  deadPig: '/dead_pig.glb',
+  rawMeat: '/psx_raw_meat_pack__low-poly_2_types.glb',
+  bloodBag: '/blood_bag.glb',
+  bloodWall: '/abandoned_horror_wall_with_blood_splatter.glb',
+  door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb',
+  wall: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb',
+  floor: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_floor.glb'
 };
 
 /** Butcher AI states */

@@ -10,16 +10,16 @@ import * as THREE from 'three';
 
 /** Asset paths relative to game/ directory */
 const ASSETS = {
-  sovietRoom: '../horror_soviet_room.glb',
-  horrorWoman: '../horror_woman.glb',
-  jasonStalker: '../jeson_horror_fan_art.glb',
-  horrorGirl: '../a_horror_girl_character.glb',
-  clock: '../vintage_wooden_wall_clock_-.glb',
-  devilsBible: '../devils_bible_-_dark_fantasy_book (1).glb',
-  ceilingFan: '../old_rusty_ceiling_fan.glb',
-  door: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb',
-  wall: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb',
-  floor: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_floor.glb'
+  sovietRoom: '/horror_soviet_room.glb',
+  horrorWoman: '/horror_woman.glb',
+  jasonStalker: '/jeson_horror_fan_art.glb',
+  horrorGirl: '/a_horror_girl_character.glb',
+  clock: '/vintage_wooden_wall_clock_-.glb',
+  devilsBible: '/devils_bible_-_dark_fantasy_book (1).glb',
+  ceilingFan: '/old_rusty_ceiling_fan.glb',
+  door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb',
+  wall: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb',
+  floor: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_floor.glb'
 };
 
 /**

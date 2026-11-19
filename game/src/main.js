@@ -82,7 +82,7 @@ let isPaused = false;
  * Build Ambient Starting Scene (renders behind Main Menu)
  * ──────────────────────────────────────────────────────── */
 let ambientSceneGroup = new THREE.Group();
-function buildAmbientScene() {
+async function buildAmbientScene() {
   scene.add(ambientSceneGroup);
 
   // Dark decaying floor
@@ -93,50 +93,66 @@ function buildAmbientScene() {
   ambientSceneGroup.add(floor);
   physics.addCollider(floor);
 
-  // Surrounding walls
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x1b1313, roughness: 0.9 });
-  const wallGeo = new THREE.BoxGeometry(30, 5, 0.3);
+  // Load original Soviet Room model into ambient background
+  try {
+    const gltf = await assetLoader.load('/horror_soviet_room.glb');
+    const model = gltf.scene || gltf;
+    model.position.set(0, 0, 0);
+    model.scale.set(1.2, 1.2, 1.2);
+    model.traverse((c) => {
+      if (c.isMesh) {
+        c.castShadow = true;
+        c.receiveShadow = true;
+      }
+    });
+    ambientSceneGroup.add(model);
+    console.log('[Game] Original horror_soviet_room.glb loaded into ambient scene.');
+  } catch (err) {
+    console.warn('[Game] Using fallback walls for ambient scene:', err);
+    // Surrounding walls fallback
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x1b1313, roughness: 0.9 });
+    const wallGeo = new THREE.BoxGeometry(30, 5, 0.3);
 
-  const backWall = new THREE.Mesh(wallGeo, wallMat);
-  backWall.position.set(0, 2.5, -10);
-  ambientSceneGroup.add(backWall);
-  physics.addCollider(backWall);
+    const backWall = new THREE.Mesh(wallGeo, wallMat);
+    backWall.position.set(0, 2.5, -10);
+    ambientSceneGroup.add(backWall);
 
-  const leftWall = new THREE.Mesh(wallGeo, wallMat);
-  leftWall.position.set(-10, 2.5, 0);
-  leftWall.rotation.y = Math.PI / 2;
-  ambientSceneGroup.add(leftWall);
-  physics.addCollider(leftWall);
+    const leftWall = new THREE.Mesh(wallGeo, wallMat);
+    leftWall.position.set(-10, 2.5, 0);
+    leftWall.rotation.y = Math.PI / 2;
+    ambientSceneGroup.add(leftWall);
 
-  const rightWall = new THREE.Mesh(wallGeo, wallMat);
-  rightWall.position.set(10, 2.5, 0);
-  rightWall.rotation.y = Math.PI / 2;
-  ambientSceneGroup.add(rightWall);
-  physics.addCollider(rightWall);
+    const rightWall = new THREE.Mesh(wallGeo, wallMat);
+    rightWall.position.set(10, 2.5, 0);
+    rightWall.rotation.y = Math.PI / 2;
+    ambientSceneGroup.add(rightWall);
+  }
 
-  // Ceiling
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x080606 }));
-  ceiling.rotation.x = Math.PI / 2;
-  ceiling.position.y = 5.0;
-  ambientSceneGroup.add(ceiling);
+  // Load original wall clock model
+  try {
+    const clockGltf = await assetLoader.load('/vintage_wooden_wall_clock_-.glb');
+    const clock = clockGltf.scene || clockGltf;
+    clock.position.set(0, 2.2, -4.5);
+    ambientSceneGroup.add(clock);
+  } catch (e) {}
 
   // Flickering horror point lights
-  lighting.addFlickerLight(new THREE.Vector3(0, 3.8, 0), {
-    intensity: 1.8,
-    color: 0xff4422,
-    flickerAmount: 0.6,
+  lighting.addFlickerLight(new THREE.Vector3(0, 3.2, 0), {
+    intensity: 2.2,
+    color: 0xff3311,
+    flickerAmount: 0.5,
     flickerSpeed: 4
   });
 
-  lighting.addFlickerLight(new THREE.Vector3(-4, 3.5, -6), {
-    intensity: 1.2,
-    color: 0x66ccff,
+  lighting.addFlickerLight(new THREE.Vector3(-3, 2.8, -4), {
+    intensity: 1.4,
+    color: 0x4488aa,
     flickerAmount: 0.7,
     flickerSpeed: 7
   });
 
   // Ambient fog
-  scene.fog = new THREE.FogExp2(0x0a0507, 0.04);
+  scene.fog = new THREE.FogExp2(0x080406, 0.04);
 }
 
 /* ────────────────────────────────────────────────────────
@@ -377,11 +393,11 @@ function tick() {
  * Initial Boot
  * ──────────────────────────────────────────────────────── */
 async function boot() {
-  // Build 3D ambient horror room
-  buildAmbientScene();
-
   // Start continuous 60FPS render loop immediately
   startGameLoop();
+
+  // Build 3D ambient horror room using original GLB assets
+  await buildAmbientScene();
 
   // Instantly remove loading overlays
   if (loadingScreen) loadingScreen.remove();
