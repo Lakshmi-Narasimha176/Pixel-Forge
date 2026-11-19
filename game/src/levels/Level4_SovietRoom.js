@@ -282,6 +282,7 @@ export class Level4_SovietRoom extends LevelEventEmitter {
       this.bloodBagModel.userData.onInteract = () => {
         if (this.playerInventory.health !== undefined) {
           this.playerInventory.health = Math.min(100, (this.playerInventory.health || 75) + 25);
+          this.emit('healthChange', { health: this.playerInventory.health });
         }
         this.bloodBagModel.visible = false;
         this.showSubtitle('+25 HP restored from Blood Bag.', 2500);

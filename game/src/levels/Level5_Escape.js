@@ -68,7 +68,6 @@ export class Level5_Escape extends LevelEventEmitter {
     // UI
     this.interactPrompt = null;
     this.subtitleDisplay = null;
-    this.victoryOverlay = null;
 
     this._onKeyDown = this._onKeyDown.bind(this);
   }
@@ -117,32 +116,6 @@ export class Level5_Escape extends LevelEventEmitter {
     });
     document.body.appendChild(this.subtitleDisplay);
 
-    this.victoryOverlay = document.createElement('div');
-    this.victoryOverlay.id = 'victory-overlay-l5';
-    Object.assign(this.victoryOverlay.style, {
-      position: 'fixed', top: '0', left: '0',
-      width: '100vw', height: '100vh',
-      backgroundColor: 'rgba(0,0,0,0.95)',
-      color: '#ff2222', display: 'none',
-      flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-      zIndex: '10000', fontFamily: '"Courier New", monospace'
-    });
-    this.victoryOverlay.innerHTML = `
-      <h1 style="font-size:3.5rem; letter-spacing:8px; text-shadow:0 0 20px #ff0000; margin-bottom:1rem;">YOU SURVIVED</h1>
-      <h2 style="font-size:1.6rem; color:#aaaaaa; margin-bottom:2rem;">THE LAST REVENGE</h2>
-      <p style="font-size:1.1rem; color:#888; max-width:600px; text-align:center; line-height:1.6;">
-        You broke through the darkness and escaped into the misty dawn. The spirits remain trapped behind the locked gates.
-      </p>
-      <button id="btn-replay" style="margin-top:2.5rem; padding:14px 36px; background:#8B0000; color:#fff; border:none; font-size:1.2rem; cursor:pointer; font-family:inherit; letter-spacing:3px; transition:0.3s;">PLAY AGAIN</button>
-    `;
-    document.body.appendChild(this.victoryOverlay);
-
-    const replayBtn = this.victoryOverlay.querySelector('#btn-replay');
-    if (replayBtn) {
-      replayBtn.addEventListener('click', () => {
-        window.location.reload();
-      });
-    }
   }
 
   _setupEnvironment() {
@@ -260,6 +233,7 @@ export class Level5_Escape extends LevelEventEmitter {
       b.userData.onInteract = () => {
         if (this.playerInventory.health !== undefined) {
           this.playerInventory.health = Math.min(100, (this.playerInventory.health || 75) + 25);
+          this.emit('healthChange', { health: this.playerInventory.health });
         }
         b.visible = false;
         this.showSubtitle('+25 HP restored from Blood Bag.', 2500);
@@ -326,9 +300,6 @@ export class Level5_Escape extends LevelEventEmitter {
 
   _triggerVictory() {
     console.log('[Level5] Player reached safety — VICTORY!');
-    if (this.victoryOverlay) {
-      this.victoryOverlay.style.display = 'flex';
-    }
     if (document.exitPointerLock) {
       document.exitPointerLock();
     }
@@ -359,7 +330,6 @@ export class Level5_Escape extends LevelEventEmitter {
     document.removeEventListener('keydown', this._onKeyDown);
     if (this.interactPrompt?.parentNode) this.interactPrompt.remove();
     if (this.subtitleDisplay?.parentNode) this.subtitleDisplay.remove();
-    if (this.victoryOverlay?.parentNode) this.victoryOverlay.remove();
 
     this.levelGroup.traverse(child => {
       if (child.isMesh) {

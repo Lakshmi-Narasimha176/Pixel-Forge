@@ -226,7 +226,7 @@ export class Inventory {
     if (!slot) return false;
 
     if (slot.type === ItemType.BLOOD_BAG) {
-      return this._useBloodBag();
+      return this.useBloodBag();
     }
     if (slot.type === ItemType.BASEBALL_BAT) {
       this.swingBat();
@@ -308,8 +308,8 @@ export class Inventory {
 
   /* ────────────────────── Internal ────────────────────── */
 
-  /** @private Use a blood bag to heal 25 HP. */
-  _useBloodBag() {
+  /** Use a blood bag from any inventory slot to heal 25 HP. */
+  useBloodBag() {
     if (this.health >= this.maxHealth) return false;
     const healAmt = 25;
     this.health = Math.min(this.maxHealth, this.health + healAmt);
@@ -327,6 +327,23 @@ export class Inventory {
   }
 
   /* ────────────────────── Serialization ────────────────────── */
+
+  /** Reset all run-specific state for a new game. */
+  reset() {
+    this.slots.fill(null);
+    this.selectedIndex = 0;
+    this.flashlightBattery = 100;
+    this.flashlightOn = false;
+    this.hasFlashlight = false;
+    this.batEquipped = false;
+    this._swingTimer = 0;
+    this._swinging = false;
+    this.lorePages = [];
+    this.keycards.clear();
+    this.health = this.maxHealth;
+    this._emit('onHealthChanged', this.health, this.maxHealth);
+    this._emit('onChange');
+  }
 
   /** Serialize inventory state to plain object. */
   toJSON() {

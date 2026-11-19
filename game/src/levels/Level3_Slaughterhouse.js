@@ -669,9 +669,13 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
 
     // Check if player is visible during search
     const camera = this.scene.getObjectByProperty('isCamera', true);
-    if (camera && this._butcherCanSeePlayer(camera.position)) {
-      this.butcherState = BUTCHER_STATE.CHASE;
-      this.lastKnownPlayerPos = camera.position.clone();
+    if (camera) {
+      const playerPos = new THREE.Vector3();
+      camera.getWorldPosition(playerPos);
+      if (this._butcherCanSeePlayer(playerPos)) {
+        this.butcherState = BUTCHER_STATE.CHASE;
+        this.lastKnownPlayerPos = playerPos.clone();
+      }
     }
   }
 

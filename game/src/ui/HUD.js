@@ -22,7 +22,7 @@ export class HUD {
     this.root = document.createElement('div');
     this.root.id = 'game-hud';
     this.root.style.cssText =
-      'position:fixed;inset:0;z-index:950;pointer-events:none;font-family:"Special Elite",monospace;';
+      'position:fixed;inset:0;z-index:800;display:none;pointer-events:none;font-family:"Special Elite",monospace;';
     document.body.appendChild(this.root);
 
     this._buildHealthBar();
@@ -31,6 +31,7 @@ export class HUD {
     this._buildInteractionPrompt();
     this._buildInventoryBar();
     this._buildControlsHelper();
+    this._buildObjectiveIndicator();
     this._buildSanityIndicator();
     this._buildSubtitles();
   }
@@ -42,12 +43,15 @@ export class HUD {
     wrap.style.cssText =
       'position:absolute;bottom:34px;left:24px;width:180px;';
     wrap.innerHTML = `
-      <div style="font-size:0.65rem;color:#888;letter-spacing:0.1rem;margin-bottom:4px;">HEALTH</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:#888;letter-spacing:0.1rem;margin-bottom:4px;">
+        <span>HEALTH</span><span id="hud-health-text">100 / 100</span>
+      </div>
       <div id="hud-health-bg" style="width:100%;height:6px;background:#1a1a1a;border:1px solid #333;border-radius:3px;overflow:hidden;">
         <div id="hud-health-fill" style="width:100%;height:100%;background:linear-gradient(90deg,#8B0000,#cc0000);transition:width 0.3s;"></div>
       </div>`;
     this.root.appendChild(wrap);
     this._healthFill = document.getElementById('hud-health-fill');
+    this._healthText = document.getElementById('hud-health-text');
     this._healthWrap = wrap;
   }
 
@@ -147,6 +151,21 @@ export class HUD {
     this.root.appendChild(bar);
   }
 
+  /* ────────────────── Current Objective ────────────────── */
+
+  _buildObjectiveIndicator() {
+    const wrap = document.createElement('div');
+    wrap.style.cssText =
+      'position:absolute;top:24px;left:24px;max-width:min(440px,70vw);' +
+      'padding:10px 14px;background:rgba(5,5,5,0.68);border-left:2px solid #8B0000;';
+    wrap.innerHTML = `
+      <div id="hud-chapter" style="font-size:0.6rem;color:#8B0000;letter-spacing:0.16rem;margin-bottom:5px;"></div>
+      <div id="hud-objective" style="font-size:0.78rem;color:#c8c8c8;line-height:1.45;"></div>`;
+    this.root.appendChild(wrap);
+    this._chapterLabel = wrap.querySelector('#hud-chapter');
+    this._objectiveLabel = wrap.querySelector('#hud-objective');
+  }
+
   /* ────────────────── Sanity Indicator ────────────────── */
 
   _buildSanityIndicator() {
@@ -177,6 +196,12 @@ export class HUD {
 
   /* ────────────────── Public API ────────────────── */
 
+  /** Set the chapter title and current player objective. */
+  setObjective(chapter, objective) {
+    this._chapterLabel.textContent = `CHAPTER ${chapter}`;
+    this._objectiveLabel.textContent = objective;
+  }
+
   /**
    * Show a subtitle message for a duration.
    * @param {string} text
@@ -205,6 +230,7 @@ export class HUD {
     if (this.inventory) {
       const hpPct = (this.inventory.health / this.inventory.maxHealth) * 100;
       this._healthFill.style.width = `${hpPct}%`;
+      this._healthText.textContent = `${Math.ceil(this.inventory.health)} / ${this.inventory.maxHealth}`;
       // Pulse when low
       if (hpPct < 25) {
         this._healthFill.style.animation = 'hud-pulse 0.6s ease-in-out infinite';
@@ -270,10 +296,13 @@ export class HUD {
 
   show() {
     this.root.style.display = 'block';
+    if (this._crosshair) this._crosshair.style.display = 'block';
   }
 
   hide() {
     this.root.style.display = 'none';
+    if (this._crosshair) this._crosshair.style.display = 'none';
+    if (this._interactPrompt) this._interactPrompt.classList.remove('visible');
   }
 
   /* ────────────────── Cleanup ────────────────── */

@@ -52,6 +52,7 @@ const horrorRenderer = new HorrorRenderer(document.body);
 const canvas         = horrorRenderer.getDomElement();
 
 const controls       = new FPSControls(camera, canvas);
+controls.yaw.userData.persistent = true;
 scene.add(controls.yaw);
 controls.yaw.position.set(0, 1.7, 5);
 
@@ -68,6 +69,7 @@ const assetLoader    = new AssetLoader({
 
 const audioManager   = new AudioManager(camera);
 const lighting       = new LightingSystem(scene, camera);
+lighting.setFlashlight(false);
 
 // Gameplay systems
 const inventory      = new Inventory();
@@ -77,6 +79,29 @@ const levelManager   = new LevelManager(scene, assetLoader, audioManager, physic
 
 let gameStarted = false;
 let isPaused = false;
+
+function getCurrentObjective(levelIndex) {
+  const progress = levelManager.playerInventory;
+  switch (levelIndex) {
+    case 1:
+      if (progress.hasFlashlight && progress.hasWalkieTalkie) {
+        return 'Both items found. Reach the exit door.';
+      }
+      return 'Find the flashlight and walkie-talkie, then reach the exit.';
+    case 2:
+      return 'Follow the corridor, collect supplies, and reach the far door.';
+    case 3:
+      return progress.hasKeycard
+        ? 'Keycard acquired. Unlock the slaughterhouse exit.'
+        : 'Find the keycard. Avoid the Butcher and unlock the exit.';
+    case 4:
+      return 'Turn the clock hands to 3:00, then enter the secret tunnel.';
+    case 5:
+      return 'Run through the collapsing tunnel and reach the farmhouse.';
+    default:
+      return 'Survive the darkness.';
+  }
+}
 
 /* ────────────────────────────────────────────────────────
  * Build Ambient Starting Scene (renders behind Main Menu)
@@ -172,8 +197,21 @@ const menuSystem = new MenuSystem({
   },
   onResume: () => {
     isPaused = false;
+    controls.resetInput();
     controls.lock();
     levelManager.resume();
+  },
+  onQuit: () => {
+    gameStarted = false;
+    isPaused = false;
+    controls.resetInput();
+    controls.unlock();
+    levelManager.pause();
+    lighting.setFlashlight(false);
+    hud.hide();
+  },
+  onSettingsChange: (settings) => {
+    controls.sensitivity = 0.0008 + (settings.sensitivity / 100) * 0.0032;
   },
   audioManager
 });
@@ -190,35 +228,40 @@ window.addEventListener('resize', () => {
  * Input & Hotkeys
  * ──────────────────────────────────────────────────────── */
 document.addEventListener('keydown', (e) => {
-  // Flashlight toggle (F key)
-  if (e.code === 'KeyF') {
-    if (inventory.hasItem(ItemType.FLASHLIGHT)) {
-      lighting.toggleFlashlight();
-    }
-  }
-
-  // Inventory Quick-use
-  if (e.code === 'Digit1') inventory.selectSlot(0);
-  if (e.code === 'Digit2') inventory.selectSlot(1);
-  if (e.code === 'Digit3') inventory.selectSlot(2);
-  if (e.code === 'Digit4') inventory.selectSlot(3);
-  if (e.code === 'Digit5') inventory.selectSlot(4);
-
-  // Consume blood bag / heal (Q key)
-  if (e.code === 'KeyQ') {
-    if (inventory.hasItem(ItemType.BLOOD_BAG)) {
-      inventory.useItem();
-      hud.showSubtitle('+25 HP restored from Blood Bag.', 2500);
-    }
-  }
-
-  // Pause menu (Escape key)
+  // Pause is owned here while playing; MenuSystem handles resume/settings.
   if (e.code === 'Escape') {
     if (gameStarted && menuSystem.activeScreen === 'none') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       isPaused = true;
       levelManager.pause();
+      controls.resetInput();
       controls.unlock();
       menuSystem.showPause();
+    }
+    return;
+  }
+
+  if (e.repeat || !gameStarted || isPaused || menuSystem.activeScreen !== 'none') return;
+
+  if (e.code === 'KeyF' && inventory.hasItem(ItemType.FLASHLIGHT)) {
+    lighting.toggleFlashlight();
+    inventory.flashlightOn = lighting.flashlightOn;
+  }
+
+  if (/^Digit[1-8]$/.test(e.code)) {
+    inventory.selectSlot(Number(e.code.slice(-1)) - 1);
+  }
+
+  if (e.code === 'KeyQ') {
+    if (inventory.useBloodBag()) {
+      levelManager.playerInventory.health = inventory.health;
+      horrorEffects.setHealth(inventory.health, inventory.maxHealth);
+      hud.showSubtitle(`+25 HP restored. Health: ${inventory.health}/100`, 2500);
+    } else if (!inventory.hasItem(ItemType.BLOOD_BAG)) {
+      hud.showSubtitle('No Blood Bags in your inventory.', 1800);
+    } else {
+      hud.showSubtitle('Health is already full.', 1800);
     }
   }
 });
@@ -250,9 +293,12 @@ canvas.addEventListener('footstep', () => {
 levelManager.on('levelStarted', ({ levelIndex, name }) => {
   console.log(`[Game] Level ${levelIndex} (${name}) loaded.`);
   const spawn = levelManager.getSpawnPoint();
-  if (spawn) {
-    controls.yaw.position.copy(spawn);
-  }
+  if (spawn) controls.yaw.position.copy(spawn);
+
+  inventory.health = levelManager.playerInventory.health;
+  lighting.setBattery(levelManager.playerInventory.flashlightBattery / 100);
+  horrorEffects.setHealth(inventory.health, inventory.maxHealth);
+  hud.setObjective(levelIndex, getCurrentObjective(levelIndex));
   hud.showSubtitle(`ENTERING: ${name}`, 4000);
 });
 
@@ -264,42 +310,70 @@ levelManager.on('scare', (data) => {
 
 levelManager.on('playerDeath', () => {
   console.log('[Game] Player succumbed to the horrors.');
+  isPaused = true;
+  inventory.health = 0;
+  horrorEffects.setHealth(0, inventory.maxHealth);
   horrorEffects.triggerBloodSplatter();
+  controls.resetInput();
   controls.unlock();
   menuSystem.showDeath();
 });
 
 levelManager.on('victory', () => {
   console.log('[Game] Player escaped!');
+  isPaused = true;
+  controls.resetInput();
   controls.unlock();
   menuSystem.showVictory();
 });
 
-levelManager.on('inventoryUpdate', (inv) => {
-  if (inv.hasFlashlight && !inventory.hasItem(ItemType.FLASHLIGHT)) {
-    inventory.addItem(ItemType.FLASHLIGHT);
+levelManager.on('healthChange', ({ health, maxHealth }) => {
+  inventory.health = health;
+  horrorEffects.setHealth(health, maxHealth);
+});
+
+const PICKUP_ITEM_TYPES = {
+  flashlight: ItemType.FLASHLIGHT,
+  walkieTalkie: ItemType.WALKIE_TALKIE,
+  bloodBag: ItemType.BLOOD_BAG,
+  baseballBat: ItemType.BASEBALL_BAT,
+  keycard: ItemType.KEYCARD,
+};
+
+levelManager.on('itemPickup', ({ item }) => {
+  const itemType = PICKUP_ITEM_TYPES[item];
+  if (!itemType) return;
+
+  // Supplies stack; equipment is only added once.
+  if (itemType === ItemType.BLOOD_BAG || !inventory.hasItem(itemType)) {
+    inventory.addItem(itemType);
+  }
+  if (itemType === ItemType.FLASHLIGHT) {
     lighting.setFlashlightEnabled(true);
+    inventory.flashlightOn = true;
   }
-  if (inv.hasWalkieTalkie && !inventory.hasItem(ItemType.WALKIE_TALKIE)) {
-    inventory.addItem(ItemType.WALKIE_TALKIE);
-  }
-  if (inv.hasBloodBag && !inventory.hasItem(ItemType.BLOOD_BAG)) {
-    inventory.addItem(ItemType.BLOOD_BAG);
-  }
-  if (inv.hasBaseballBat && !inventory.hasItem(ItemType.BASEBALL_BAT)) {
-    inventory.addItem(ItemType.BASEBALL_BAT);
-  }
-  if (inv.hasKeycard && !inventory.hasItem(ItemType.KEYCARD)) {
-    inventory.addItem(ItemType.KEYCARD);
-  }
+  hud.setObjective(levelManager.currentLevelIndex, getCurrentObjective(levelManager.currentLevelIndex));
 });
 
 /* ────────────────────────────────────────────────────────
  * Start Game & Restart Handlers
  * ──────────────────────────────────────────────────────── */
 async function startNewGame() {
+  gameStarted = false;
+  isPaused = false;
   menuSystem.hide();
   hud.show();
+  controls.resetInput();
+  controls.lock();
+  camera.rotation.y = 0;
+
+  levelManager.reset();
+  ambientSceneGroup = null;
+  inventory.reset();
+  horrorEffects.sanity = 100;
+  horrorEffects.setHealth(100, 100);
+  lighting.setBattery(1);
+  lighting.setFlashlight(false);
 
   try {
     await audioManager.resume();
@@ -308,35 +382,37 @@ async function startNewGame() {
     console.warn('[Audio] Autoplay blocked or deferred:', e);
   }
 
-  controls.lock();
-  gameStarted = true;
-  isPaused = false;
-
-  // Load Level 1: The Awakening
   await levelManager.loadLevel(1);
-
-  // Remove ambient backdrop geometry only AFTER Level 1 has loaded
-  if (ambientSceneGroup) {
-    scene.remove(ambientSceneGroup);
-    ambientSceneGroup = null;
+  if (!levelManager.currentLevel) {
+    hud.hide();
+    controls.unlock();
+    menuSystem.showMain();
+    return;
   }
 
   const spawn = levelManager.getSpawnPoint();
   if (spawn) controls.yaw.position.copy(spawn);
-
+  gameStarted = true;
   controls.lock();
-  hud.showSubtitle("Click anywhere to lock mouse view. [WASD] to move, [E] to interact.", 5000);
+  hud.showSubtitle('Click to lock mouse view. [WASD] move, [E] interact, [Esc] pause.', 5000);
 }
 
 async function restartCurrentGame() {
+  gameStarted = false;
+  isPaused = false;
   menuSystem.hide();
   hud.show();
+  controls.resetInput();
   controls.lock();
-  isPaused = false;
+  camera.rotation.y = 0;
+  inventory.health = 100;
+  horrorEffects.setHealth(100, 100);
 
   await levelManager.restartLevel();
   const spawn = levelManager.getSpawnPoint();
   if (spawn) controls.yaw.position.copy(spawn);
+  gameStarted = true;
+  controls.lock();
 }
 
 /* ────────────────────────────────────────────────────────

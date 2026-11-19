@@ -25,11 +25,13 @@ export class LightingSystem {
     // ── Ambient light (horror dim — enough to see outlines) ──
     /** @type {THREE.AmbientLight} */
     this.ambientLight = new THREE.AmbientLight(0x1a1030, 0.35);
+    this.ambientLight.userData.persistent = true;
     scene.add(this.ambientLight);
 
     // ── Hemisphere light for realistic sky/ground bounce ──
     /** @type {THREE.HemisphereLight} */
     this.hemiLight = new THREE.HemisphereLight(0x1a0a2a, 0x0a0505, 0.25);
+    this.hemiLight.userData.persistent = true;
     scene.add(this.hemiLight);
 
     // ── Fog (lighter so scene is visible) ──

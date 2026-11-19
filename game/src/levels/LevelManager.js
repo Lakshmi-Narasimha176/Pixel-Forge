@@ -13,7 +13,7 @@ import { Level4_SovietRoom } from './Level4_SovietRoom.js';
 import { Level5_Escape } from './Level5_Escape.js';
 
 /**
- * @typedef {'IDLE'|'LOADING'|'TRANSITIONING'|'PLAYING'|'PAUSED'} LevelState
+ * @typedef {'IDLE'|'LOADING'|'TRANSITIONING'|'PLAYING'|'PAUSED'|'DEAD'|'COMPLETED'} LevelState
  */
 
 /**
@@ -111,6 +111,7 @@ export class LevelManager extends EventEmitter {
       hasFlashlight: false,
       hasWalkieTalkie: false,
       hasBaseballBat: false,
+      hasBloodBag: false,
       hasKeycard: false,
       health: 100,
       flashlightBattery: 100
@@ -340,7 +341,9 @@ export class LevelManager extends EventEmitter {
   async nextLevel() {
     const nextIndex = this.currentLevelIndex + 1;
     if (!this.levelRegistry.has(nextIndex)) {
+      this.state = 'COMPLETED';
       this.emit('gameComplete', { finalLevel: this.currentLevelIndex });
+      this.emit('victory', { finalLevel: this.currentLevelIndex });
       console.log('[LevelManager] All levels complete — game finished!');
       return;
     }
@@ -386,23 +389,13 @@ export class LevelManager extends EventEmitter {
    * @private
    */
   _cleanScene() {
-    const toRemove = [];
-    this.scene.traverse(child => {
-      // Keep camera and essential scene objects
-      if (child === this.scene || child.isCamera) return;
-      toRemove.push(child);
+    // Levels dispose their own geometry. Only detach leftover top-level groups,
+    // and never detach the player hierarchy or global lighting.
+    const toRemove = this.scene.children.filter(child => {
+      if (child.userData.persistent || child.isCamera) return false;
+      return !child.getObjectByProperty('isCamera', true);
     });
-    toRemove.forEach(obj => {
-      if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach(m => m.dispose());
-        } else {
-          obj.material.dispose();
-        }
-      }
-      this.scene.remove(obj);
-    });
+    toRemove.forEach(obj => this.scene.remove(obj));
   }
 
   /**
@@ -414,7 +407,15 @@ export class LevelManager extends EventEmitter {
     if (level.on) {
       level.on('exit', () => this.nextLevel());
       level.on('itemPickup', (data) => this._handleItemPickup(data));
+      level.on('healthChange', (data) => {
+        this.playerInventory.health = Math.max(0, Math.min(100, data.health));
+        this.emit('healthChange', { health: this.playerInventory.health, maxHealth: 100 });
+      });
       level.on('playerDeath', () => this._handlePlayerDeath());
+      level.on('victory', (data) => {
+        this.state = 'COMPLETED';
+        this.emit('victory', data);
+      });
       level.on('triggerScare', (data) => this.emit('scare', data));
     }
   }
@@ -452,32 +453,16 @@ export class LevelManager extends EventEmitter {
         break;
     }
     this.emit('inventoryUpdate', this.playerInventory);
+    this.emit('itemPickup', data);
   }
 
-  /**
-   * Handle player death — reload current level
-   * @private
-   */
-  async _handlePlayerDeath() {
+  /** Stop gameplay and let the death menu choose when to restart. */
+  _handlePlayerDeath() {
+    if (this.state === 'DEAD') return;
+    this.state = 'DEAD';
+    this.playerInventory.health = 0;
+    this.emit('healthChange', { health: 0, maxHealth: 100 });
     this.emit('playerDeath', { levelIndex: this.currentLevelIndex });
-
-    // Fade to red-black
-    this.fadeOverlay.style.backgroundColor = '#1a0000';
-    await this._fadeToBlack();
-    this.fadeOverlay.style.backgroundColor = '#000000';
-
-    // Restart current level
-    if (this.currentLevel) {
-      this._unbindLevelEvents(this.currentLevel);
-      this.currentLevel.dispose();
-      this.currentLevel = null;
-      this._cleanScene();
-    }
-
-    // Reset health
-    this.playerInventory.health = 100;
-
-    await this.loadLevel(this.currentLevelIndex);
   }
 
   /**
@@ -521,11 +506,40 @@ export class LevelManager extends EventEmitter {
     }
   }
 
+  /** Dispose the active level and reset all progress for a new run. */
+  reset() {
+    if (this.currentLevel) {
+      this._unbindLevelEvents(this.currentLevel);
+      this.currentLevel.dispose();
+      this.currentLevel = null;
+    }
+    this._cleanScene();
+    this.physics?.clearColliders();
+    this.currentLevelIndex = 0;
+    this.state = 'IDLE';
+    this.isTransitioning = false;
+    Object.assign(this.playerInventory, {
+      hasFlashlight: false,
+      hasWalkieTalkie: false,
+      hasBaseballBat: false,
+      hasBloodBag: false,
+      hasKeycard: false,
+      health: 100,
+      flashlightBattery: 100,
+    });
+    this._hideLoadingScreen();
+    this.fadeOverlay.style.opacity = '0';
+    this.fadeOverlay.style.pointerEvents = 'none';
+  }
+
   /**
    * Restart the current level
    * @returns {Promise<void>}
    */
   async restartLevel() {
+    if (!this.currentLevelIndex) return this.loadLevel(1);
+    this.playerInventory.health = 100;
+    this.emit('healthChange', { health: 100, maxHealth: 100 });
     await this.transitionTo(this.currentLevelIndex);
   }
 

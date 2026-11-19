@@ -198,6 +198,16 @@ export class FPSControls {
     return { moveState, speed };
   }
 
+  /** Clear held input when pausing, quitting, or starting a new run. */
+  resetInput() {
+    for (const key of Object.keys(this._keys)) this._keys[key] = false;
+    this._mouseDX = 0;
+    this._mouseDY = 0;
+    this._isMouseDown = false;
+    this.velocity.set(0, 0, 0);
+    this.interactPressed = false;
+  }
+
   /** Dispose all event listeners. */
   dispose() {
     document.removeEventListener('pointerlockchange', this._onLockChange);

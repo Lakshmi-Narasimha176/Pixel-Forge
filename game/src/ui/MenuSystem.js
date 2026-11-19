@@ -13,12 +13,16 @@ export class MenuSystem {
    * @param {Function} [deps.onNewGame] - Called when user clicks NEW GAME.
    * @param {Function} [deps.onRestart] - Called when user clicks RESTART.
    * @param {Function} [deps.onResume] - Called when user resumes from pause.
+   * @param {Function} [deps.onQuit] - Called before returning to the main menu.
+   * @param {Function} [deps.onSettingsChange] - Called with updated settings.
    * @param {object} [deps.audioManager] - AudioManager for menu sounds.
    */
-  constructor({ onNewGame, onRestart, onResume, audioManager } = {}) {
+  constructor({ onNewGame, onRestart, onResume, onQuit, onSettingsChange, audioManager } = {}) {
     this.onNewGame = onNewGame || (() => {});
     this.onRestart = onRestart || (() => {});
     this.onResume = onResume || (() => {});
+    this.onQuit = onQuit || (() => {});
+    this.onSettingsChange = onSettingsChange || (() => {});
     this.audioManager = audioManager || null;
 
     /** Current visible screen */
@@ -49,9 +53,11 @@ export class MenuSystem {
     // Keyboard listener for ESC → pause toggle
     this._onKeyDown = (e) => {
       if (e.code === 'Escape') {
-        if (this.activeScreen === 'none') this.showPause();
-        else if (this.activeScreen === 'pause') this.resume();
-        else if (this.activeScreen === 'settings') this.showPause();
+        if (this.activeScreen === 'pause') this.resume();
+        else if (this.activeScreen === 'settings') {
+          if (this._prevScreen === 'main') this.showMain();
+          else this.showPause();
+        }
       }
     };
     window.addEventListener('keydown', this._onKeyDown);
@@ -114,7 +120,7 @@ export class MenuSystem {
 
     this._pauseMenu.querySelector('#btn-resume').addEventListener('click', () => this.resume());
     this._pauseMenu.querySelector('#btn-settings-pause').addEventListener('click', () => this.showSettings());
-    this._pauseMenu.querySelector('#btn-quit').addEventListener('click', () => this.showMain());
+    this._pauseMenu.querySelector('#btn-quit').addEventListener('click', () => this.quitToMain());
   }
 
   _buildSettingsMenu() {
@@ -173,7 +179,7 @@ export class MenuSystem {
       this.activeScreen = 'none';
       this.onRestart();
     });
-    this._deathScreen.querySelector('#btn-death-quit').addEventListener('click', () => this.showMain());
+    this._deathScreen.querySelector('#btn-death-quit').addEventListener('click', () => this.quitToMain());
   }
 
   _buildVictoryScreen() {
@@ -188,7 +194,7 @@ export class MenuSystem {
       </div>`;
     this._container.appendChild(this._victoryScreen);
 
-    this._victoryScreen.querySelector('#btn-victory-menu').addEventListener('click', () => this.showMain());
+    this._victoryScreen.querySelector('#btn-victory-menu').addEventListener('click', () => this.quitToMain());
   }
 
   _buildLoadingScreen() {
@@ -213,6 +219,11 @@ export class MenuSystem {
   /* ══════════════════════════════════════════════════════════
      PUBLIC API
      ══════════════════════════════════════════════════════════ */
+
+  quitToMain() {
+    this.onQuit();
+    this.showMain();
+  }
 
   showMain() {
     this._hideAll();
@@ -273,9 +284,13 @@ export class MenuSystem {
     this.activeScreen = 'none';
   }
 
-  resume() {
+  hide() {
     this._hideAll();
     this.activeScreen = 'none';
+  }
+
+  resume() {
+    this.hide();
     this.onResume();
   }
 
@@ -333,6 +348,7 @@ export class MenuSystem {
       const brightness = 0.5 + (this.settings.brightness / 100) * 1.0; // 0.5 – 1.5
       canvas.style.filter = `brightness(${brightness})`;
     }
+    this.onSettingsChange({ ...this.settings });
   }
 
   /* ────────────────── Cleanup ────────────────── */
