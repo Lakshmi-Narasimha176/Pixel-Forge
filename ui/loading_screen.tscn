@@ -1,0 +1,76 @@
+[gd_scene load_steps=5 format=3 uid="uid://loading_screen"]
+
+[ext_resource type="Script" path="res://ui/loading_screen.gd" id="1_ldscript"]
+
+[sub_resource type="Animation" id="Animation_pulse"]
+resource_name = "pulse"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CenterContainer/LoadingLabel:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.0, 2.0),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 1.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_RESET"]
+resource_name = "RESET"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CenterContainer/LoadingLabel:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_data = {
+"RESET": SubResource("Animation_RESET"),
+"pulse": SubResource("Animation_pulse")
+}
+
+[node name="LoadingScreen" type="CanvasLayer"]
+script = ExtResource("1_ldscript")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0, 0.0, 0.0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LoadingLabel" type="Label" parent="CenterContainer"]
+layout_mode = 2
+text = "ENTERING THE DEAD WORLD…"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.831, 0.812, 0.722, 1)
+theme_override_font_sizes/font_size = 24
+modulate = Color(1, 1, 1, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_1")
+}
+autoplay = "pulse"
