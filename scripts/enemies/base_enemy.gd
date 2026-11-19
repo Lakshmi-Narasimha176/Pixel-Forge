@@ -115,6 +115,7 @@ func _do_attack() -> void:
 			look_at(global_position + dir.normalized(), Vector3.UP)
 	if _attack_timer <= 0.0:
 		_attack_timer = attack_cooldown
+		AudioManager.play_enemy_sfx(enemy_name, "fast")
 		GameState.take_damage(attack_damage)
 
 
@@ -127,6 +128,7 @@ func take_damage(amount: int) -> void:
 	if state == State.DEAD:
 		return
 	current_health -= amount
+	AudioManager.play_sfx("hit")
 	GameState.show_subtitle("Combat", "%s HP: %d/%d" % [enemy_name, maxi(0, current_health), max_health], 1.5)
 	if current_health <= 0:
 		_die()
@@ -134,6 +136,7 @@ func take_damage(amount: int) -> void:
 
 func _die() -> void:
 	state = State.DEAD
+	AudioManager.play_enemy_sfx(enemy_name, "zombie1")
 	if not death_objective_id.is_empty():
 		ObjectiveManager.complete_objective(death_objective_id)
 	if not death_flag.is_empty():

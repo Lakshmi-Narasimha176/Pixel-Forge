@@ -12,6 +12,18 @@ config_version=5
 
 config/features=PackedStringArray("4.7")
 
+[autoload]
+
+GameState="*res://autoload/game_state.gd"
+DataLoader="*res://autoload/data_loader.gd"
+SaveManager="*res://autoload/save_manager.gd"
+SaveSystem="*res://autoload/save_system.gd"
+ObjectiveManager="*res://autoload/objective_manager.gd"
+LevelManager="*res://autoload/level_manager.gd"
+GameManager="*res://autoload/game_manager.gd"
+AudioManager="*res://autoload/audio_manager.gd"
+SoundManager="*res://autoload/sound_manager.gd"
+
 [display]
 
 window/stretch/mode="canvas_items"
