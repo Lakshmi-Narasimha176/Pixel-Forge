@@ -25,7 +25,7 @@ body {
   color: #c8c8c8;
   font-family: 'Special Elite', 'Courier New', monospace;
   overflow: hidden;
-  cursor: none;
+  cursor: default;
   user-select: none;
 }
 
