@@ -310,7 +310,7 @@ export class Inventory {
 
   /** Use a blood bag from any inventory slot to heal 25 HP. */
   useBloodBag() {
-    if (this.health >= this.maxHealth) return false;
+    if (!this.hasItem(ItemType.BLOOD_BAG) || this.health >= this.maxHealth) return false;
     const healAmt = 25;
     this.health = Math.min(this.maxHealth, this.health + healAmt);
     this.removeItem(ItemType.BLOOD_BAG);

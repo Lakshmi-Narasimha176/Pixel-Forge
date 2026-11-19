@@ -496,6 +496,7 @@ async function boot() {
   if (startPrompt) startPrompt.remove();
 
   // Show Horror Main Menu
+  hud.hide();
   menuSystem.showMain();
 
   // Auto-start if ?start=1 is in URL
