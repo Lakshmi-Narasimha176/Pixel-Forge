@@ -1,41 +1,27 @@
-[
-  {
-    "id": "puz_01_cell_gate",
-    "name": "Settlement Gate Lock",
-    "level": 1,
-    "type": "key_lock",
-    "required_key": "iron_key",
-    "hint": "Search the rusted table near the flickering lamp for the rusty iron key."
-  },
-  {
-    "id": "puz_02_slaughter_keycard",
-    "name": "Butcher Vault Security Terminal",
-    "level": 2,
-    "type": "keycard_lock",
-    "required_key": "butcher_keycard",
-    "hint": "Defeat the Butcher to retrieve his security keycard."
-  },
-  {
-    "id": "puz_03_generator_breakers",
-    "name": "Underground Power Grid",
-    "level": 3,
-    "type": "switch_sequence",
-    "switches_required": 3,
-    "hint": "Activate all 3 electrical breaker switches across the laboratory corridor to open the blast doors."
-  },
-  {
-    "id": "puz_04_witching_clock",
-    "name": "The Impossible Clock Riddle",
-    "level": 4,
-    "type": "clock_dial",
-    "target_hour": 3,
-    "hint": "Turn the antique wooden wall clock hands until the hour strikes 3:00 to trigger the resurrection loophole."
-  },
-  {
-    "id": "puz_05_portal_seal",
-    "name": "Sanctuary Gateway",
-    "level": 5,
-    "type": "boss_seal",
-    "hint": "Overcome the final antagonist to break the supernatural barrier and escape into the dawn."
-  }
-]
+{
+  "puzzles": [
+    {
+      "id": "puzzle_l1_gate",
+      "level": "level_01",
+      "type": "key_and_door",
+      "required_item": "l1_gate_key",
+      "description": "Find the rusty settlement key to open the gate."
+    },
+    {
+      "id": "puzzle_l3_traps",
+      "level": "level_03",
+      "type": "multi_switch",
+      "required_switches": 2,
+      "sets_flag": "l3_traps_disabled",
+      "description": "Flip both facility breaker switches to shut down the corridor traps."
+    },
+    {
+      "id": "puzzle_l4_anchors",
+      "level": "level_04",
+      "type": "multi_object_activation",
+      "required_switches": 3,
+      "sets_flag": "l4_portal_unlocked",
+      "description": "Align all 3 Soul Anchors to exploit the resurrection loophole."
+    }
+  ]
+}

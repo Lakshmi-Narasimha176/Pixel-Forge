@@ -1,112 +1,56 @@
-# 🩸 THE LAST REVENGE — First-Person Horror Game
+# THE LAST REVENGE (Godot 4.x — Compatibility Renderer)
 
-A realistic 3D psychological survival horror game built with **Three.js**, **WebGL**, **GLSL Shaders**, and the **Web Audio API**.
-
----
-
-## 🎮 Play the Game
-
-### Quick Start
-```bash
-# Navigate to the game directory
-cd game
-
-# Install dependencies (first time only)
-npm install
-
-# Start the local development server
-npm run dev
-```
-
-Then open the local URL in your browser (e.g. `http://localhost:5173/`).
-
-### Production Build
-```bash
-cd game
-npm run build
-npm run preview
-```
+**Theme:** THE UNKNOWN  
+**Genre:** First-Person Supernatural Horror Adventure  
+**Target Platform:** Windows PC (4 GB RAM, Compatibility Renderer, Offline-First)
 
 ---
 
-## 🕹️ Controls
+## Running & Exporting in Godot 4.x
 
-| Key / Action | Action |
+1. Install **Godot 4.2+** (Standard edition, GDScript).
+2. Open Godot Project Manager -> **Import** -> select `project.godot` at the repository root.
+3. Press **F5** to launch from `res://scenes/ui/main_menu.tscn`.
+4. **Windows `.exe` Export:**
+   - In Godot: **Editor -> Manage Export Templates -> Download and Install** for your Godot 4.x version.
+   - Go to **Project -> Export...**, select **Windows Desktop** (`export_presets.cfg`), and export to `build/windows/TheLastRevenge.exe`.
+
+---
+
+## Controls
+
+| Key / Input | Action |
 |---|---|
-| **W, A, S, D** | Walk Forward / Left / Backward / Right |
-| **Mouse** | Look around (Pointer Lock) |
-| **Shift** | Sprint (consumes stamina, increases footstep volume) |
-| **C** | Crouch (silent movement, sneak past stalkers) |
-| **E** | Interact (pick up items, open doors, examine puzzles) |
-| **F** | Toggle Flashlight (consumes battery over time) |
-| **Q** | Use Blood Bag (Restores +25 HP) |
-| **1 - 5** | Quick-select Inventory Slots |
-| **Esc** | Pause Game / Settings Menu |
+| **W, A, S, D** | Move |
+| **Mouse** | Look around |
+| **Shift** | Sprint |
+| **C** | Toggle Crouch |
+| **Space** | Jump |
+| **E** | Interact (pick up items, read clues, flip switches, open doors) |
+| **F** | Toggle Flashlight |
+| **Left Mouse** | Melee Attack (once Baseball Bat is equipped) |
+| **Q** | Use Blood Bag (+35 HP) |
+| **Esc** | Pause Menu (Resume, Restart Checkpoint, Save, Main Menu) |
 
 ---
 
-## 📖 Story & Chapters
+## Five Connected Levels
 
-You wake up trapped in a decrepit, blood-soaked asylum and meat facility. A static voice crackles through a walkie-talkie: *"Get out... before HE finds you."*
-
-### Chapter 1: The Awakening
-- Wake in the dark starting room (`horror_room.glb`).
-- Discover the flashlight and crackling walkie-talkie.
-- Beware the cursed porcelain doll (`cursed_porcelain_doll_-_antique_horror_prop.glb`) whose head tracks your every movement.
-
-### Chapter 2: The Corridor
-- Navigate the long decaying hallway (`horror_corridor_5.glb`).
-- Encounter the wandering spirit (`horror_ghost_character_-_blood_stained_spirit.glb`).
-- Arm yourself with the blood-stained baseball bat (`baseball_bat_covered_in_blood.glb`).
-- Watch out for scurrying street rats and sudden corridor apparitions.
-
-### Chapter 3: The Slaughterhouse
-- Enter the meat processing plant (`butcher_meat_hook_rail_-_cured_ham__sausages.glb`, `dead_pig.glb`, `psx_raw_meat_pack__low-poly_2_types.glb`).
-- Evade **The Butcher** (`horror_butcher_fat_killer_bloody_cleaver.glb`), a lethal stalker who patrols with a massive meat cleaver.
-- Sneak to locate the electronic Security Keycard and scavenge Blood Bags for survival.
-
-### Chapter 4: The Soviet Facility
-- Penetrate the Cold War interrogation bunker (`horror_soviet_room.glb`).
-- Survive psychological apparitions of the Horror Woman (`horror_woman.glb`) causing intense VHS static distortions.
-- Solve the antique clock riddle (`vintage_wooden_wall_clock_-.glb`) to unlock the secret subterranean blast doors.
-
-### Chapter 5: The Escape
-- Sprint through the crumbling collapse tunnel (`tunnel.glb`) under emergency strobe lights.
-- Break through into the night storm to reach the weathered farmhouse sanctuary (`weathered_red_saltbox_farmhouse.glb`).
+1. **Level 1 — The Awakening (`scenes/levels/level_01/level_01.tscn`)**: Wake in the foggy abandoned settlement, pick up the walkie-talkie, discover you are dead, read the Dark Tome for the **Resurrection Rule**, and unlock the Settlement Gate.
+2. **Level 2 — The Butcher (`scenes/levels/level_02/level_02.tscn`)**: Equip the bloodied baseball bat, gather shipment evidence, defeat **The Butcher**, and take the Bunker Keycard.
+3. **Level 3 — The Strategist (`scenes/levels/level_03/level_03.tscn`)**: Flip both breaker switches to disable corridor shock traps, recover the betrayal dossier, and defeat **The Strategist**.
+4. **Level 4 — The Impossible Return (`scenes/levels/level_04/level_04.tscn`)**: Discover the **Resurrection Loophole** in the distorted afterlife and align all 3 Soul Anchors.
+5. **Level 5 — The Betrayer (`scenes/levels/level_05/level_05.tscn`)**: Examine your dead friend's memory and confession, defeat **The Betrayer**, and step into the Dawn Sanctuary (`scenes/ui/ending_screen.tscn`).
 
 ---
 
-## ⚙️ Architecture & Engine Features
+## Documentation & QA
 
-- **Custom GLSL Post-Processing Pipeline** (`Renderer.js`):
-  - Dynamic CRT scanlines and film grain.
-  - Deep vignette darkening edges.
-  - Cold, desaturated horror color grading.
-  - Chromatic aberration spike filter triggered during jump scares.
-- **Dynamic Horror Lighting** (`LightingSystem.js`):
-  - Directional camera flashlight with real-time shadow casting, battery drain, and intermittent flicker.
-  - Flickering fluorescent tube and blood-red meat light simulations.
-  - Volumetric exponential distance fog (`FogExp2`).
-- **Positional 3D Audio Engine** (`AudioManager.js`):
-  - Synthesized impulse responses for claustrophobic indoor reverb.
-  - Distance-based enemy footstep and breath tracking.
-  - Heartbeat audio cues scaling dynamically with player health and sanity.
-- **Sanity & Fear System** (`HorrorEffects.js`):
-  - Sanity depletion in pitch darkness or near paranormal anomalies.
-  - Screen shake, distortion, and blood splatter overlays upon taking damage.
-- **Complete UI System** (`HUD.js`, `MenuSystem.js`):
-  - Horror typography and aesthetic styling.
-  - Health bar, battery indicator, sanity meter, subtitle narration, and death/victory screens.
-
----
-
-## 🛠️ QA Utilities (Device 4 Package)
-
-```powershell
-# Verify QA environment
-python tools\qa\qa.py inspect
-
-# Content and asset validation
-python tools\qa\qa.py validate-json data --id-field id --out reports\content-validation.txt
-python tools\qa\qa.py audit-assets data --out reports\asset-audit.txt
-```
+- `docs/PROJECT_AUDIT.md` — Initial repository, asset size, and hardware audit.
+- `docs/PROGRESS.md` — Development log.
+- `docs/TEST_REPORT.md` — Static QA checks and runtime test status.
+- Offline QA check:
+  ```bash
+  python3 tools/qa/qa.py validate-json data --id-field id --out reports/content-validation.txt
+  python3 tools/qa/qa.py audit-project . --out reports/project-audit.txt
+  ```

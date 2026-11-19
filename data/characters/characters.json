@@ -1,38 +1,28 @@
-[
-  {
-    "id": "char_01_protagonist",
-    "name": "The Protagonist",
-    "role": "The Vengeful Soul",
-    "description": "Murdered by betrayal, refusing to enter eternal slumber until vengeance is fulfilled."
-  },
-  {
-    "id": "char_02_butcher",
-    "name": "The Butcher",
-    "role": "First Conspirator — The Enforcer",
-    "health": 120.0,
-    "speed": 3.8,
-    "description": "A brutal syndicate enforcer who slaughtered anyone who questioned the syndicate boss."
-  },
-  {
-    "id": "char_03_strategist",
-    "name": "The Strategist",
-    "role": "Second Conspirator — The Mastermind",
-    "health": 100.0,
-    "speed": 4.5,
-    "description": "The calculating schemer who orchestrated the traps and setup that led to your demise."
-  },
-  {
-    "id": "char_04_horror_woman",
-    "name": "The Pale Apparition",
-    "role": "Supernatural Guide / Phantom",
-    "description": "A restless specter bound to the underworld who whispers clues of the resurrection loophole."
-  },
-  {
-    "id": "char_05_betrayer",
-    "name": "The Betrayer",
-    "role": "Third Conspirator — The Former Companion",
-    "health": 150.0,
-    "speed": 4.2,
-    "description": "Your closest friend who sold your life for passage out of the city."
-  }
-]
+{
+  "characters": [
+    {
+      "id": "char_protagonist",
+      "name": "The Fallen",
+      "role": "Protagonist",
+      "summary": "Murdered and bound by a supernatural resurrection pact."
+    },
+    {
+      "id": "char_butcher",
+      "name": "The Butcher",
+      "role": "Level 2 Boss",
+      "summary": "First gangster enforcer ruling the blood-stained slaughterhouse."
+    },
+    {
+      "id": "char_strategist",
+      "name": "The Strategist",
+      "role": "Level 3 Boss",
+      "summary": "Second gangster mastermind who rigged the underground bunker with traps."
+    },
+    {
+      "id": "char_betrayer",
+      "name": "The Betrayer",
+      "role": "Level 5 Final Antagonist",
+      "summary": "Your dead friend who orchestrated the ambush and sealed the pact."
+    }
+  ]
+}
