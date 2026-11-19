@@ -1,0 +1,22 @@
+{
+  "dialogue": [
+    {
+      "id": "dlg_l1_walkie",
+      "speaker": "Static Voice",
+      "level": "level_01",
+      "text": "You're already dead, friend. The Butcher and the Strategist buried you—yet the pact drags you back."
+    },
+    {
+      "id": "dlg_l3_strategist",
+      "speaker": "The Strategist",
+      "level": "level_03",
+      "text": "You think dying was an accident? Look at the rift..."
+    },
+    {
+      "id": "dlg_l5_betrayer",
+      "speaker": "The Betrayer",
+      "level": "level_05",
+      "text": "I sealed the pact so neither of us could leave. Forgive me—or end me."
+    }
+  ]
+}

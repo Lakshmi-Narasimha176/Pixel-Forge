@@ -1,0 +1,16 @@
+{
+  "lore_clues": [
+    {
+      "id": "lore_resurrection_rule",
+      "level": "level_01",
+      "title": "The Resurrection Rule",
+      "text": "While the Betrayer lives, death returns you to your last anchor—until your soul fractures."
+    },
+    {
+      "id": "lore_resurrection_loophole",
+      "level": "level_04",
+      "title": "The Resurrection Loophole",
+      "text": "If the Betrayer's own anchor is inverted, the pact turns back on its maker."
+    }
+  ]
+}

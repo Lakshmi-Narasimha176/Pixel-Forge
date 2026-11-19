@@ -1,3 +1,14 @@
+# Godot 4+ specific ignores
+.godot/
+*.translation
+*.import
+*.uid
+export_presets.cfg
+
+# Extracted GLB textures (keep original GLBs, ignore extracted loose slices)
+*_*.png
+*_*.jpg
+
 # Dependencies
 node_modules/
 .pnp
