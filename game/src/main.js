@@ -440,14 +440,16 @@ function tick() {
     // ── Update active level ──
     levelManager.update(dt);
 
+    inventory.health = levelManager.playerInventory.health;
+    horrorEffects.setHealth(inventory.health, inventory.maxHealth);
+
     // ── Update horror effects (sanity, camera shake) ──
     horrorEffects.update(dt);
 
     // ── Update lighting & flashlight battery ──
     lighting.update(dt);
-    if (lighting.flashlight) {
-      inventory.flashlightBattery = lighting.battery;
-    }
+    inventory.flashlightBattery = lighting.battery * 100;
+    levelManager.playerInventory.flashlightBattery = inventory.flashlightBattery;
 
     // ── Update HUD ──
     hud.update();
@@ -470,10 +472,9 @@ function tick() {
         if (typeof callback === 'function') callback(hit.object);
       }
     }
-  } else {
-    // Menu backdrop idle animation: slowly rotate camera and pulse lights
+  } else if (!gameStarted && menuSystem.activeScreen === 'main') {
+    // Only animate the menu backdrop; paused gameplay stays frozen.
     camera.rotation.y = Math.sin(clock.getElapsedTime() * 0.2) * 0.15;
-    lighting.update(dt);
   }
 
   // ── Render with horror post-processing ──
