@@ -15,6 +15,7 @@ const ASSETS = {
   room: '/horror_room.glb',
   flashlight: '/horror_game_flashlight_download_game-ready.glb',
   walkieTalkie: '/psx-style_horror_walkie-talkie.glb',
+  bloodBag: '/blood_bag.glb',
   devilsBible: '/devils_bible_-_dark_fantasy_book.glb',
   cursedDoll: '/cursed_porcelain_doll_-_antique_horror_prop.glb',
   bloodWall: '/abandoned_horror_wall_with_blood_splatter.glb',
@@ -105,6 +106,9 @@ export class Level1_Awakening extends LevelEventEmitter {
     this.walkieTalkieModel = null;
 
     /** @type {THREE.Object3D|null} */
+    this.bloodBagModel = null;
+
+    /** @type {THREE.Object3D|null} */
     this.devilsBibleModel = null;
 
     /** @type {THREE.Object3D|null} */
@@ -121,6 +125,9 @@ export class Level1_Awakening extends LevelEventEmitter {
 
     /** @type {boolean} Whether walkie talkie has been picked up */
     this.walkieTalkiePickedUp = false;
+
+    /** @type {boolean} Whether blood bag has been picked up */
+    this.bloodBagPickedUp = false;
 
     /** @type {boolean} Whether walkie talkie message has played */
     this.walkieMessagePlayed = false;
@@ -230,57 +237,67 @@ export class Level1_Awakening extends LevelEventEmitter {
    */
   _setupEnvironment() {
     // Atmospheric ambient light — visible horror silhouettes
-    this.ambientLight = new THREE.AmbientLight(0x2a2228, 0.45);
+    this.ambientLight = new THREE.AmbientLight(0x40353c, 0.75);
     this.levelGroup.add(this.ambientLight);
 
+    // Sky/ground bounce light
+    this.hemiLight = new THREE.HemisphereLight(0x4a4050, 0x181414, 0.65);
+    this.levelGroup.add(this.hemiLight);
+
     // Overhead hanging bulb — active, eerie flickering light
-    this.overheadLight = new THREE.PointLight(0xffcc88, 2.2, 22, 1.2);
-    this.overheadLight.position.set(0, 3.4, 0);
+    this.overheadLight = new THREE.PointLight(0xffddaa, 3.5, 18, 1.2);
+    this.overheadLight.position.set(0, 2.7, 0);
     this.overheadLight.castShadow = true;
     this.overheadLight.shadow.mapSize.set(1024, 1024);
     this.overheadLight.shadow.bias = -0.002;
     this.levelGroup.add(this.overheadLight);
     this.lightActivated = true;
 
-    // Secondary dim cold cyan accent light
-    this.accentLight = new THREE.PointLight(0x224455, 1.2, 16, 1.5);
-    this.accentLight.position.set(-3, 2.2, -2);
+    // Secondary dim cold cyan accent light in dark corner
+    this.accentLight = new THREE.PointLight(0x336688, 1.5, 12, 1.5);
+    this.accentLight.position.set(-2.2, 2.0, -1.8);
     this.levelGroup.add(this.accentLight);
 
     // Spotlight highlighting the flashlight table
-    this.tableSpot = new THREE.SpotLight(0xffeedd, 3.0, 10, Math.PI / 5, 0.5, 1.2);
-    this.tableSpot.position.set(1.5, 3.0, -1.0);
-    this.tableSpot.target.position.set(1.5, 0.8, -1.0);
+    this.tableSpot = new THREE.SpotLight(0xffeedd, 3.5, 8, Math.PI / 5, 0.5, 1.2);
+    this.tableSpot.position.set(1.2, 2.8, -0.8);
+    this.tableSpot.target.position.set(1.2, 0.88, -0.8);
     this.levelGroup.add(this.tableSpot);
     this.levelGroup.add(this.tableSpot.target);
 
-    // Horror atmospheric fog
-    this.scene.fog = new THREE.FogExp2(0x0c080a, 0.035);
+    // Horror atmospheric fog (soft depth, not blinding)
+    this.scene.fog = new THREE.FogExp2(0x0c080a, 0.015);
 
     // Solid floor and boundary walls so the scene is never void
     const floorMat = new THREE.MeshStandardMaterial({ color: 0x181414, roughness: 0.9 });
-    const floorGeo = new THREE.PlaneGeometry(24, 24);
+    const floorGeo = new THREE.PlaneGeometry(16, 16);
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = 0;
     floor.receiveShadow = true;
     this.levelGroup.add(floor);
 
-    // Pedestal/table for flashlight
+    // Pedestal/table for flashlight (examination table)
     const tableMat = new THREE.MeshStandardMaterial({ color: 0x241a16, roughness: 0.8 });
-    const tableGeo = new THREE.BoxGeometry(1.2, 0.85, 0.8);
-    const table = new THREE.Mesh(tableGeo, tableMat);
-    table.position.set(1.5, 0.425, -1.0);
-    table.castShadow = true;
-    table.receiveShadow = true;
-    this.levelGroup.add(table);
+    this.tableMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.85, 0.8), tableMat);
+    this.tableMesh.position.set(1.2, 0.425, -0.8);
+    this.tableMesh.castShadow = true;
+    this.tableMesh.receiveShadow = true;
+    this.levelGroup.add(this.tableMesh);
 
-    // Pedestal for walkie-talkie
-    const table2 = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.85, 0.8), tableMat);
-    table2.position.set(-1.8, 0.425, -1.0);
-    table2.castShadow = true;
-    table2.receiveShadow = true;
-    this.levelGroup.add(table2);
+    // Pedestal for walkie-talkie & blood bag (side medical desk)
+    this.deskMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.85, 0.8), tableMat);
+    this.deskMesh.position.set(-1.4, 0.425, -0.8);
+    this.deskMesh.castShadow = true;
+    this.deskMesh.receiveShadow = true;
+    this.levelGroup.add(this.deskMesh);
+
+    // Register colliders with Physics
+    if (this.physics) {
+      this.physics.clearColliders();
+      this.physics.addCollider(floor, this.tableMesh, this.deskMesh);
+      this.physics.eyeHeight = 1.6;
+    }
   }
 
   /**
@@ -326,54 +343,60 @@ export class Level1_Awakening extends LevelEventEmitter {
       }
     };
 
-    // Load original horror room environment (scaled to realistic 18m room)
+    // Load original horror room environment (1:1 scale, 6.07m x 3.30m x 6.71m)
     await loadModel('room', ASSETS.room,
-      new THREE.Vector3(0, 0, 0), null, 0.05);
+      new THREE.Vector3(0, 0, 0), null, 1.0);
 
-    // Flashlight on table
+    // Flashlight on examination table (size ~20cm)
     this.flashlightModel = await loadModel('flashlight', ASSETS.flashlight,
-      new THREE.Vector3(1.5, 0.88, -1.0),
+      new THREE.Vector3(1.2, 0.88, -0.8),
       { x: 0, y: Math.PI * 0.4, z: 0 },
-      0.35);
+      0.1);
 
-    // Walkie-talkie on table
+    // Walkie-talkie on side medical desk (size ~22cm)
     this.walkieTalkieModel = await loadModel('walkieTalkie', ASSETS.walkieTalkie,
-      new THREE.Vector3(-1.8, 0.88, -1.0),
+      new THREE.Vector3(-1.4, 0.88, -0.8),
       { x: 0, y: -Math.PI * 0.3, z: 0 },
-      0.4);
+      0.12);
+
+    // Real Blood Bag collectible pickup on medical desk (realistic IV bag ~29cm tall)
+    this.bloodBagModel = await loadModel('bloodBag', ASSETS.bloodBag,
+      new THREE.Vector3(-1.4, 0.88, -0.3),
+      { x: Math.PI / 2, y: 0, z: 0.2 },
+      0.01);
 
     // Devil's Bible on stand
     this.devilsBibleModel = await loadModel('devilsBible', ASSETS.devilsBible,
-      new THREE.Vector3(2.5, 0.85, -3.0),
+      new THREE.Vector3(2.0, 0.85, -2.0),
       { x: 0, y: Math.PI * 0.15, z: 0 },
-      0.03);
+      0.7);
 
     // Cursed porcelain doll
     this.cursedDollModel = await loadModel('cursedDoll', ASSETS.cursedDoll,
-      new THREE.Vector3(-2.2, 0.5, -2.8),
+      new THREE.Vector3(-2.2, 0.45, -2.2),
       { x: 0, y: Math.PI * 0.2, z: 0 },
-      0.5);
+      0.4);
 
-    // Blood splatter wall
+    // Blood splatter wall (aligned flush with right room wall)
     await loadModel('bloodWall', ASSETS.bloodWall,
-      new THREE.Vector3(4.5, 1.5, 0),
+      new THREE.Vector3(2.95, 1.25, 0),
       { x: 0, y: -Math.PI / 2, z: 0 },
-      0.8);
+      1.0);
 
-    // Vintage wall clock
+    // Vintage wall clock mounted on north wall
     await loadModel('wallClock', ASSETS.wallClock,
-      new THREE.Vector3(0, 2.4, -5.8),
+      new THREE.Vector3(0, 2.2, -3.25),
       { x: 0, y: 0, z: 0 },
-      0.02);
+      0.6);
 
-    // Ceiling fan (rotating overhead)
+    // Ceiling fan rotating overhead
     this.ceilingFanModel = await loadModel('ceilingFan', ASSETS.ceilingFan,
-      new THREE.Vector3(0, 3.4, 0),
-      null, 0.25);
+      new THREE.Vector3(0, 2.8, 0),
+      null, 0.9);
 
-    // Exit door
+    // Exit door in north wall
     this.exitDoor = await loadModel('exitDoor', ASSETS.door,
-      new THREE.Vector3(0, 0, -6.0),
+      new THREE.Vector3(0, 0, -3.3),
       { x: 0, y: 0, z: 0 },
       1.0);
   }
@@ -396,9 +419,17 @@ export class Level1_Awakening extends LevelEventEmitter {
     if (this.walkieTalkieModel) {
       this.walkieTalkieModel.userData.interactable = true;
       this.walkieTalkieModel.userData.interactType = 'pickup';
-      this.walkieTalkieModel.userData.interactLabel = 'Open drawer — Take Walkie-Talkie [E]';
+      this.walkieTalkieModel.userData.interactLabel = 'Take Walkie-Talkie [E]';
       this.walkieTalkieModel.userData.itemName = 'walkieTalkie';
       this.interactables.push(this.walkieTalkieModel);
+    }
+
+    if (this.bloodBagModel) {
+      this.bloodBagModel.userData.interactable = true;
+      this.bloodBagModel.userData.interactType = 'pickup';
+      this.bloodBagModel.userData.interactLabel = 'Take Blood Bag (+25 HP) [E]';
+      this.bloodBagModel.userData.itemName = 'bloodBag';
+      this.interactables.push(this.bloodBagModel);
     }
 
     if (this.devilsBibleModel) {
@@ -435,11 +466,13 @@ export class Level1_Awakening extends LevelEventEmitter {
     const camera = this.scene.getObjectByProperty('isCamera', true);
     if (!camera) return;
 
-    // Cast ray from camera center
-    this.interactRaycaster.set(
-      camera.position.clone(),
-      new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-    );
+    // Cast ray from camera world position along camera gaze direction
+    const origin = new THREE.Vector3();
+    camera.getWorldPosition(origin);
+    const dir = new THREE.Vector3(0, 0, -1);
+    camera.getWorldDirection(dir);
+
+    this.interactRaycaster.set(origin, dir);
 
     const intersects = this.interactRaycaster.intersectObjects(
       this.interactables, true
@@ -475,6 +508,35 @@ export class Level1_Awakening extends LevelEventEmitter {
 
           // Hide the model (picked up)
           target.visible = false;
+          this._removeInteractable(target);
+
+          this._showSubtitle('Flashlight acquired. Press [F] to toggle.', 3000);
+          console.log('[Level1] Flashlight picked up');
+        }
+        if (itemName === 'walkieTalkie' && !this.walkieTalkiePickedUp) {
+          this.walkieTalkiePickedUp = true;
+          this.playerInventory.hasWalkieTalkie = true;
+          this.emit('itemPickup', { item: 'walkieTalkie', model: target });
+
+          target.visible = false;
+          this._removeInteractable(target);
+
+          // Play walkie-talkie message
+          this._playWalkieMessage();
+          console.log('[Level1] Walkie-talkie picked up');
+        }
+        if (itemName === 'bloodBag' && !this.bloodBagPickedUp) {
+          this.bloodBagPickedUp = true;
+          this.playerInventory.hasBloodBag = true;
+          this.emit('itemPickup', { item: 'bloodBag', model: target });
+
+          target.visible = false;
+          this._removeInteractable(target);
+
+          this._showSubtitle('Blood Bag acquired. Press [Q] anytime to heal (+25 HP).', 3500);
+          console.log('[Level1] Blood bag picked up');
+        }
+        break;
           this._removeInteractable(target);
 
           this._showSubtitle('Flashlight acquired. Click to toggle.', 3000);
