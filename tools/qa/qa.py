@@ -8,7 +8,8 @@ import platform
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {".git", ".godot", "Library", "Temp", "obj", ".vs", "__pycache__"}
+SKIP_DIRS = {".git", ".godot", "Library", "Temp", "obj", ".vs",
+             "__pycache__", ".venv", "device3_story_package"}
 PATH_KEYS = {"path", "resource", "resource_path", "asset", "asset_path",
              "texture", "audio", "scene", "file", "filename"}
 
