@@ -268,6 +268,11 @@ export class MenuSystem {
     if (this.activeScreen === 'loading') this.activeScreen = 'none';
   }
 
+  hide() {
+    this._hideAll();
+    this.activeScreen = 'none';
+  }
+
   resume() {
     this._hideAll();
     this.activeScreen = 'none';

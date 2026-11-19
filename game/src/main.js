@@ -301,8 +301,12 @@ async function startNewGame() {
   menuSystem.hide();
   hud.show();
 
-  await audioManager.resume();
-  audioManager.generateReverb(2.8, 3.5);
+  try {
+    await audioManager.resume();
+    audioManager.generateReverb(2.8, 3.5);
+  } catch (e) {
+    console.warn('[Audio] Autoplay blocked or deferred:', e);
+  }
 
   controls.lock();
   gameStarted = true;
