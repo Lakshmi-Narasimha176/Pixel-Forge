@@ -1,4 +1,4 @@
-extends Interactable
+extends "res://scripts/interaction/interactable.gd"
 ## Pickup or story clue: notes, evidence, keys, blood bags, weapon, and resurrection lore.
 
 @export_enum("note", "evidence", "key", "weapon", "blood_bag", "battery", "resurrection_rule", "resurrection_loophole", "memory") var pickup_type: String = "note"

@@ -1,4 +1,4 @@
-extends Interactable
+extends "res://scripts/interaction/interactable.gd"
 ## Reusable door / level exit with key, flag, or objective gating.
 
 @export var next_level_id: String = ""

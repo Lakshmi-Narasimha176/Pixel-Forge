@@ -25,10 +25,39 @@ var flashlight_battery: float:
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_setup_default_inputs()
 	GameState.health_changed.connect(func(c, m): player_health_changed.emit(c, m))
 	GameState.player_died.connect(func(): player_died.emit())
 	GameState.inventory_changed.connect(_on_inventory_changed)
 	GameState.subtitle_requested.connect(func(s, t, d): subtitle_requested.emit(s, t, d))
+
+
+func _setup_default_inputs() -> void:
+	var mappings := {
+		"move_forward": KEY_W,
+		"move_backward": KEY_S,
+		"move_left": KEY_A,
+		"move_right": KEY_D,
+		"jump": KEY_SPACE,
+		"sprint": KEY_SHIFT,
+		"crouch": KEY_C,
+		"flashlight": KEY_F,
+		"interact": KEY_E,
+		"heal": KEY_Q,
+		"pause": KEY_ESCAPE
+	}
+	for action in mappings:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+			var ev := InputEventKey.new()
+			ev.physical_keycode = mappings[action]
+			InputMap.action_add_event(action, ev)
+
+	if not InputMap.has_action("attack"):
+		InputMap.add_action("attack")
+		var mb := InputEventMouseButton.new()
+		mb.button_index = MOUSE_BUTTON_LEFT
+		InputMap.action_add_event("attack", mb)
 
 
 func _on_inventory_changed() -> void:

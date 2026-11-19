@@ -1,5 +1,5 @@
 class_name Door
-extends Interactable
+extends "res://scripts/interaction/interactable.gd"
 ## Standard interactive door with sound effects and physical swing animation.
 
 @export var is_open: bool = false

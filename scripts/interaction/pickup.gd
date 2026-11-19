@@ -1,5 +1,5 @@
 class_name Pickup
-extends Interactable
+extends "res://scripts/interaction/interactable.gd"
 ## General world item pickup.
 
 @export var item_id: String = ""
