@@ -16,6 +16,8 @@ enum State { IDLE, PATROL, CHASE, ATTACK, DEAD }
 @export var death_flag: String = ""
 @export var reward_item_id: String = ""
 @export var boss_defeat_line: String = ""
+@export var speed_boost_on_low_health: float = 1.4  ## Speed multiplier when health < rage_threshold
+@export var rage_threshold: float = 0.3             ## Fraction of max_health that triggers rage mode
 
 var current_health: int
 var state: State = State.PATROL
@@ -24,6 +26,7 @@ var _patrol_points: Array[Vector3] = []
 var _patrol_index: int = 0
 var _attack_timer: float = 0.0
 var _origin: Vector3 = Vector3.ZERO
+var _is_enraged: bool = false
 
 
 func _ready() -> void:
@@ -50,12 +53,26 @@ func _physics_process(delta: float) -> void:
 		if players.size() > 0:
 			_player = players[0] as Node3D
 
+	# Rage mode: trigger when health drops below rage_threshold
+	if not _is_enraged and current_health < int(max_health * rage_threshold):
+		_is_enraged = true
+		AudioManager.play_enemy_sfx(enemy_name, "growl")
+		GameState.show_subtitle(enemy_name, "SOMETHING HAS AWAKENED IN THE DARK...", 3.0)
+
 	if _player and not GameState.is_dead:
 		var dist := global_position.distance_to(_player.global_position)
 		var old_state := state
+
+		# Sprinting player makes noise — wider detection
+		var effective_detect := detect_range
+		if _player and _player is CharacterBody3D:
+			var pvel := (_player as CharacterBody3D).velocity
+			if Vector2(pvel.x, pvel.z).length() > 5.5:
+				effective_detect = detect_range * 1.8
+
 		if dist <= attack_range:
 			state = State.ATTACK
-		elif dist <= detect_range:
+		elif dist <= effective_detect:
 			state = State.CHASE
 			if old_state != State.CHASE and old_state != State.ATTACK:
 				AudioManager.play_enemy_sfx(enemy_name, "growl")
@@ -100,8 +117,11 @@ func _do_chase(delta: float) -> void:
 	dir.y = 0.0
 	if dir.length() > 0.1:
 		dir = dir.normalized()
-		velocity.x = dir.x * move_speed
-		velocity.z = dir.z * move_speed
+		var chase_speed := move_speed
+		if _is_enraged:
+			chase_speed *= speed_boost_on_low_health
+		velocity.x = dir.x * chase_speed
+		velocity.z = dir.z * chase_speed
 		_face_direction(dir, delta)
 
 
@@ -145,4 +165,12 @@ func _die() -> void:
 		GameState.add_item(reward_item_id)
 	if not boss_defeat_line.is_empty():
 		GameState.show_subtitle(enemy_name, boss_defeat_line, 4.5)
-	queue_free()
+
+	# Death fall animation tween
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "rotation_degrees:x", 90.0, 0.4)
+	tween.tween_property(self, "position:y", position.y - 0.5, 0.4)
+	tween.set_parallel(false)
+	tween.tween_interval(1.5)
+	tween.tween_callback(queue_free)
