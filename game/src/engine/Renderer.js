@@ -113,7 +113,7 @@ export class HorrorRenderer {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 0.6;
+    this.renderer.toneMappingExposure = 1.2;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     container.appendChild(this.renderer.domElement);
@@ -121,11 +121,11 @@ export class HorrorRenderer {
     /** @type {HTMLCanvasElement} */
     this.canvas = this.renderer.domElement;
 
-    // ── Render target for scene pass ──
+    // ── Render target for scene pass (use logical pixels, not physical) ──
     this._rt = new THREE.WebGLRenderTarget(
-      window.innerWidth * Math.min(window.devicePixelRatio, 2),
-      window.innerHeight * Math.min(window.devicePixelRatio, 2),
-      { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }
+      window.innerWidth,
+      window.innerHeight,
+      { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, colorSpace: THREE.SRGBColorSpace }
     );
 
     // ── Post-processing material ──
@@ -236,10 +236,9 @@ export class HorrorRenderer {
   _onResize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const pr = Math.min(window.devicePixelRatio, 2);
 
     this.renderer.setSize(w, h);
-    this._rt.setSize(w * pr, h * pr);
+    this._rt.setSize(w, h);
     this._postMaterial.uniforms.uResolution.value.set(w, h);
   }
 }

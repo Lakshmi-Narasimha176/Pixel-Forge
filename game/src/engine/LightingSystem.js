@@ -22,13 +22,18 @@ export class LightingSystem {
     /** @type {THREE.Camera} */
     this.camera = camera;
 
-    // ── Ambient light (very dim) ──
+    // ── Ambient light (horror dim — enough to see outlines) ──
     /** @type {THREE.AmbientLight} */
-    this.ambientLight = new THREE.AmbientLight(0x111122, 0.08);
+    this.ambientLight = new THREE.AmbientLight(0x1a1030, 0.35);
     scene.add(this.ambientLight);
 
-    // ── Fog ──
-    scene.fog = new THREE.FogExp2(0x000000, 0.06);
+    // ── Hemisphere light for realistic sky/ground bounce ──
+    /** @type {THREE.HemisphereLight} */
+    this.hemiLight = new THREE.HemisphereLight(0x1a0a2a, 0x0a0505, 0.25);
+    scene.add(this.hemiLight);
+
+    // ── Fog (lighter so scene is visible) ──
+    scene.fog = new THREE.FogExp2(0x060208, 0.025);
 
     // ── Flashlight ──
     /** @type {THREE.SpotLight} */
@@ -271,6 +276,10 @@ export class LightingSystem {
     this.clearFlickerLights();
     this.scene.remove(this.ambientLight);
     this.ambientLight.dispose();
+    if (this.hemiLight) {
+      this.scene.remove(this.hemiLight);
+      this.hemiLight.dispose();
+    }
     this.flashlight.dispose();
   }
 }

@@ -86,18 +86,43 @@ async function buildAmbientScene() {
   scene.add(ambientSceneGroup);
 
   // Dark decaying floor
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0x140e0e, roughness: 0.95 });
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), floorMat);
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x1a1010, roughness: 0.95, metalness: 0.0 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   ambientSceneGroup.add(floor);
   physics.addCollider(floor);
 
+  // ── Ceiling (so the room feels enclosed) ──
+  const ceilMat = new THREE.MeshStandardMaterial({ color: 0x0d0a0a, roughness: 1.0 });
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), ceilMat);
+  ceil.rotation.x = Math.PI / 2;
+  ceil.position.set(0, 5, 0);
+  ambientSceneGroup.add(ceil);
+
+  // ── Back wall with blood texture feel ──
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x1a0d0d, roughness: 0.95 });
+  const wallGeo = new THREE.BoxGeometry(30, 6, 0.3);
+
+  const backWall = new THREE.Mesh(wallGeo, wallMat);
+  backWall.position.set(0, 3, -8);
+  ambientSceneGroup.add(backWall);
+
+  const leftWall = new THREE.Mesh(wallGeo, wallMat);
+  leftWall.position.set(-10, 3, 0);
+  leftWall.rotation.y = Math.PI / 2;
+  ambientSceneGroup.add(leftWall);
+
+  const rightWall = new THREE.Mesh(wallGeo, wallMat);
+  rightWall.position.set(10, 3, 0);
+  rightWall.rotation.y = Math.PI / 2;
+  ambientSceneGroup.add(rightWall);
+
   // Load original Soviet Room model into ambient background
   try {
     const gltf = await assetLoader.load('/horror_soviet_room.glb');
     const model = gltf.scene || gltf;
-    model.position.set(0, 0, 0);
+    model.position.set(0, 0, -2);
     model.scale.set(0.025, 0.025, 0.025);
     model.traverse((c) => {
       if (c.isMesh) {
@@ -106,54 +131,56 @@ async function buildAmbientScene() {
       }
     });
     ambientSceneGroup.add(model);
-    console.log('[Game] Original horror_soviet_room.glb loaded into ambient scene.');
+    console.log('[Game] horror_soviet_room.glb loaded into ambient scene.');
   } catch (err) {
-    console.warn('[Game] Using fallback walls for ambient scene:', err);
-    // Surrounding walls fallback
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x1b1313, roughness: 0.9 });
-    const wallGeo = new THREE.BoxGeometry(30, 5, 0.3);
-
-    const backWall = new THREE.Mesh(wallGeo, wallMat);
-    backWall.position.set(0, 2.5, -10);
-    ambientSceneGroup.add(backWall);
-
-    const leftWall = new THREE.Mesh(wallGeo, wallMat);
-    leftWall.position.set(-10, 2.5, 0);
-    leftWall.rotation.y = Math.PI / 2;
-    ambientSceneGroup.add(leftWall);
-
-    const rightWall = new THREE.Mesh(wallGeo, wallMat);
-    rightWall.position.set(10, 2.5, 0);
-    rightWall.rotation.y = Math.PI / 2;
-    ambientSceneGroup.add(rightWall);
+    console.warn('[Game] Soviet room fallback:', err.message);
   }
 
   // Load original wall clock model
   try {
     const clockGltf = await assetLoader.load('/vintage_wooden_wall_clock_-.glb');
     const clock = clockGltf.scene || clockGltf;
-    clock.position.set(0, 2.2, -4.5);
+    clock.position.set(0, 2.4, -7.6);
     clock.scale.set(0.015, 0.015, 0.015);
     ambientSceneGroup.add(clock);
   } catch (e) {}
 
-  // Flickering horror point lights
-  lighting.addFlickerLight(new THREE.Vector3(0, 3.2, 0), {
-    intensity: 2.2,
-    color: 0xff3311,
+  // ── Main blood-red overhead light (strong enough to see the room) ──
+  const mainLight = new THREE.PointLight(0xcc2200, 4.0, 18, 1.5);
+  mainLight.position.set(0, 4.0, 0);
+  mainLight.castShadow = true;
+  mainLight.shadow.mapSize.set(512, 512);
+  mainLight.shadow.bias = -0.002;
+  ambientSceneGroup.add(mainLight);
+
+  // ── Secondary eerie blue-purple fill light ──
+  const fillLight = new THREE.PointLight(0x2244aa, 2.0, 14, 1.5);
+  fillLight.position.set(-4, 3.5, -5);
+  ambientSceneGroup.add(fillLight);
+
+  // ── Add to flicker system for atmospheric animation ──
+  lighting.addFlickerLight(new THREE.Vector3(0, 4.0, 0), {
+    intensity: 4.0,
+    color: 0xcc2200,
+    flickerAmount: 0.3,
+    flickerSpeed: 3,
+    distance: 18
+  });
+
+  lighting.addFlickerLight(new THREE.Vector3(-4, 3.5, -5), {
+    intensity: 2.0,
+    color: 0x2244aa,
     flickerAmount: 0.5,
-    flickerSpeed: 4
+    flickerSpeed: 6,
+    distance: 14
   });
 
-  lighting.addFlickerLight(new THREE.Vector3(-3, 2.8, -4), {
-    intensity: 1.4,
-    color: 0x4488aa,
-    flickerAmount: 0.7,
-    flickerSpeed: 7
-  });
+  // ── Remove the static lights we added (flicker system owns them now) ──
+  ambientSceneGroup.remove(mainLight);
+  ambientSceneGroup.remove(fillLight);
 
-  // Ambient fog
-  scene.fog = new THREE.FogExp2(0x080406, 0.04);
+  // Lighter ambient fog so the menu room is visible
+  scene.fog = new THREE.FogExp2(0x080204, 0.018);
 }
 
 /* ────────────────────────────────────────────────────────
