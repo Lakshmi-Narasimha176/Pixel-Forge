@@ -16,3 +16,4 @@ func interact(_player: Node) -> void:
 	if one_shot and _used:
 		return
 	_used = true
+

@@ -3,3 +3,4 @@ extends "res://autoload/save_manager.gd"
 
 func has_save() -> bool:
 	return has_save_file()
+

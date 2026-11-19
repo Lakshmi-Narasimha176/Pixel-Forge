@@ -7,3 +7,4 @@ func _ready() -> void:
 	detect_range = 20.0
 	attack_range = 2.5
 	super._ready()
+

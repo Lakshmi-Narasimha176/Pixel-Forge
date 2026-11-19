@@ -18,3 +18,4 @@ func interact(_player: Node) -> void:
 		AudioManager.play_sfx(sound_type)
 	GameState.show_subtitle("System", "Acquired %s." % pickup_name, 2.5)
 	queue_free()
+
