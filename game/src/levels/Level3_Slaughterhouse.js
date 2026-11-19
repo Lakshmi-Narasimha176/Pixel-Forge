@@ -325,7 +325,7 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
     ];
     for (let i = 0; i < bagPositions.length; i++) {
       const bag = await load(`bloodBag_${i}`, ASSETS.bloodBag,
-        bagPositions[i], null, 0.5);
+        bagPositions[i], null, 0.01);
       if (bag) {
         bag.userData.interactable = true;
         bag.userData.interactType = 'healthPickup';
