@@ -1,0 +1,107 @@
+================================================================================
+                    THE LAST REVENGE — AUDIO CREDITS & LICENSES
+================================================================================
+
+All integrated audio assets in this project are licensed under Creative Commons Zero (CC0)
+or public domain equivalents, free for commercial and non-commercial use with no copyright
+restrictions.
+
+--------------------------------------------------------------------------------
+1. KENNEY AUDIO ASSETS (CC0 1.0 Universal - Public Domain)
+--------------------------------------------------------------------------------
+Source: https://kenney.nl/assets
+Author: Kenney (Asset Jesus)
+License: Creative Commons Zero (CC0 1.0 Universal)
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+
+Included Packs:
+• Impact Sounds:
+  - Surface footsteps: Concrete, Wood, Grass, Dirt/Gravel, Carpet
+  - Body impacts: Punch, Soft impacts (jump landing, damage)
+  - Environmental impacts: Wood, Metal, Glass, Plate, Tin
+• RPG Audio:
+  - Footsteps: Concrete steps (footstep00 - footstep09)
+  - Doors & Architecture: Door opening (1-2), Door closing (1-4), Structural creaks (1-3)
+  - Interactive items: Metal latches, clicks, book opening, closing, page turns
+  - Weapons & Melee: Knife drawing, knife slicing, axe chopping
+• Interface & UI Audio:
+  - UI clicks, button presses, confirmation tones, cancel/back sounds, error chimes, switches
+• Sci-Fi & Digital Audio:
+  - Atmospheric machine hums, computer processing chirps, high frequency electrical tones
+
+--------------------------------------------------------------------------------
+2. OPENGAMEART COMMUNITY ASSETS (CC0 1.0 Universal - Public Domain)
+--------------------------------------------------------------------------------
+Source: https://opengameart.org
+
+• "Lost in a bad place (horror ambience loop)"
+  Author: congusbongus
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/lost-in-a-bad-place-horror-ambience-loop
+  File: assets/audio/ambient/lost_2.ogg, assets/audio/music/lost_2.ogg
+
+• "Abandoned Passages (horror ambience loop)"
+  Author: congusbongus
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/abandoned-passages-horror-ambience-loop
+  File: assets/audio/ambient/freezer_0.ogg
+
+• "Ambient Horror"
+  Author: Tekiyo
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/ambient-horror
+  File: assets/audio/ambient/ambient_horror_0.ogg, assets/audio/music/ambient_horror_0.ogg
+
+• "A Lurking Evil"
+  Author: Alexandr Zhelanov
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/a-lurking-evil-horror-ambience
+  File: assets/audio/ambient/evil_0.ogg
+
+• "Heartbeat Sounds" (Slow, Fast, Low Health)
+  Author: qubodup
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/heartbeat-sounds
+  Files: assets/audio/player/heartbeat_slow.ogg, assets/audio/player/heartbeat_fast.ogg
+
+• "Horror SFX Stingers" (Jumpscares)
+  Author: artisticdude
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/horror-sfx
+  Files: assets/audio/jumpscare/horror_effect1.ogg, assets/audio/jumpscare/horror_effect2.ogg
+
+• "Female Scream"
+  Author: SoundFlakes
+  License: CC0 1.0 Universal
+  Source URL: https://opengameart.org/content/female-high-pitched-scream-sfx
+  File: assets/audio/jumpscare/scream.ogg
+
+• "Zombie Moans & Monster Growls"
+  Author: artisticdude / qubodup
+  License: CC0 1.0 Universal
+  Source URLs:
+    https://opengameart.org/content/zombie-noises-and-moans
+    https://opengameart.org/content/monster-sfx
+  Files: assets/audio/enemy/fastzombie1.ogg, zombienoise1-3.ogg, monster_growl.ogg
+
+• "Firearm Gunshots"
+  Author: Michel Baradari / qubodup
+  License: CC0 1.0 Universal
+  Source URLs:
+    https://opengameart.org/content/gunshots
+    https://opengameart.org/content/gunshot-sounds
+  Files: assets/audio/guns/pistol_fire.ogg, magnum_fire.ogg, shotty.ogg, mosin.ogg, cz.ogg, sks.ogg
+
+--------------------------------------------------------------------------------
+3. FOOTSTEPS & RETRO HORROR (ITCH.IO REFERENCES)
+--------------------------------------------------------------------------------
+• "Footsteps SFX Free" by heyheythere
+  Source: https://heyheythere.itch.io/footsteps-sfx-free
+  License: CC BY 4.0
+  Attribution: "Footsteps SFX Free" by heyheythere (https://heyheythere.itch.io/footsteps-sfx-free)
+  Note: When external itch.io files are manually unpacked, this attribution applies.
+
+• "Retro Horror SFX Pack" by ognomo
+  Source: https://ognomo.itch.io/retro-horror-sfx-pack
+  License: Standard itch.io free game audio license
+================================================================================

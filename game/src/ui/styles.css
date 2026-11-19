@@ -1,0 +1,425 @@
+/*
+ * styles.css — All UI styling for THE LAST REVENGE
+ * Horror theme · Dark backgrounds · Red accents (#8B0000)
+ * Fonts: Creepster (titles), Special Elite (body)
+ */
+
+/* ═══════════════════════════════════════════════
+   FONTS
+   ═══════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&display=swap');
+
+/* ═══════════════════════════════════════════════
+   GLOBAL RESET & BASE
+   ═══════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  color: #c8c8c8;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   MENU SHARED
+   ═══════════════════════════════════════════════ */
+.menu-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 910;
+}
+
+.menu-backdrop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 2, 2, 0.94);
+  padding: 40px;
+}
+
+/* ── Title ── */
+.menu-title {
+  font-family: 'Creepster', cursive;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  color: #8B0000;
+  text-transform: uppercase;
+  letter-spacing: 0.5rem;
+  text-shadow:
+    0 0 20px rgba(139, 0, 0, 0.7),
+    0 0 60px rgba(139, 0, 0, 0.3),
+    0 2px 4px #000;
+  animation: textFlicker 4s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+.menu-subtitle {
+  font-family: 'Creepster', cursive;
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  color: #8B0000;
+  letter-spacing: 0.4rem;
+  text-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+  margin-bottom: 30px;
+}
+
+.menu-footer {
+  margin-top: 40px;
+  font-size: 0.75rem;
+  color: #444;
+  letter-spacing: 0.2rem;
+  font-style: italic;
+}
+
+/* ── Buttons ── */
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 36px;
+  z-index: 2;
+}
+
+.menu-btn {
+  font-family: 'Creepster', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 0.3rem;
+  color: #aaa;
+  background: transparent;
+  border: 1px solid #333;
+  padding: 12px 48px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(139, 0, 0, 0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+
+.menu-btn:hover {
+  color: #fff;
+  border-color: #8B0000;
+  text-shadow: 0 0 10px rgba(139, 0, 0, 0.6);
+}
+
+.menu-btn:hover::before {
+  transform: translateX(100%);
+}
+
+.menu-btn:active {
+  transform: scale(0.97);
+}
+
+.menu-btn-danger {
+  color: #8B0000;
+  border-color: #500;
+}
+
+.menu-btn-danger:hover {
+  color: #ff2222;
+  border-color: #8B0000;
+  background: rgba(139, 0, 0, 0.1);
+}
+
+/* ═══════════════════════════════════════════════
+   BLOOD DRIP ANIMATION
+   ═══════════════════════════════════════════════ */
+.blood-drip {
+  position: relative;
+  width: 200px;
+  height: 60px;
+  margin-top: -8px;
+  z-index: 1;
+  overflow: visible;
+}
+
+.blood-drip::before,
+.blood-drip::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #8B0000 0%, #5a0000 60%, transparent 100%);
+  border-radius: 0 0 2px 2px;
+  animation: drip 3s ease-in infinite;
+}
+
+.blood-drip::before {
+  left: 30%;
+  height: 0;
+  animation-delay: 0s;
+}
+
+.blood-drip::after {
+  left: 65%;
+  height: 0;
+  animation-delay: 1.5s;
+}
+
+@keyframes drip {
+  0% {
+    height: 0;
+    opacity: 1;
+  }
+  70% {
+    height: 50px;
+    opacity: 1;
+  }
+  100% {
+    height: 60px;
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   DEATH SCREEN
+   ═══════════════════════════════════════════════ */
+.death-bg {
+  background:
+    radial-gradient(circle at 30% 50%, rgba(139, 0, 0, 0.3) 0%, transparent 60%),
+    radial-gradient(circle at 70% 40%, rgba(100, 0, 0, 0.2) 0%, transparent 55%),
+    rgba(5, 0, 0, 0.95);
+}
+
+.death-title {
+  font-family: 'Creepster', cursive;
+  font-size: clamp(3rem, 8vw, 7rem);
+  color: #8B0000;
+  text-shadow:
+    0 0 30px rgba(139, 0, 0, 0.8),
+    0 0 80px rgba(139, 0, 0, 0.4),
+    0 4px 8px #000;
+  animation: deathPulse 1.5s ease-in-out infinite;
+}
+
+.blood-splatter-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(100, 0, 0, 0.3) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(80, 0, 0, 0.15) 0%, transparent 50%);
+  z-index: 0;
+}
+
+@keyframes deathPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+/* ═══════════════════════════════════════════════
+   VICTORY SCREEN
+   ═══════════════════════════════════════════════ */
+.victory-title {
+  font-family: 'Creepster', cursive;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  color: #c8c8c8;
+  letter-spacing: 0.6rem;
+  text-shadow: 0 0 20px rgba(200, 200, 200, 0.3);
+  animation: textFlicker 3s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   SETTINGS
+   ═══════════════════════════════════════════════ */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setting-row label {
+  flex: 0 0 160px;
+  font-size: 0.85rem;
+  color: #888;
+  letter-spacing: 0.08rem;
+  text-align: right;
+}
+
+.setting-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #222;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.setting-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #8B0000;
+  border: 2px solid #cc0000;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.setting-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.setting-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #8B0000;
+  border: 2px solid #cc0000;
+  cursor: pointer;
+}
+
+.setting-val {
+  flex: 0 0 32px;
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════
+   HUD
+   ═══════════════════════════════════════════════ */
+#game-hud {
+  font-family: 'Special Elite', monospace;
+}
+
+/* Health pulse animation */
+@keyframes hud-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════ */
+
+/* Text flicker — creepy light effect */
+@keyframes textFlicker {
+  0%, 100% { opacity: 1; }
+  4% { opacity: 0.9; }
+  6% { opacity: 0.4; }
+  8% { opacity: 0.9; }
+  42% { opacity: 1; }
+  43% { opacity: 0.5; }
+  44% { opacity: 1; }
+  46% { opacity: 0.3; }
+  47% { opacity: 1; }
+  56% { opacity: 1; }
+  57% { opacity: 0.6; }
+  58% { opacity: 1; }
+}
+
+/* General pulse */
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Slide up */
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════
+   NOTE / DOCUMENT OVERLAY
+   ═══════════════════════════════════════════════ */
+#note-overlay {
+  font-family: 'Special Elite', monospace;
+}
+
+#note-overlay > div {
+  animation: slideUp 0.4s ease-out;
+}
+
+/* ═══════════════════════════════════════════════
+   LOADING SCREEN
+   ═══════════════════════════════════════════════ */
+#loading-screen,
+#loading-screen-menu .menu-backdrop {
+  background: #0a0a0a;
+}
+
+#loading-screen h1 {
+  font-family: 'Creepster', cursive;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .menu-btn {
+    font-size: 1rem;
+    padding: 10px 32px;
+    letter-spacing: 0.15rem;
+  }
+
+  .setting-row {
+    flex-wrap: wrap;
+  }
+
+  .setting-row label {
+    flex: 1 1 100%;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+
+  #hud-inventory-bar {
+    gap: 2px !important;
+  }
+
+  #hud-inventory-bar > div {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}

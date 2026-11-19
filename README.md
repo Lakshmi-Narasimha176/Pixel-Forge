@@ -1,44 +1,56 @@
-# THE LAST REVENGE — Device 4 QA package
+# THE LAST REVENGE (Godot 4.x — Compatibility Renderer)
 
-Offline, read-only QA utilities for Godot and Unity. Python standard library only.
-No network access, runtime AI, background process, or third-party package.
+**Theme:** THE UNKNOWN  
+**Genre:** First-Person Supernatural Horror Adventure  
+**Target Platform:** Windows PC (4 GB RAM, Compatibility Renderer, Offline-First)
 
-## Requirements
-- Python 3.9 or newer.
-- Windows PowerShell.
-- A Godot or Unity project folder for project audits.
+---
 
-## Verify the QA tool
-```powershell
-python --version
-python tools\qa\qa.py inspect
-python tools\qa\qa.py --help
-```
+## Running & Exporting in Godot 4.x
 
-## Commands
-Run from the repository root. Device 3's integrated content in `data/` is
-authoritative for content checks; the standalone `device3_story_package/` copy
-and the local `.venv/` are excluded from QA scans.
+1. Install **Godot 4.2+** (Standard edition, GDScript).
+2. Open Godot Project Manager -> **Import** -> select `project.godot` at the repository root.
+3. Press **F5** to launch from `res://scenes/ui/main_menu.tscn`.
+4. **Windows `.exe` Export:**
+   - In Godot: **Editor -> Manage Export Templates -> Download and Install** for your Godot 4.x version.
+   - Go to **Project -> Export...**, select **Windows Desktop** (`export_presets.cfg`), and export to `build/windows/TheLastRevenge.exe`.
 
-```powershell
-python tools\qa\qa.py validate-json data --id-field id --out reports\content-validation.txt
-python tools\qa\qa.py audit-assets data --out reports\asset-audit.txt
-python tools\qa\qa.py audit-project GAME_PROJECT --out reports\project-audit.txt
-```
+---
 
-## Command behavior
-- `inspect`: checks Python version, Windows platform and standard-library availability.
-- `validate-json INPUT`: validates one JSON file or all JSON files in a directory. Duplicate object keys fail. `--id-field id` optionally checks ID uniqueness across scanned files.
-- `audit-assets PROJECT`: finds byte-identical files using SHA-256 in 1 MB chunks and checks common resource-path fields in JSON. Device 4's content audit targets `data/`; `.venv/` and `device3_story_package/` are always skipped.
-- `audit-project PROJECT`: detects Godot using `project.godot`, or Unity using `ProjectSettings/ProjectVersion.txt` and `Assets/`. Godot `scenes`, `scripts`, and `assets` folders are informational, not mandatory.
+## Controls
 
-## Reports and exit codes
-Each command prints a plain-text PASS/FAIL report and writes it to `--out`.
-Exit code `0` means all checks passed; `1` means at least one check failed.
+| Key / Input | Action |
+|---|---|
+| **W, A, S, D** | Move |
+| **Mouse** | Look around |
+| **Shift** | Sprint |
+| **C** | Toggle Crouch |
+| **Space** | Jump |
+| **E** | Interact (pick up items, read clues, flip switches, open doors) |
+| **F** | Toggle Flashlight |
+| **Left Mouse** | Melee Attack (once Baseball Bat is equipped) |
+| **Q** | Use Blood Bag (+35 HP) |
+| **Esc** | Pause Menu (Resume, Restart Checkpoint, Save, Main Menu) |
 
-## Safety and limitations
-- Source project files are read only; reports are written only to the selected output path.
-- Do not point `--out` at a source file.
-- JSON resource paths are checked relative to the selected audit root (`data/` for the integrated content audit). Confirm Device 3's actual schema before relying on these checks.
-- Unity GUID references and engine-specific binary resource formats are not resolved.
-- Static checks do not prove scenes run or gameplay progression works. Use `docs/TEST_CHECKLIST.md` for manual playtesting.
+---
+
+## Five Connected Levels
+
+1. **Level 1 — The Awakening (`scenes/levels/level_01/level_01.tscn`)**: Wake in the foggy abandoned settlement, pick up the walkie-talkie, discover you are dead, read the Dark Tome for the **Resurrection Rule**, and unlock the Settlement Gate.
+2. **Level 2 — The Butcher (`scenes/levels/level_02/level_02.tscn`)**: Equip the bloodied baseball bat, gather shipment evidence, defeat **The Butcher**, and take the Bunker Keycard.
+3. **Level 3 — The Strategist (`scenes/levels/level_03/level_03.tscn`)**: Flip both breaker switches to disable corridor shock traps, recover the betrayal dossier, and defeat **The Strategist**.
+4. **Level 4 — The Impossible Return (`scenes/levels/level_04/level_04.tscn`)**: Discover the **Resurrection Loophole** in the distorted afterlife and align all 3 Soul Anchors.
+5. **Level 5 — The Betrayer (`scenes/levels/level_05/level_05.tscn`)**: Examine your dead friend's memory and confession, defeat **The Betrayer**, and step into the Dawn Sanctuary (`scenes/ui/ending_screen.tscn`).
+
+---
+
+## Documentation & QA
+
+- `docs/PROJECT_AUDIT.md` — Initial repository, asset size, and hardware audit.
+- `docs/PROGRESS.md` — Development log.
+- `docs/TEST_REPORT.md` — Static QA checks and runtime test status.
+- Offline QA check:
+  ```bash
+  python3 tools/qa/qa.py validate-json data --id-field id --out reports/content-validation.txt
+  python3 tools/qa/qa.py audit-project . --out reports/project-audit.txt
+  ```
