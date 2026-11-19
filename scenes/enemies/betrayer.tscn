@@ -18,7 +18,7 @@ attack_range = 2.4
 attack_cooldown = 1.0
 death_objective_id = "l5_obj_kill_betrayer"
 death_flag = "betrayer_defeated"
-boss_defeat_line = "The Betrayer shatters. The pact is broken — the dawn door opens."
+boss_defeat_line = "The echo collapses. The pact still hums beneath the floor; the last choice is yours."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)

@@ -32,9 +32,8 @@ func _on_resume() -> void:
 
 func _on_restart() -> void:
 	get_tree().paused = false
-	GameManager.change_level(GameManager.current_level)
+	LevelManager.go_to_level(GameState.current_level_id, false)
 
 func _on_main_menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
-
+	LevelManager.go_to_level("main_menu", false)

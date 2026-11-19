@@ -101,6 +101,10 @@
           "description": "Defeat The Betrayer to end the pact."
         },
         {
+          "id": "l5_obj_final_choice",
+          "description": "Confront your friend with the truth and choose what comes next."
+        },
+        {
           "id": "l5_obj_ending",
           "description": "Walk into the dawn sanctuary to complete your revenge."
         }

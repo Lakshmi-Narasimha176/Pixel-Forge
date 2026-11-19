@@ -10,7 +10,10 @@ config_version=5
 
 [application]
 
-config/features=PackedStringArray("4.7")
+config/name="THE LAST REVENGE"
+config/description="A first-person supernatural mystery about death, trust, and a resurrection pact."
+run/main_scene="res://scenes/ui/main_menu.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
 
 [autoload]
 
@@ -28,6 +31,24 @@ SoundManager="*res://autoload/sound_manager.gd"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[input]
+
+move_forward={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 87)]}
+move_backward={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 83)]}
+move_left={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 65)]}
+move_right={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 68)]}
+sprint={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 4194325)]}
+crouch={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 67)]}
+jump={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 32)]}
+interact={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 69)]}
+flashlight={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 70)]}
+attack={"deadzone": 0.2, "events": [Object(InputEventMouseButton, "button_index": 1)]}
+heal={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 81)]}
+pause={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 4194305)]}
+journal={"deadzone": 0.2, "events": [Object(InputEventKey, "physical_keycode": 4194306)]}
 
 [physics]
 
@@ -35,4 +56,6 @@ window/stretch/aspect="expand"
 
 [rendering]
 
-rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.02, 0.022, 0.03, 1)

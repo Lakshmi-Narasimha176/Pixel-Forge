@@ -10,19 +10,28 @@
       "id": "char_butcher",
       "name": "The Butcher",
       "role": "Level 2 Boss",
-      "summary": "First gangster enforcer ruling the blood-stained slaughterhouse."
+      "summary": "A frightening enforcer who secretly left an escape route open on the night of the murder.",
+      "hidden_motive": "He once helped the protagonist's friend try to get the protagonist out alive. He still chooses to spare the player once in combat.",
+      "initial_trust": 0,
+      "initial_suspicion": 2
     },
     {
       "id": "char_strategist",
       "name": "The Strategist",
       "role": "Level 3 Boss",
-      "summary": "Second gangster mastermind who rigged the underground bunker with traps."
+      "summary": "A manipulative tactician who tells partial truths and alters the contract's copy.",
+      "hidden_motive": "He tests whether the protagonist will choose violence when an escape route remains open.",
+      "initial_trust": 0,
+      "initial_suspicion": 1
     },
     {
       "id": "char_betrayer",
       "name": "The Betrayer",
       "role": "Level 5 Final Antagonist",
-      "summary": "Your dead friend who orchestrated the ambush and sealed the pact."
+      "summary": "Your closest friend. He did fire the fatal shot, but the reason and the memory around it are incomplete.",
+      "hidden_motive": "He tried the Butcher's escape route, then shot the protagonist to interrupt a binding ritual that would have permanently surrendered the protagonist's soul.",
+      "initial_trust": 0,
+      "initial_suspicion": 2
     }
   ]
 }

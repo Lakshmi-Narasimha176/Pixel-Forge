@@ -29,6 +29,19 @@ func save_game() -> bool:
 		"collected_items": GameState.collected_items,
 		"completed_objectives": ObjectiveManager.completed_objectives,
 		"puzzle_states": GameState.puzzle_states,
+		"narrative": {
+			"trust": GameState.character_trust,
+			"suspicion": GameState.character_suspicion,
+			"evidence": GameState.discovered_evidence,
+			"memories": GameState.unlocked_memories,
+			"secrets": GameState.revealed_secrets,
+			"contradictions": GameState.discovered_contradictions,
+			"choices": GameState.dialogue_choices,
+			"events": GameState.fired_story_events,
+			"mystery": GameState.current_mystery,
+			"ending": GameState.ending_id
+		},
+		"flashlight_on": GameState.flashlight_on,
 		"mouse_sensitivity": GameState.mouse_sensitivity,
 		"master_volume": GameState.master_volume
 	}
@@ -69,6 +82,7 @@ func load_game() -> bool:
 	GameState.blood_bags = int(data.get("blood_bags", 1))
 	GameState.has_weapon = bool(data.get("has_weapon", false))
 	GameState.flashlight_battery = float(data.get("flashlight_battery", 100.0))
+	GameState.flashlight_on = bool(data.get("flashlight_on", true))
 	GameState.resurrection_count = int(data.get("resurrection_count", 0))
 	GameState.resurrection_rule_discovered = bool(data.get("resurrection_rule_discovered", false))
 	GameState.resurrection_loophole_found = bool(data.get("resurrection_loophole_found", false))
@@ -93,12 +107,43 @@ func load_game() -> bool:
 	if pstates is Dictionary:
 		GameState.puzzle_states = pstates.duplicate(true)
 
+	var narrative: Variant = data.get("narrative", {})
+	if narrative is Dictionary:
+		var trust: Variant = narrative.get("trust", {})
+		if trust is Dictionary:
+			GameState.character_trust = trust.duplicate(true)
+		var suspicion: Variant = narrative.get("suspicion", {})
+		if suspicion is Dictionary:
+			GameState.character_suspicion = suspicion.duplicate(true)
+		var evidence: Variant = narrative.get("evidence", {})
+		if evidence is Dictionary:
+			GameState.discovered_evidence = evidence.duplicate(true)
+		GameState.unlocked_memories = _string_array(narrative.get("memories", []))
+		GameState.revealed_secrets = _string_array(narrative.get("secrets", []))
+		GameState.discovered_contradictions = _string_array(narrative.get("contradictions", []))
+		var choices: Variant = narrative.get("choices", {})
+		if choices is Dictionary:
+			GameState.dialogue_choices = choices.duplicate(true)
+		GameState.fired_story_events = _string_array(narrative.get("events", []))
+		GameState.current_mystery = str(narrative.get("mystery", GameState.current_mystery))
+		GameState.ending_id = str(narrative.get("ending", ""))
+
 	GameState.mouse_sensitivity = float(data.get("mouse_sensitivity", 0.0025))
 	GameState.master_volume = float(data.get("master_volume", 0.8))
 	AudioManager.apply_volume(GameState.master_volume)
 	GameState.health_changed.emit(GameState.health, GameState.MAX_HEALTH)
 	GameState.inventory_changed.emit()
+	GameState.flashlight_changed.emit(GameState.flashlight_battery, GameState.flashlight_on)
+	GameState.narrative_changed.emit()
 	return true
+
+
+func _string_array(value: Variant) -> Array[String]:
+	var result: Array[String] = []
+	if value is Array:
+		for item in value:
+			result.append(str(item))
+	return result
 
 
 func delete_save() -> void:

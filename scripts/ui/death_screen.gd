@@ -16,9 +16,8 @@ func _ready() -> void:
 
 func _on_resurrect() -> void:
 	get_tree().paused = false
-	GameManager.resurrect()
+	GameState.trigger_resurrection()
 
 func _on_main_menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
-
+	LevelManager.go_to_level("main_menu", false)

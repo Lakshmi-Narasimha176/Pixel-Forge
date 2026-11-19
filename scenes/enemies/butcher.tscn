@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/base_enemy.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://horror_butcher_fat_killer_bloody_cleaver.glb" id="2_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_butcher"]
 radius = 0.55
@@ -39,7 +40,12 @@ shape = SubResource("CapsuleShape3D_butcher")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
 mesh = SubResource("CapsuleMesh_butcher")
 surface_material_override/0 = SubResource("StandardMaterial3D_butcher")
+visible = false
 
 [node name="CleaverMesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 1.05, -0.35)
 mesh = SubResource("BoxMesh_cleaver")
+visible = false
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 0, 0, 0)

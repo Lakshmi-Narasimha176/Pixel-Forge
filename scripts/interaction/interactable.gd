@@ -1,10 +1,9 @@
+extends Area3D
 class_name Interactable
-extends Node3D
-## Base class for all interactable 3D world objects.
+## Common camera-ray interaction contract for clues, doors, and puzzle devices.
 
 @export var prompt_label: String = "Interact"
-@export var one_shot: bool = false
-
+@export var one_shot: bool = true
 var _used: bool = false
 
 
@@ -16,3 +15,4 @@ func interact(_player: Node) -> void:
 	if one_shot and _used:
 		return
 	_used = true
+	AudioManager.play_interaction_sfx("pickup")

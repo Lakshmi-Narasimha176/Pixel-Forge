@@ -8,6 +8,11 @@ extends Interactable
 @export var subtitle_speaker: String = "Thought"
 @export_multiline var subtitle_text: String = ""
 @export var remove_on_pickup: bool = true
+@export var narrative_event_id: String = ""
+@export var additional_event_ids: Array[String] = []
+@export var evidence_title: String = ""
+@export_multiline var evidence_text: String = ""
+@export var memory_id: String = ""
 
 
 func _ready() -> void:
@@ -18,6 +23,14 @@ func _ready() -> void:
 func interact(player: Node) -> void:
 	if one_shot and _used:
 		return
+	var all_events: Array[String] = []
+	if not narrative_event_id.is_empty():
+		all_events.append(narrative_event_id)
+	all_events.append_array(additional_event_ids)
+	for event_id in all_events:
+		if not GameState.story_event_ready(event_id):
+			GameState.show_subtitle("Thought", "This memory is incomplete. Find the clues it depends on before returning.", 3.5)
+			return
 	super.interact(player)
 
 	match pickup_type:
@@ -39,12 +52,21 @@ func interact(player: Node) -> void:
 
 	if not item_id.is_empty():
 		GameState.add_item(item_id)
+	if not evidence_title.is_empty() and not item_id.is_empty():
+		GameState.record_evidence(item_id, evidence_title, evidence_text, GameState.current_level_id)
+	if not memory_id.is_empty():
+		GameState.unlock_memory(memory_id)
 	if not flag_to_set.is_empty():
 		GameState.set_flag(flag_to_set, true)
 	if not objective_id.is_empty():
 		ObjectiveManager.complete_objective(objective_id)
 	if not subtitle_text.is_empty():
 		GameState.show_subtitle(subtitle_speaker, subtitle_text, 5.0)
+	for event_id in all_events:
+		GameState.apply_story_event(event_id)
+	if pickup_type == "resurrection_loophole" and bool(GameState.get_flag("resurrection_loophole_found", false)) and not bool(GameState.get_flag("resurrection_returned", false)):
+		GameState.set_flag("resurrection_returned", true)
+		GameState.trigger_resurrection()
 
 	if remove_on_pickup:
 		queue_free()

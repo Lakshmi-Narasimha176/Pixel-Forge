@@ -26,6 +26,7 @@ var _current_interactable: Node = null
 var _spawn_position: Vector3 = Vector3.ZERO
 var _footstep_timer: float = 0.0
 var _was_on_floor: bool = false
+var _flashlight_update_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -33,6 +34,7 @@ func _ready() -> void:
 	_spawn_position = global_position
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if flashlight:
+		_flashlight_on = GameState.flashlight_on
 		flashlight.visible = _flashlight_on
 	if weapon_mesh:
 		weapon_mesh.visible = GameState.has_weapon
@@ -163,6 +165,8 @@ func _toggle_flashlight() -> void:
 		_flashlight_on = false
 	if flashlight:
 		flashlight.visible = _flashlight_on
+	GameState.flashlight_on = _flashlight_on
+	GameState.flashlight_changed.emit(GameState.flashlight_battery, _flashlight_on)
 	AudioManager.play_sfx("flashlight")
 
 
@@ -173,7 +177,9 @@ func _update_flashlight(delta: float) -> void:
 		GameState.flashlight_battery = maxf(0.0, GameState.flashlight_battery - delta * 0.45)
 		if GameState.flashlight_battery <= 0.0:
 			_flashlight_on = false
+			GameState.flashlight_on = false
 			flashlight.visible = false
+			GameState.flashlight_changed.emit(GameState.flashlight_battery, false)
 			return
 		# Subtle low-battery flicker without heavy processing
 		if GameState.flashlight_battery < 25.0:
@@ -183,6 +189,10 @@ func _update_flashlight(delta: float) -> void:
 				flashlight.light_energy = 1.6 if randf() > 0.25 else 0.35
 		else:
 			flashlight.light_energy = 2.0
+		_flashlight_update_timer += delta
+		if _flashlight_update_timer >= 0.5:
+			_flashlight_update_timer = 0.0
+			GameState.flashlight_changed.emit(GameState.flashlight_battery, _flashlight_on)
 
 
 func _update_interaction_ray() -> void:

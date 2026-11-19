@@ -19,6 +19,7 @@ attack_cooldown = 1.1
 death_objective_id = "l3_obj_kill_strategist"
 death_flag = "strategist_defeated"
 boss_defeat_line = "The Strategist collapses: 'You think dying was an accident? Look at the rift...'"
+story_event_id = "l3_trap_design"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)

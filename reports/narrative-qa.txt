@@ -1,0 +1,16 @@
+NARRATIVE / GODOT QA
+DATE: 2026-11-19
+
+[PASS] Parsed all five content JSON files.
+[PASS] 13 narrative event IDs are unique.
+[PASS] Narrative event references in all five level scenes resolve.
+[PASS] Evidence prerequisites used by events have evidence providers.
+[PASS] 20 objective IDs are present in level data.
+[PASS] Headless launch/load check completed for the main menu and levels 01-05 after rebasing onto the latest upstream assets and audio integration.
+[PASS] No script-class assignment errors in isolated level load checks.
+[PASS] Added GitHub GLB character assets to the Butcher boss and Level 4's bound-spirit / porcelain-witness set pieces.
+[PASS] Existing imported OGG ambience, enemy, interface, and surface-footstep assets are routed through AudioManager; levels select distinct ambient tracks.
+
+[WARN] Godot 4.3 headless dummy renderer reports a null mesh warning during level loads; interactive rendering has not yet been visually verified.
+[WARN] Godot editor scan reports Windows get_system_dir errors and ignores the nested sampler project at PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/Godot/project.godot.
+[NOTE] Full interactive playthrough, save/load behavior, and ending choices still need manual runtime QA. Per-scene headless checks exited without script parse or missing-resource errors; quick-quit cleanup warnings are not treated as gameplay verification.

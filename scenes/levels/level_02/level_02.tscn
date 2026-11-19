@@ -149,7 +149,8 @@ pickup_type = "evidence"
 item_id = "l2_evidence"
 objective_id = "l2_obj_evidence"
 subtitle_speaker = "Evidence"
-subtitle_text = "Manifest signed by 'The Strategist'—someone paid The Butcher to silence you."
+subtitle_text = "A shipment for the night of your death: blood bags, a clean shirt, and a way out. The recipient is only marked 'F'."
+narrative_event_id = "l2_shipment_record"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/EvidenceNote"]
 shape = SubResource("BoxShape_pickup")
@@ -187,6 +188,7 @@ prompt_label = "Descend to Bunker (Level 3)"
 next_level_id = "level_03"
 required_item_id = "l2_bunker_keycard"
 required_flag = "butcher_defeated"
+require_all_objectives = true
 objective_id = "l2_obj_exit"
 locked_message = "Locked. Defeat The Butcher to take the Bunker Keycard."
 
@@ -198,3 +200,4 @@ mesh = SubResource("BoxMesh_door")
 
 [node name="Butcher" parent="." instance=ExtResource("6_butcher")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -9)
+mercy_event_id = "l2_butcher_mercy"

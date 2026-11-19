@@ -183,7 +183,8 @@ pickup_type = "evidence"
 item_id = "l3_dossier"
 objective_id = "l3_obj_evidence"
 subtitle_speaker = "Dossier"
-subtitle_text = "Your closest friend—already dead—sold you out to fund the resurrection pact."
+subtitle_text = "The signature looks like your friend's. The ink is fresh, the page is a carbon copy, and someone has overwritten a single word."
+narrative_event_id = "l3_altered_dossier"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalDossier"]
 shape = SubResource("BoxShape_pickup")

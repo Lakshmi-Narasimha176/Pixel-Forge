@@ -16,7 +16,37 @@
       "id": "dlg_l5_betrayer",
       "speaker": "The Betrayer",
       "level": "level_05",
-      "text": "I sealed the pact so neither of us could leave. Forgive me—or end me."
+      "text": "I sealed the pact so neither of us could leave. I did pull the trigger. I will tell you why, but not before you see what the contract hid."
+    },
+    {
+      "id": "dlg_l1_ledger_contradiction",
+      "speaker": "Thought",
+      "level": "level_01",
+      "text": "The voice blames the gangsters. The ledger says a close-range shot—and the shell casing is from your friend's pistol."
+    },
+    {
+      "id": "dlg_l2_butcher_escape",
+      "speaker": "The Butcher",
+      "level": "level_02",
+      "text": "I left the back door open. Your friend asked for a way out before the ritual started."
+    },
+    {
+      "id": "dlg_l3_strategist_partial_truth",
+      "speaker": "The Strategist",
+      "level": "level_03",
+      "text": "I changed one word. The original says at least one. The rest of the contract? I never wrote it."
+    },
+    {
+      "id": "dlg_l4_original_clause",
+      "speaker": "The Pact",
+      "level": "level_04",
+      "text": "AT LEAST ONE. Not exactly one. Your return was allowed. The tether was not an accident."
+    },
+    {
+      "id": "dlg_l5_motive_reveal",
+      "speaker": "Your Friend",
+      "level": "level_05",
+      "text": "The Strategist planned to bind your living soul as the Witness's anchor. I shot you to interrupt it. I tried to save you first. I am still responsible for killing you."
     }
   ]
 }

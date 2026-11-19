@@ -16,6 +16,9 @@ enum State { IDLE, PATROL, CHASE, ATTACK, DEAD }
 @export var death_flag: String = ""
 @export var reward_item_id: String = ""
 @export var boss_defeat_line: String = ""
+@export var story_event_id: String = ""
+@export var mercy_event_id: String = ""
+@export var mercy_heal_amount: int = 20
 
 var current_health: int
 var state: State = State.PATROL
@@ -24,6 +27,7 @@ var _patrol_points: Array[Vector3] = []
 var _patrol_index: int = 0
 var _attack_timer: float = 0.0
 var _origin: Vector3 = Vector3.ZERO
+var _mercy_used: bool = false
 
 
 func _ready() -> void:
@@ -108,6 +112,13 @@ func _do_chase(delta: float) -> void:
 func _do_attack() -> void:
 	velocity.x = 0.0
 	velocity.z = 0.0
+	# The Butcher can interrupt his own attack once to leave the player a way out.
+	if not mercy_event_id.is_empty() and not _mercy_used and GameState.health <= 30:
+		_mercy_used = true
+		GameState.apply_story_event(mercy_event_id)
+		GameState.heal(mercy_heal_amount)
+		GameState.show_subtitle(enemy_name, "He lowers the cleaver and slides a blood bag across the floor. 'Take it. Run.'", 5.0)
+		return
 	if _player:
 		var dir := (_player.global_position - global_position)
 		dir.y = 0.0
@@ -137,6 +148,8 @@ func take_damage(amount: int) -> void:
 func _die() -> void:
 	state = State.DEAD
 	AudioManager.play_enemy_sfx(enemy_name, "zombie1")
+	if not story_event_id.is_empty():
+		GameState.apply_story_event(story_event_id)
 	if not death_objective_id.is_empty():
 		ObjectiveManager.complete_objective(death_objective_id)
 	if not death_flag.is_empty():

@@ -26,7 +26,7 @@ func interact(_player: Node) -> void:
 		GameState.show_subtitle("System", locked_message, 3.0)
 		return
 
-	if require_all_objectives and not ObjectiveManager.are_all_level_objectives_completed():
+	if require_all_objectives and not ObjectiveManager.are_all_level_objectives_completed(objective_id):
 		AudioManager.play_sfx("error")
 		GameState.show_subtitle("System", "Complete remaining objectives first.", 3.0)
 		return

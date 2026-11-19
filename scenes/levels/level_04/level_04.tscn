@@ -1,10 +1,12 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
 [ext_resource type="Script" path="res://scripts/interaction/puzzle_switch.gd" id="4_switch"]
 [ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="5_door"]
+[ext_resource type="PackedScene" path="res://horror_ghost_character_-_blood_stained_spirit.glb" id="6_ghost"]
+[ext_resource type="PackedScene" path="res://cursed_porcelain_doll_-_antique_horror_prop.glb" id="7_doll"]
 
 [sub_resource type="Environment" id="Environment_l4"]
 background_mode = 1
@@ -96,6 +98,12 @@ use_collision = false
 size = Vector3(2, 6, 2)
 material = SubResource("Mat_surreal")
 
+[node name="BoundSpirit" parent="Geometry" instance=ExtResource("6_ghost")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 0, -5)
+
+[node name="PorcelainWitness" parent="Geometry" instance=ExtResource("7_doll")]
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, -8, 0, -7)
+
 [node name="Lights" type="Node3D" parent="."]
 
 [node name="VoidLight1" type="OmniLight3D" parent="Lights"]
@@ -121,7 +129,9 @@ item_id = "l4_loophole"
 objective_id = "l4_obj_loophole"
 flag_to_set = "resurrection_loophole_found"
 subtitle_speaker = "Loophole"
-subtitle_text = "LOOPHOLE: If the Betrayer's own anchor is inverted, the pact turns back on its maker."
+narrative_event_id = "l4_loophole_clause"
+additional_event_ids = ["l4_voice_identity"]
+subtitle_text = "The stone bears the original clause: 'AT LEAST ONE'. Not 'exactly one'. The return is allowed—but the tether remains."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/LoopholeInscription"]
 shape = SubResource("BoxShape_pickup")

@@ -132,6 +132,7 @@ item_id = "l1_walkie"
 objective_id = "l1_obj_walkie"
 subtitle_speaker = "Static Voice"
 subtitle_text = "'You're already dead, friend. The Butcher and the Strategist buried you—yet the pact drags you back.'"
+narrative_event_id = "l1_walkie_guidance"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/WalkieTalkie"]
 shape = SubResource("BoxShape_pickup")
@@ -147,7 +148,8 @@ pickup_type = "evidence"
 item_id = "l1_death_ledger"
 objective_id = "l1_obj_death_clue"
 subtitle_speaker = "Thought"
-subtitle_text = "My name is crossed out in dried blood. Date of death: three nights ago."
+subtitle_text = "My name is crossed out in dried blood. The close-range wound and familiar shell casing do not match the voice's story."
+narrative_event_id = "l1_murder_ledger"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DeathLedger"]
 shape = SubResource("BoxShape_pickup")
@@ -164,7 +166,8 @@ item_id = "l1_dark_tome"
 objective_id = "l1_obj_resurrection_rule"
 flag_to_set = "resurrection_rule_discovered"
 subtitle_speaker = "The Pact"
-subtitle_text = "RESURRECTION RULE: While the Betrayer lives, death returns you to your last anchor—until your soul fractures."
+subtitle_text = "A lifeline can be earned through satisfaction—but the central clause is torn away. 'Do not trust a copy made by the interested.'"
+narrative_event_id = "l1_contract_fragment"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DarkTome"]
 shape = SubResource("BoxShape_pickup")

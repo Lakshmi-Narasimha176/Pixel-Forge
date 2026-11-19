@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://blood_bag.glb" id="7_blood"]
 [ext_resource type="PackedScene" path="res://old_rusty_ceiling_fan.glb" id="8_fan"]
 [ext_resource type="PackedScene" path="res://abandoned_horror_wall_with_blood_splatter.glb" id="9_bloodwall"]
+[ext_resource type="Script" path="res://scripts/interaction/story_character.gd" id="10_story_character"]
 
 [sub_resource type="Environment" id="Environment_l5"]
 background_mode = 1
@@ -120,7 +121,8 @@ pickup_type = "memory"
 item_id = "l5_memory"
 objective_id = "l5_obj_memory"
 subtitle_speaker = "Memory"
-subtitle_text = "Your friend owed the syndicate everything—and traded your life to buy their own."
+narrative_event_id = "l5_memory_reframed"
+subtitle_text = "From the doorway your friend raises the gun. In the window, the Strategist holds the blood-sealed contract. Both images are real."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryFragment"]
 shape = SubResource("BoxShape_pickup")
@@ -136,7 +138,8 @@ pickup_type = "evidence"
 item_id = "l5_confession"
 objective_id = "l5_obj_betrayal_proof"
 subtitle_speaker = "Confession"
-subtitle_text = "'I sealed the pact so neither of us could leave. Forgive me—or end me.'"
+narrative_event_id = "l5_motive_revealed"
+subtitle_text = "The confession is incomplete until the ledger, shipment, dossier, original clause, and memory are compared."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalConfession"]
 shape = SubResource("BoxShape_pickup")
@@ -185,3 +188,12 @@ mesh = SubResource("BoxMesh_door")
 
 [node name="Betrayer" parent="." instance=ExtResource("6_betrayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -10)
+
+[node name="FinalEcho" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -8)
+script = ExtResource("10_story_character")
+prompt_label = "Speak to your friend's echo"
+one_shot = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/FinalEcho"]
+shape = SubResource("BoxShape_pickup")
