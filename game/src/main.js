@@ -41,7 +41,7 @@ const interactPrompt = document.getElementById('interact-prompt');
  * Core Three.js Objects
  * ──────────────────────────────────────────────────────── */
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x020204);
+scene.background = new THREE.Color(0x050203);
 
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.05, 120);
 
@@ -77,6 +77,67 @@ const levelManager   = new LevelManager(scene, assetLoader, audioManager);
 
 let gameStarted = false;
 let isPaused = false;
+
+/* ────────────────────────────────────────────────────────
+ * Build Ambient Starting Scene (renders behind Main Menu)
+ * ──────────────────────────────────────────────────────── */
+let ambientSceneGroup = new THREE.Group();
+function buildAmbientScene() {
+  scene.add(ambientSceneGroup);
+
+  // Dark decaying floor
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x140e0e, roughness: 0.95 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), floorMat);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  ambientSceneGroup.add(floor);
+  physics.addCollider(floor);
+
+  // Surrounding walls
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x1b1313, roughness: 0.9 });
+  const wallGeo = new THREE.BoxGeometry(30, 5, 0.3);
+
+  const backWall = new THREE.Mesh(wallGeo, wallMat);
+  backWall.position.set(0, 2.5, -10);
+  ambientSceneGroup.add(backWall);
+  physics.addCollider(backWall);
+
+  const leftWall = new THREE.Mesh(wallGeo, wallMat);
+  leftWall.position.set(-10, 2.5, 0);
+  leftWall.rotation.y = Math.PI / 2;
+  ambientSceneGroup.add(leftWall);
+  physics.addCollider(leftWall);
+
+  const rightWall = new THREE.Mesh(wallGeo, wallMat);
+  rightWall.position.set(10, 2.5, 0);
+  rightWall.rotation.y = Math.PI / 2;
+  ambientSceneGroup.add(rightWall);
+  physics.addCollider(rightWall);
+
+  // Ceiling
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x080606 }));
+  ceiling.rotation.x = Math.PI / 2;
+  ceiling.position.y = 5.0;
+  ambientSceneGroup.add(ceiling);
+
+  // Flickering horror point lights
+  lighting.addFlickerLight(new THREE.Vector3(0, 3.8, 0), {
+    intensity: 1.8,
+    color: 0xff4422,
+    flickerAmount: 0.6,
+    flickerSpeed: 4
+  });
+
+  lighting.addFlickerLight(new THREE.Vector3(-4, 3.5, -6), {
+    intensity: 1.2,
+    color: 0x66ccff,
+    flickerAmount: 0.7,
+    flickerSpeed: 7
+  });
+
+  // Ambient fog
+  scene.fog = new THREE.FogExp2(0x0a0507, 0.04);
+}
 
 /* ────────────────────────────────────────────────────────
  * Menu System
@@ -115,7 +176,7 @@ document.addEventListener('keydown', (e) => {
     }
   }
 
-  // Inventory Quick-use / Melee swing
+  // Inventory Quick-use
   if (e.code === 'Digit1') inventory.selectSlot(0);
   if (e.code === 'Digit2') inventory.selectSlot(1);
   if (e.code === 'Digit3') inventory.selectSlot(2);
@@ -145,7 +206,6 @@ document.addEventListener('keydown', (e) => {
  * Footstep Audio Trigger
  * ──────────────────────────────────────────────────────── */
 canvas.addEventListener('footstep', () => {
-  // Synthesize or trigger footstep sound in indoor reverb
   if (audioManager && audioManager.ctx) {
     try {
       const osc = audioManager.ctx.createOscillator();
@@ -159,9 +219,7 @@ canvas.addEventListener('footstep', () => {
       gain.connect(audioManager.ctx.destination);
       osc.start();
       osc.stop(audioManager.ctx.currentTime + 0.13);
-    } catch (err) {
-      // Audio context might be restricted
-    }
+    } catch (err) {}
   }
 });
 
@@ -219,6 +277,12 @@ async function startNewGame() {
   menuSystem.hide();
   hud.show();
 
+  // Remove ambient backdrop geometry to load Chapter 1
+  if (ambientSceneGroup) {
+    scene.remove(ambientSceneGroup);
+    ambientSceneGroup = null;
+  }
+
   await audioManager.resume();
   audioManager.generateReverb(2.8, 3.5);
 
@@ -231,8 +295,6 @@ async function startNewGame() {
 
   const spawn = levelManager.getSpawnPoint();
   if (spawn) controls.yaw.position.copy(spawn);
-
-  startGameLoop();
 }
 
 async function restartCurrentGame() {
@@ -247,14 +309,11 @@ async function restartCurrentGame() {
 }
 
 /* ────────────────────────────────────────────────────────
- * Game Loop
+ * Game Loop (Runs continuously from page load)
  * ──────────────────────────────────────────────────────── */
 const clock = new THREE.Clock();
-let running = false;
 
 function startGameLoop() {
-  if (running) return;
-  running = true;
   clock.start();
   requestAnimationFrame(tick);
 }
@@ -304,6 +363,10 @@ function tick() {
         if (typeof callback === 'function') callback(hit.object);
       }
     }
+  } else {
+    // Menu backdrop idle animation: slowly rotate camera and pulse lights
+    camera.rotation.y = Math.sin(clock.getElapsedTime() * 0.2) * 0.15;
+    lighting.update(dt);
   }
 
   // ── Render with horror post-processing ──
@@ -314,13 +377,20 @@ function tick() {
  * Initial Boot
  * ──────────────────────────────────────────────────────── */
 async function boot() {
-  if (loadingScreen) loadingScreen.classList.add('hidden');
+  // Build 3D ambient horror room
+  buildAmbientScene();
+
+  // Start continuous 60FPS render loop immediately
+  startGameLoop();
+
+  // Instantly remove loading overlays
+  if (loadingScreen) loadingScreen.remove();
   if (startPrompt) startPrompt.remove();
 
-  // Show Main Menu on boot
+  // Show Horror Main Menu
   menuSystem.showMain();
 
-  // Re-lock pointer on click if playing
+  // Click canvas to resume pointer lock during gameplay
   canvas.addEventListener('click', () => {
     if (gameStarted && !isPaused && menuSystem.activeScreen === 'none' && !controls.isLocked) {
       controls.lock();
@@ -331,7 +401,7 @@ async function boot() {
 boot().catch((err) => {
   console.error('[THE LAST REVENGE] Fatal boot error:', err);
   if (loadingText) {
-    loadingText.textContent = 'INIT ERROR';
+    loadingText.textContent = 'INIT ERROR: ' + err.message;
     loadingText.style.color = '#ff0000';
   }
 });
