@@ -1,0 +1,30 @@
+CONTENT JSON VALIDATION
+RESULT: PASS
+CHECKS: 26/26 passed
+
+[PASS] JSON syntax: data/characters/characters.json: valid UTF-8 JSON
+[PASS] Unique id: data/characters/characters.json:$[0]: char_01_protagonist
+[PASS] Unique id: data/characters/characters.json:$[1]: char_02_butcher
+[PASS] Unique id: data/characters/characters.json:$[2]: char_03_strategist
+[PASS] Unique id: data/characters/characters.json:$[3]: char_04_horror_woman
+[PASS] Unique id: data/characters/characters.json:$[4]: char_05_betrayer
+[PASS] JSON syntax: data/puzzles/puzzles.json: valid UTF-8 JSON
+[PASS] Unique id: data/puzzles/puzzles.json:$[0]: puz_01_cell_gate
+[PASS] Unique id: data/puzzles/puzzles.json:$[1]: puz_02_slaughter_keycard
+[PASS] Unique id: data/puzzles/puzzles.json:$[2]: puz_03_generator_breakers
+[PASS] Unique id: data/puzzles/puzzles.json:$[3]: puz_04_witching_clock
+[PASS] Unique id: data/puzzles/puzzles.json:$[4]: puz_05_portal_seal
+[PASS] JSON syntax: data/story/dialogue.json: valid UTF-8 JSON
+[PASS] Unique id: data/story/dialogue.json:$[0]: dial_01_awakening
+[PASS] Unique id: data/story/dialogue.json:$[1]: dial_02_walkie_intro
+[PASS] Unique id: data/story/dialogue.json:$[2]: dial_03_bible_rule
+[PASS] Unique id: data/story/dialogue.json:$[3]: dial_04_butcher_confront
+[PASS] Unique id: data/story/dialogue.json:$[4]: dial_05_strategist_mock
+[PASS] Unique id: data/story/dialogue.json:$[5]: dial_06_loophole_found
+[PASS] Unique id: data/story/dialogue.json:$[6]: dial_07_betrayer_truth
+[PASS] JSON syntax: data/story/lore_clues.json: valid UTF-8 JSON
+[PASS] Unique id: data/story/lore_clues.json:$[0]: clue_01_settlement_ledger
+[PASS] Unique id: data/story/lore_clues.json:$[1]: clue_02_butcher_orders
+[PASS] Unique id: data/story/lore_clues.json:$[2]: clue_03_strategist_schematic
+[PASS] Unique id: data/story/lore_clues.json:$[3]: clue_04_afterlife_tablet
+[PASS] Unique id: data/story/lore_clues.json:$[4]: clue_05_confession_tape

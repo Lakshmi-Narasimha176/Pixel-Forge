@@ -1,0 +1,187 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
+[ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="4_door"]
+[ext_resource type="Script" path="res://scripts/systems/checkpoint_zone.gd" id="5_cp"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/betrayer.tscn" id="6_betrayer"]
+[ext_resource type="PackedScene" path="res://blood_bag.glb" id="7_blood"]
+[ext_resource type="PackedScene" path="res://old_rusty_ceiling_fan.glb" id="8_fan"]
+[ext_resource type="PackedScene" path="res://abandoned_horror_wall_with_blood_splatter.glb" id="9_bloodwall"]
+
+[sub_resource type="Environment" id="Environment_l5"]
+background_mode = 1
+background_color = Color(0.05, 0.025, 0.025, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.22, 0.14, 0.12, 1)
+ambient_light_energy = 0.55
+fog_enabled = true
+fog_light_color = Color(0.09, 0.04, 0.04, 1)
+fog_density = 0.045
+
+[sub_resource type="StandardMaterial3D" id="Mat_floor"]
+albedo_color = Color(0.16, 0.11, 0.09, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_wall"]
+albedo_color = Color(0.22, 0.16, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape_pickup"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_note"]
+size = Vector3(0.45, 0.2, 0.35)
+
+[sub_resource type="BoxShape3D" id="BoxShape_cp"]
+size = Vector3(6, 3, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_door"]
+size = Vector3(2.4, 3.2, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_door"]
+size = Vector3(2.2, 3.0, 0.25)
+
+[node name="Level05_Betrayer" type="Node3D"]
+script = ExtResource("1_lvl")
+level_id = "level_05"
+level_title = "Level 5: The Betrayer"
+intro_subtitle = "Your old mansion, twisted by guilt. Uncover your friend's betrayal and end the pact."
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_l5")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 15)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 15)
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(30, 1, 38)
+material = SubResource("Mat_floor")
+
+[node name="WallNorth" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -19)
+use_collision = true
+size = Vector3(30, 6, 1)
+material = SubResource("Mat_wall")
+
+[node name="WallSouth" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 19)
+use_collision = true
+size = Vector3(30, 6, 1)
+material = SubResource("Mat_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.5, 0)
+use_collision = true
+size = Vector3(1, 6, 38)
+material = SubResource("Mat_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.5, 0)
+use_collision = true
+size = Vector3(1, 6, 38)
+material = SubResource("Mat_wall")
+
+[node name="CeilingFan" parent="Geometry" instance=ExtResource("8_fan")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+
+[node name="BloodWall" parent="Geometry" instance=ExtResource("9_bloodwall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -2)
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="MansionLight1" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 10)
+light_color = Color(0.95, 0.65, 0.35, 1)
+light_energy = 1.6
+omni_range = 15.0
+
+[node name="MansionLight2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, -8)
+light_color = Color(0.9, 0.25, 0.25, 1)
+light_energy = 1.8
+omni_range = 18.0
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="MemoryFragment" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.9, 10)
+script = ExtResource("3_pickup")
+prompt_label = "Examine Memory Fragment"
+pickup_type = "memory"
+item_id = "l5_memory"
+objective_id = "l5_obj_memory"
+subtitle_speaker = "Memory"
+subtitle_text = "Your friend owed the syndicate everything—and traded your life to buy their own."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/MemoryFragment"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/MemoryFragment"]
+mesh = SubResource("BoxMesh_note")
+
+[node name="BetrayalConfession" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.9, 6)
+script = ExtResource("3_pickup")
+prompt_label = "Read Final Confession"
+pickup_type = "evidence"
+item_id = "l5_confession"
+objective_id = "l5_obj_betrayal_proof"
+subtitle_speaker = "Confession"
+subtitle_text = "'I sealed the pact so neither of us could leave. Forgive me—or end me.'"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalConfession"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/BetrayalConfession"]
+mesh = SubResource("BoxMesh_note")
+
+[node name="BloodBag" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.8, 3)
+script = ExtResource("3_pickup")
+prompt_label = "Take Blood Bag"
+pickup_type = "blood_bag"
+item_id = "l5_blood_bag"
+subtitle_speaker = "System"
+subtitle_text = "Collected Blood Bag (+1)."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BloodBag"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Model" parent="Interactables/BloodBag" instance=ExtResource("7_blood")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
+
+[node name="FinalCheckpoint" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 1)
+script = ExtResource("5_cp")
+checkpoint_name = "Mansion Hall"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/FinalCheckpoint"]
+shape = SubResource("BoxShape_cp")
+
+[node name="DawnSanctuaryDoor" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -18)
+script = ExtResource("4_door")
+prompt_label = "Step into Dawn Sanctuary (Ending)"
+next_level_id = "ending"
+required_flag = "betrayer_defeated"
+require_all_objectives = true
+objective_id = "l5_obj_ending"
+locked_message = "Locked. Uncover the betrayal and defeat The Betrayer."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/DawnSanctuaryDoor"]
+shape = SubResource("BoxShape_door")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/DawnSanctuaryDoor"]
+mesh = SubResource("BoxMesh_door")
+
+[node name="Betrayer" parent="." instance=ExtResource("6_betrayer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -10)

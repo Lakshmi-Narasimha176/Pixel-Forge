@@ -1,0 +1,219 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/level_base.gd" id="1_lvl"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/interaction/story_pickup.gd" id="3_pickup"]
+[ext_resource type="Script" path="res://scripts/interaction/puzzle_switch.gd" id="4_switch"]
+[ext_resource type="Script" path="res://scripts/interaction/locked_door.gd" id="5_door"]
+[ext_resource type="Script" path="res://scripts/systems/hazard_trap.gd" id="6_trap"]
+[ext_resource type="Script" path="res://scripts/systems/checkpoint_zone.gd" id="7_cp"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/strategist.tscn" id="8_strat"]
+[ext_resource type="PackedScene" path="res://horror_soviet_room.glb" id="9_soviet"]
+[ext_resource type="PackedScene" path="res://vintage_wooden_wall_clock_-.glb" id="10_clock"]
+
+[sub_resource type="Environment" id="Environment_l3"]
+background_mode = 1
+background_color = Color(0.02, 0.05, 0.04, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.1, 0.22, 0.18, 1)
+ambient_light_energy = 0.55
+fog_enabled = true
+fog_light_color = Color(0.04, 0.09, 0.08, 1)
+fog_density = 0.055
+
+[sub_resource type="StandardMaterial3D" id="Mat_floor"]
+albedo_color = Color(0.1, 0.14, 0.13, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_wall"]
+albedo_color = Color(0.15, 0.2, 0.19, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_trap"]
+albedo_color = Color(0.9, 0.15, 0.1, 1)
+emission_enabled = true
+emission = Color(0.9, 0.15, 0.1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape_pickup"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_box"]
+size = Vector3(0.45, 0.45, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape_trap"]
+size = Vector3(4.0, 1.5, 2.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_trap"]
+size = Vector3(4.0, 0.15, 1.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape_cp"]
+size = Vector3(6, 3, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_door"]
+size = Vector3(2.2, 3.0, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_door"]
+size = Vector3(2.0, 2.8, 0.25)
+
+[node name="Level03_Strategist" type="Node3D"]
+script = ExtResource("1_lvl")
+level_id = "level_03"
+level_title = "Level 3: The Strategist"
+intro_subtitle = "An underground bunker. Watch for floor traps—flip both breakers to disable them."
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_l3")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 15)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 15)
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(28, 1, 38)
+material = SubResource("Mat_floor")
+
+[node name="WallNorth" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -19)
+use_collision = true
+size = Vector3(28, 6, 1)
+material = SubResource("Mat_wall")
+
+[node name="WallSouth" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 19)
+use_collision = true
+size = Vector3(28, 6, 1)
+material = SubResource("Mat_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2.5, 0)
+use_collision = true
+size = Vector3(1, 6, 38)
+material = SubResource("Mat_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2.5, 0)
+use_collision = true
+size = Vector3(1, 6, 38)
+material = SubResource("Mat_wall")
+
+[node name="SovietProps" parent="Geometry" instance=ExtResource("9_soviet")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, -9, 0, 6)
+
+[node name="WallClock" parent="Geometry" instance=ExtResource("10_clock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2.5, 0)
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="LabLight1" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 10)
+light_color = Color(0.4, 0.9, 0.75, 1)
+light_energy = 1.5
+omni_range = 14.0
+
+[node name="LabLight2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, -8)
+light_color = Color(0.4, 0.85, 0.7, 1)
+light_energy = 1.6
+omni_range = 16.0
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="SwitchA" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.0, 11)
+script = ExtResource("4_switch")
+prompt_label = "Flip Breaker Switch A"
+one_shot = true
+puzzle_id = "l3_traps"
+switch_index = 1
+required_switches = 2
+flag_to_set = "l3_traps_disabled"
+objective_id = "l3_obj_switches"
+speaker = "Bunker System"
+activation_message = "Breaker A engaged. Corridor traps status updated."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/SwitchA"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/SwitchA"]
+mesh = SubResource("BoxMesh_box")
+
+[node name="SwitchB" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 1.0, 11)
+script = ExtResource("4_switch")
+prompt_label = "Flip Breaker Switch B"
+one_shot = true
+puzzle_id = "l3_traps"
+switch_index = 2
+required_switches = 2
+flag_to_set = "l3_traps_disabled"
+objective_id = "l3_obj_switches"
+speaker = "Bunker System"
+activation_message = "Both breakers engaged! Corridor traps deactivated."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/SwitchB"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/SwitchB"]
+mesh = SubResource("BoxMesh_box")
+
+[node name="ShockTrap1" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 5)
+script = ExtResource("6_trap")
+damage = 30
+deactivated_by_flag = "l3_traps_disabled"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ShockTrap1"]
+shape = SubResource("BoxShape_trap")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/ShockTrap1"]
+mesh = SubResource("BoxMesh_trap")
+surface_material_override/0 = SubResource("Mat_trap")
+
+[node name="BetrayalDossier" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.9, -2)
+script = ExtResource("3_pickup")
+prompt_label = "Read Betrayal Dossier"
+pickup_type = "evidence"
+item_id = "l3_dossier"
+objective_id = "l3_obj_evidence"
+subtitle_speaker = "Dossier"
+subtitle_text = "Your closest friend—already dead—sold you out to fund the resurrection pact."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BetrayalDossier"]
+shape = SubResource("BoxShape_pickup")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/BetrayalDossier"]
+mesh = SubResource("BoxMesh_box")
+
+[node name="BunkerCheckpoint" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+script = ExtResource("7_cp")
+checkpoint_name = "Bunker Core"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/BunkerCheckpoint"]
+shape = SubResource("BoxShape_cp")
+
+[node name="ExitRift" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -18)
+script = ExtResource("5_door")
+prompt_label = "Enter the Impossible Return (Level 4)"
+next_level_id = "level_04"
+required_flag = "strategist_defeated"
+require_all_objectives = true
+objective_id = "l3_obj_exit"
+locked_message = "Locked. Defeat The Strategist and recover the dossier first."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/ExitRift"]
+shape = SubResource("BoxShape_door")
+
+[node name="Mesh" type="MeshInstance3D" parent="Interactables/ExitRift"]
+mesh = SubResource("BoxMesh_door")
+
+[node name="Strategist" parent="." instance=ExtResource("8_strat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -11)

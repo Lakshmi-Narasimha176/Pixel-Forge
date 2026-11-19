@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/base_enemy.gd" id="1_enemy"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_butcher"]
+radius = 0.55
+height = 2.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_butcher"]
+radius = 0.5
+height = 1.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_butcher"]
+albedo_color = Color(0.55, 0.08, 0.08, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_cleaver"]
+size = Vector3(0.12, 0.45, 0.7)
+
+[node name="Butcher" type="CharacterBody3D"]
+script = ExtResource("1_enemy")
+enemy_name = "The Butcher"
+max_health = 100
+move_speed = 3.4
+attack_damage = 25
+detect_range = 14.0
+attack_range = 2.3
+attack_cooldown = 1.3
+death_objective_id = "l2_obj_kill_butcher"
+death_flag = "butcher_defeated"
+reward_item_id = "l2_bunker_keycard"
+boss_defeat_line = "The Butcher falls. You take the Bunker Keycard from his coat."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+shape = SubResource("CapsuleShape3D_butcher")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+mesh = SubResource("CapsuleMesh_butcher")
+surface_material_override/0 = SubResource("StandardMaterial3D_butcher")
+
+[node name="CleaverMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 1.05, -0.35)
+mesh = SubResource("BoxMesh_cleaver")

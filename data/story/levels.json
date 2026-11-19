@@ -1,0 +1,110 @@
+{
+  "levels": [
+    {
+      "id": "level_01",
+      "title": "The Awakening",
+      "objectives": [
+        {
+          "id": "l1_obj_walkie",
+          "description": "Pick up the crackling walkie-talkie."
+        },
+        {
+          "id": "l1_obj_death_clue",
+          "description": "Inspect the ledger to learn what happened to you."
+        },
+        {
+          "id": "l1_obj_resurrection_rule",
+          "description": "Read the Dark Tome to discover the Resurrection Rule."
+        },
+        {
+          "id": "l1_obj_key",
+          "description": "Find the Settlement Gate Key and unlock the exit."
+        }
+      ]
+    },
+    {
+      "id": "level_02",
+      "title": "The Butcher",
+      "objectives": [
+        {
+          "id": "l2_obj_weapon",
+          "description": "Arm yourself with the bloodied baseball bat."
+        },
+        {
+          "id": "l2_obj_evidence",
+          "description": "Find the Butcher's shipment evidence."
+        },
+        {
+          "id": "l2_obj_kill_butcher",
+          "description": "Defeat The Butcher in the slaughterhouse."
+        },
+        {
+          "id": "l2_obj_exit",
+          "description": "Take the Bunker Keycard and reach the bunker hatch."
+        }
+      ]
+    },
+    {
+      "id": "level_03",
+      "title": "The Strategist",
+      "objectives": [
+        {
+          "id": "l3_obj_switches",
+          "description": "Disable the laser/shock traps using both facility switches (0/2)."
+        },
+        {
+          "id": "l3_obj_evidence",
+          "description": "Recover the encrypted betrayal dossier."
+        },
+        {
+          "id": "l3_obj_kill_strategist",
+          "description": "Confront and defeat The Strategist."
+        },
+        {
+          "id": "l3_obj_exit",
+          "description": "Unlock the subterranean rift door."
+        }
+      ]
+    },
+    {
+      "id": "level_04",
+      "title": "The Impossible Return",
+      "objectives": [
+        {
+          "id": "l4_obj_loophole",
+          "description": "Discover the loophole in the resurrection pact."
+        },
+        {
+          "id": "l4_obj_anchors",
+          "description": "Activate all 3 Soul Anchors in the distorted void."
+        },
+        {
+          "id": "l4_obj_exit",
+          "description": "Step through the living-world portal."
+        }
+      ]
+    },
+    {
+      "id": "level_05",
+      "title": "The Betrayer",
+      "objectives": [
+        {
+          "id": "l5_obj_memory",
+          "description": "Examine your dead friend's memory fragment."
+        },
+        {
+          "id": "l5_obj_betrayal_proof",
+          "description": "Uncover the final betrayal confession."
+        },
+        {
+          "id": "l5_obj_kill_betrayer",
+          "description": "Defeat The Betrayer to end the pact."
+        },
+        {
+          "id": "l5_obj_ending",
+          "description": "Walk into the dawn sanctuary to complete your revenge."
+        }
+      ]
+    }
+  ]
+}
