@@ -46,6 +46,7 @@
 
 ## Documentation & QA
 
+- `docs/PROJECT_LAYOUT.md` — repository map and rules for preserving original assets.
 - `docs/PROJECT_AUDIT.md` — Initial repository, asset size, and hardware audit.
 - `docs/PROGRESS.md` — Development log.
 - `docs/TEST_REPORT.md` — Static QA checks and runtime test status.
