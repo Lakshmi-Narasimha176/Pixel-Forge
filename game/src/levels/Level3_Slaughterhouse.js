@@ -208,37 +208,37 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
    * @private
    */
   _setupEnvironment() {
-    // Dim, sickly ambient
-    const ambient = new THREE.AmbientLight(0x0a0505, 0.2);
+    // Sickly atmospheric horror ambient
+    const ambient = new THREE.AmbientLight(0x241818, 0.4);
     this.levelGroup.add(ambient);
 
     // Overhead industrial lights — sickly yellow-green
     const lightPositions = [
-      new THREE.Vector3(-4, 4, -4),
-      new THREE.Vector3(4, 4, -4),
-      new THREE.Vector3(0, 4, 4),
-      new THREE.Vector3(-4, 4, 4),
-      new THREE.Vector3(4, 4, 0)
+      new THREE.Vector3(-4, 3.5, -4),
+      new THREE.Vector3(4, 3.5, -4),
+      new THREE.Vector3(0, 3.5, 4),
+      new THREE.Vector3(-4, 3.5, 4),
+      new THREE.Vector3(4, 3.5, 0)
     ];
 
     lightPositions.forEach((pos, i) => {
-      const light = new THREE.PointLight(0xaa8844, 0.5, 12, 2);
+      const light = new THREE.PointLight(0xffaa55, 1.8, 14, 1.4);
       light.position.copy(pos);
-      light.castShadow = i < 2; // Only first 2 cast shadows for performance
-      light.shadow.mapSize.set(256, 256);
-      light.userData.baseIntensity = 0.5;
+      light.castShadow = i < 3;
+      light.shadow.mapSize.set(512, 512);
+      light.userData.baseIntensity = 1.8;
       light.userData.flickerOffset = Math.random() * 10;
       this.roomLights.push(light);
       this.levelGroup.add(light);
     });
 
     // Blood-red accent light
-    const redLight = new THREE.PointLight(0x880000, 0.3, 10, 2);
-    redLight.position.set(0, 2, 0);
+    const redLight = new THREE.PointLight(0xaa2211, 1.5, 12, 1.5);
+    redLight.position.set(0, 2.5, 0);
     this.levelGroup.add(redLight);
 
     // Fog
-    this.scene.fog = new THREE.FogExp2(0x050201, 0.04);
+    this.scene.fog = new THREE.FogExp2(0x0a0505, 0.035);
 
     // Create floor plane (fallback if model doesn't have one)
     const floorGeo = new THREE.PlaneGeometry(20, 20);
@@ -309,9 +309,9 @@ export class Level3_Slaughterhouse extends LevelEventEmitter {
       this.hideSpots.push(pig);
     }
 
-    // Raw meat
+    // Raw meat (scaled to realistic 1.8m table size)
     await load('rawMeat', ASSETS.rawMeat,
-      new THREE.Vector3(-4, 0.3, -5), null, 0.6);
+      new THREE.Vector3(-4, 0.3, -5), null, 0.012);
 
     // Blood splatter walls
     await load('bloodWall', ASSETS.bloodWall,

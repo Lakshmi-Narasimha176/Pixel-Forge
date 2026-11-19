@@ -15,7 +15,7 @@ const ASSETS = {
   jasonStalker: '/jeson_horror_fan_art.glb',
   horrorGirl: '/a_horror_girl_character.glb',
   clock: '/vintage_wooden_wall_clock_-.glb',
-  devilsBible: '/devils_bible_-_dark_fantasy_book (1).glb',
+  devilsBible: '/devils_bible_-_dark_fantasy_book.glb',
   ceilingFan: '/old_rusty_ceiling_fan.glb',
   door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb',
   wall: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb',
@@ -217,9 +217,9 @@ export class Level4_SovietRoom extends LevelEventEmitter {
       return null;
     };
 
-    // Soviet Room
+    // Soviet Room (scaled to realistic 4.5m height)
     this.sovietRoomModel = await loadModel('sovietRoom', ASSETS.sovietRoom,
-      new THREE.Vector3(0, 0, 0), null, 1.0);
+      new THREE.Vector3(0, 0, 0), null, 0.025);
 
     // Horror Woman (Apparition)
     this.horrorWomanModel = await loadModel('horrorWoman', ASSETS.horrorWoman,
@@ -237,9 +237,9 @@ export class Level4_SovietRoom extends LevelEventEmitter {
       this.horrorWomanModel = g;
     }
 
-    // Jason Stalker
+    // Jason Stalker (scaled to realistic 1.95m human height)
     this.jasonModel = await loadModel('jasonStalker', ASSETS.jasonStalker,
-      new THREE.Vector3(7, 0, -8), { x: 0, y: -Math.PI / 4, z: 0 }, 1.0);
+      new THREE.Vector3(7, 0, -8), { x: 0, y: -Math.PI / 4, z: 0 }, 0.035);
     if (!this.jasonModel) {
       const jg = new THREE.Group();
       const jb = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.9, 0.4), new THREE.MeshStandardMaterial({ color: 0x1a261a }));
@@ -263,25 +263,13 @@ export class Level4_SovietRoom extends LevelEventEmitter {
       this.girlModel = gg;
     }
 
-    // Vintage wall clock (The Puzzle)
+    // Vintage wall clock (The Puzzle - scaled realistically)
     this.clockModel = await loadModel('clock', ASSETS.clock,
-      new THREE.Vector3(0, 2.2, -9.8), { x: 0, y: 0, z: 0 }, 1.0);
-    if (!this.clockModel) {
-      const cg = new THREE.Group();
-      const frame = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.1, 16), new THREE.MeshStandardMaterial({ color: 0x5a3311 }));
-      frame.rotation.x = Math.PI / 2;
-      cg.add(frame);
-      const face = new THREE.Mesh(new THREE.CircleGeometry(0.42, 16), new THREE.MeshStandardMaterial({ color: 0xddddcc }));
-      face.position.z = 0.06;
-      cg.add(face);
-      cg.position.set(0, 2.2, -9.8);
-      this.levelGroup.add(cg);
-      this.clockModel = cg;
-    }
+      new THREE.Vector3(0, 2.2, -9.8), { x: 0, y: 0, z: 0 }, 0.015);
 
     // Ceiling fan
     this.ceilingFanModel = await loadModel('ceilingFan', ASSETS.ceilingFan,
-      new THREE.Vector3(0, 3.6, 0), null, 1.0);
+      new THREE.Vector3(0, 3.6, 0), null, 0.25);
 
     // Secret passage door
     this.exitDoor = await loadModel('door', ASSETS.door,

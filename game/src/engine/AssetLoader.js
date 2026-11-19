@@ -48,47 +48,64 @@ export class AssetLoader {
     /** @type {Map<string, GLTF>} Loaded model cache keyed by path. */
     this._cache = new Map();
 
-    /** Base path for asset resolution — relative to game/ folder. */
-    this.basePath = '../assets/';
+    /** Base path for asset resolution */
+    this.basePath = '/';
   }
 
   /**
-   * Load a GLB/GLTF model.
-   * @param {string} filename — file name relative to basePath (e.g. 'hallway.glb')
+   * Resolve any asset path to a valid web URL
+   * @param {string} rawPath
+   * @returns {string}
+   */
+  resolvePath(rawPath) {
+    if (!rawPath) return '/';
+    if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) return rawPath;
+    let clean = rawPath.replace(/^(\.\.\/)+/, '').replace(/^\.\//, '');
+    if (!clean.startsWith('/')) clean = '/' + clean;
+    return clean;
+  }
+
+  /**
+   * Primary loading method used by main.js and all levels.
+   * @param {string} path — Path or filename of the GLB model
    * @param {Object} [opts]
    * @param {boolean} [opts.castShadow=true]
    * @param {boolean} [opts.receiveShadow=true]
    * @returns {Promise<GLTF>}
    */
-  async loadModel(filename, opts = {}) {
-    const path = this.basePath + filename;
+  async load(path, opts = {}) {
+    const resolvedUrl = this.resolvePath(path);
 
-    // Return cached model (clone the scene)
-    if (this._cache.has(path)) {
-      const cached = this._cache.get(path);
-      return { ...cached, scene: cached.scene.clone() };
+    // Return cached model (cloning the scene)
+    if (this._cache.has(resolvedUrl)) {
+      const cached = this._cache.get(resolvedUrl);
+      const clonedScene = cached.scene.clone(true);
+      return { ...cached, scene: clonedScene };
     }
 
     return new Promise((resolve, reject) => {
       this.gltfLoader.load(
-        path,
+        resolvedUrl,
         (gltf) => {
-          const castShadow    = opts.castShadow    ?? true;
+          const castShadow    = opts.castShadow ?? true;
           const receiveShadow = opts.receiveShadow ?? true;
 
           gltf.scene.traverse((child) => {
             if (child.isMesh) {
               child.castShadow    = castShadow;
               child.receiveShadow = receiveShadow;
+              if (child.material) {
+                child.material.roughness = Math.min(child.material.roughness ?? 0.8, 0.95);
+              }
             }
           });
 
-          this._cache.set(path, gltf);
+          this._cache.set(resolvedUrl, gltf);
           resolve(gltf);
         },
-        undefined, // progress handled by manager
+        undefined,
         (err) => {
-          console.error(`[AssetLoader] Error loading ${path}:`, err);
+          console.error(`[AssetLoader] Error loading ${resolvedUrl}:`, err);
           reject(err);
         }
       );
@@ -96,16 +113,48 @@ export class AssetLoader {
   }
 
   /**
+   * Alias for load()
+   */
+  async loadModel(filename, opts = {}) {
+    return this.load(filename, opts);
+  }
+
+  /**
+   * Fit and center a 3D model to a target bounding box size
+   * @param {THREE.Object3D} model
+   * @param {number} targetHeight
+   * @param {boolean} [groundOnZero=true]
+   */
+  fitToSize(model, targetHeight = 2.0, groundOnZero = true) {
+    const box = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    if (maxDim > 0) {
+      const s = targetHeight / maxDim;
+      model.scale.multiplyScalar(s);
+    }
+    const finalBox = new THREE.Box3().setFromObject(model);
+    const center = new THREE.Vector3();
+    finalBox.getCenter(center);
+    model.position.x -= center.x;
+    model.position.z -= center.z;
+    if (groundOnZero) {
+      model.position.y -= finalBox.min.y;
+    }
+    return model;
+  }
+
+  /**
    * Load multiple models in parallel.
    * @param {string[]} filenames
-   * @param {Object} [opts] — same options as loadModel
-   * @returns {Promise<Map<string, GLTF>>} Map of filename → GLTF
+   * @param {Object} [opts]
+   * @returns {Promise<Map<string, GLTF>>}
    */
   async loadModels(filenames, opts = {}) {
-    /** @type {Map<string, GLTF>} */
     const results = new Map();
     const promises = filenames.map(async (name) => {
-      const gltf = await this.loadModel(name, opts);
+      const gltf = await this.load(name, opts);
       results.set(name, gltf);
     });
     await Promise.all(promises);
@@ -114,14 +163,14 @@ export class AssetLoader {
 
   /**
    * Preload a texture.
-   * @param {string} filename — relative to basePath
+   * @param {string} filename
    * @returns {Promise<THREE.Texture>}
    */
   async loadTexture(filename) {
-    const path = this.basePath + filename;
+    const resolvedUrl = this.resolvePath(filename);
     const loader = new THREE.TextureLoader(this.manager);
     return new Promise((resolve, reject) => {
-      loader.load(path, resolve, undefined, reject);
+      loader.load(resolvedUrl, resolve, undefined, reject);
     });
   }
 

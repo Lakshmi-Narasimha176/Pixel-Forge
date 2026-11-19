@@ -92,6 +92,14 @@ export class LightingSystem {
   }
 
   /**
+   * Enable/disable flashlight (alias)
+   * @param {boolean} on
+   */
+  setFlashlightEnabled(on) {
+    this.flashlightOn = on;
+  }
+
+  /**
    * Set battery level.
    * @param {number} level — 0–1
    */

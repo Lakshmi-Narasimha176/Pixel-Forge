@@ -227,25 +227,34 @@ export class Level2_Corridor extends LevelEventEmitter {
    * @private
    */
   _setupEnvironment() {
-    // Very dark ambient
-    this.ambientLight = new THREE.AmbientLight(0x030303, 0.15);
+    // Atmospheric ambient
+    this.ambientLight = new THREE.AmbientLight(0x221c25, 0.4);
     this.levelGroup.add(this.ambientLight);
+
+    // Solid floor for the corridor
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x151212, roughness: 0.9 });
+    const floorGeo = new THREE.PlaneGeometry(8, 40);
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set(0, 0, -15);
+    floor.receiveShadow = true;
+    this.levelGroup.add(floor);
 
     // Create flickering corridor lights
     for (let i = 0; i < this.numLights; i++) {
-      const light = new THREE.PointLight(0xddaa55, 0.6, 8, 2);
-      light.position.set(0, 3.2, -4 - i * 5);
+      const light = new THREE.PointLight(0xffbb66, 1.8, 14, 1.5);
+      light.position.set(0, 2.8, -3 - i * 6);
       light.castShadow = true;
-      light.shadow.mapSize.set(256, 256);
-      light.userData.baseIntensity = 0.6;
+      light.shadow.mapSize.set(512, 512);
+      light.userData.baseIntensity = 1.8;
       light.userData.flickerOffset = Math.random() * Math.PI * 2;
       light.userData.flickerSpeed = 2 + Math.random() * 3;
       this.corridorLights.push(light);
       this.levelGroup.add(light);
     }
 
-    // Dense corridor fog
-    this.scene.fog = new THREE.FogExp2(0x010101, 0.06);
+    // Fog
+    this.scene.fog = new THREE.FogExp2(0x0c080a, 0.035);
   }
 
   /**
@@ -284,9 +293,9 @@ export class Level2_Corridor extends LevelEventEmitter {
       }
     };
 
-    // Corridor environment
+    // Corridor environment — scaled to realistic 4.8m height
     await load('corridor', ASSETS.corridor,
-      new THREE.Vector3(0, 0, 0), null, 1);
+      new THREE.Vector3(0, 0, -10), null, 0.0025);
 
     // Ghost — initially hidden far away
     this.ghostModel = await load('ghost', ASSETS.ghost,

@@ -98,7 +98,7 @@ async function buildAmbientScene() {
     const gltf = await assetLoader.load('/horror_soviet_room.glb');
     const model = gltf.scene || gltf;
     model.position.set(0, 0, 0);
-    model.scale.set(1.2, 1.2, 1.2);
+    model.scale.set(0.025, 0.025, 0.025);
     model.traverse((c) => {
       if (c.isMesh) {
         c.castShadow = true;
@@ -133,6 +133,7 @@ async function buildAmbientScene() {
     const clockGltf = await assetLoader.load('/vintage_wooden_wall_clock_-.glb');
     const clock = clockGltf.scene || clockGltf;
     clock.position.set(0, 2.2, -4.5);
+    clock.scale.set(0.015, 0.015, 0.015);
     ambientSceneGroup.add(clock);
   } catch (e) {}
 

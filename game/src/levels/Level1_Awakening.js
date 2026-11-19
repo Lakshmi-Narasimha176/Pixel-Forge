@@ -229,25 +229,58 @@ export class Level1_Awakening extends LevelEventEmitter {
    * @private
    */
   _setupEnvironment() {
-    // Pitch black — very minimal ambient
-    this.ambientLight = new THREE.AmbientLight(0x050505, 0.1);
+    // Atmospheric ambient light — visible horror silhouettes
+    this.ambientLight = new THREE.AmbientLight(0x2a2228, 0.45);
     this.levelGroup.add(this.ambientLight);
 
-    // Overhead light — starts off, will flicker on after 3 seconds
-    this.overheadLight = new THREE.PointLight(0xffaa44, 0, 12, 2);
-    this.overheadLight.position.set(0, 3.5, 0);
+    // Overhead hanging bulb — active, eerie flickering light
+    this.overheadLight = new THREE.PointLight(0xffcc88, 2.2, 22, 1.2);
+    this.overheadLight.position.set(0, 3.4, 0);
     this.overheadLight.castShadow = true;
-    this.overheadLight.shadow.mapSize.set(512, 512);
+    this.overheadLight.shadow.mapSize.set(1024, 1024);
     this.overheadLight.shadow.bias = -0.002;
     this.levelGroup.add(this.overheadLight);
+    this.lightActivated = true;
 
-    // Secondary dim red accent light
-    this.accentLight = new THREE.PointLight(0x330000, 0, 8, 2);
-    this.accentLight.position.set(-3, 2, -2);
+    // Secondary dim cold cyan accent light
+    this.accentLight = new THREE.PointLight(0x224455, 1.2, 16, 1.5);
+    this.accentLight.position.set(-3, 2.2, -2);
     this.levelGroup.add(this.accentLight);
 
-    // Dense fog for horror atmosphere
-    this.scene.fog = new THREE.FogExp2(0x000000, 0.08);
+    // Spotlight highlighting the flashlight table
+    this.tableSpot = new THREE.SpotLight(0xffeedd, 3.0, 10, Math.PI / 5, 0.5, 1.2);
+    this.tableSpot.position.set(1.5, 3.0, -1.0);
+    this.tableSpot.target.position.set(1.5, 0.8, -1.0);
+    this.levelGroup.add(this.tableSpot);
+    this.levelGroup.add(this.tableSpot.target);
+
+    // Horror atmospheric fog
+    this.scene.fog = new THREE.FogExp2(0x0c080a, 0.035);
+
+    // Solid floor and boundary walls so the scene is never void
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x181414, roughness: 0.9 });
+    const floorGeo = new THREE.PlaneGeometry(24, 24);
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
+    floor.receiveShadow = true;
+    this.levelGroup.add(floor);
+
+    // Pedestal/table for flashlight
+    const tableMat = new THREE.MeshStandardMaterial({ color: 0x241a16, roughness: 0.8 });
+    const tableGeo = new THREE.BoxGeometry(1.2, 0.85, 0.8);
+    const table = new THREE.Mesh(tableGeo, tableMat);
+    table.position.set(1.5, 0.425, -1.0);
+    table.castShadow = true;
+    table.receiveShadow = true;
+    this.levelGroup.add(table);
+
+    // Pedestal for walkie-talkie
+    const table2 = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.85, 0.8), tableMat);
+    table2.position.set(-1.8, 0.425, -1.0);
+    table2.castShadow = true;
+    table2.receiveShadow = true;
+    this.levelGroup.add(table2);
   }
 
   /**
@@ -263,14 +296,13 @@ export class Level1_Awakening extends LevelEventEmitter {
       try {
         const gltf = await this.assetLoader.load(path);
         const model = gltf.scene || gltf;
-        model.position.copy(position);
+        if (position) model.position.copy(position);
         if (rotation) model.rotation.set(rotation.x, rotation.y, rotation.z);
         if (scale) model.scale.set(scale, scale, scale);
         model.name = key;
         model.userData.levelObject = true;
         model.userData.assetKey = key;
 
-        // Enable shadow casting/receiving
         model.traverse(child => {
           if (child.isMesh) {
             child.castShadow = true;
@@ -294,55 +326,56 @@ export class Level1_Awakening extends LevelEventEmitter {
       }
     };
 
-    // Load room environment
+    // Load original horror room environment (scaled to realistic 18m room)
     await loadModel('room', ASSETS.room,
-      new THREE.Vector3(0, 0, 0), null, 1);
+      new THREE.Vector3(0, 0, 0), null, 0.05);
 
-    // Flashlight on a table
+    // Flashlight on table
     this.flashlightModel = await loadModel('flashlight', ASSETS.flashlight,
-      new THREE.Vector3(2, 0.85, -1.5),
-      { x: 0, y: Math.PI * 0.3, z: 0 },
+      new THREE.Vector3(1.5, 0.88, -1.0),
+      { x: 0, y: Math.PI * 0.4, z: 0 },
+      0.35);
+
+    // Walkie-talkie on table
+    this.walkieTalkieModel = await loadModel('walkieTalkie', ASSETS.walkieTalkie,
+      new THREE.Vector3(-1.8, 0.88, -1.0),
+      { x: 0, y: -Math.PI * 0.3, z: 0 },
+      0.4);
+
+    // Devil's Bible on stand
+    this.devilsBibleModel = await loadModel('devilsBible', ASSETS.devilsBible,
+      new THREE.Vector3(2.5, 0.85, -3.0),
+      { x: 0, y: Math.PI * 0.15, z: 0 },
+      0.03);
+
+    // Cursed porcelain doll
+    this.cursedDollModel = await loadModel('cursedDoll', ASSETS.cursedDoll,
+      new THREE.Vector3(-2.2, 0.5, -2.8),
+      { x: 0, y: Math.PI * 0.2, z: 0 },
       0.5);
 
-    // Walkie-talkie in a drawer area
-    this.walkieTalkieModel = await loadModel('walkieTalkie', ASSETS.walkieTalkie,
-      new THREE.Vector3(-2.5, 0.6, 1),
-      { x: 0, y: -Math.PI * 0.5, z: 0 },
-      0.8);
-
-    // Devil's Bible on shelf
-    this.devilsBibleModel = await loadModel('devilsBible', ASSETS.devilsBible,
-      new THREE.Vector3(3, 1.4, -3),
-      { x: 0, y: Math.PI * 0.1, z: 0 },
-      0.6);
-
-    // Cursed doll on chair
-    this.cursedDollModel = await loadModel('cursedDoll', ASSETS.cursedDoll,
-      new THREE.Vector3(-1.5, 0.5, -3),
-      null, 0.7);
-
-    // Blood splatter walls
+    // Blood splatter wall
     await loadModel('bloodWall', ASSETS.bloodWall,
-      new THREE.Vector3(4, 1.5, 0),
+      new THREE.Vector3(4.5, 1.5, 0),
       { x: 0, y: -Math.PI / 2, z: 0 },
-      1);
-
-    // Wall clock
-    await loadModel('wallClock', ASSETS.wallClock,
-      new THREE.Vector3(-4, 2.2, 0),
-      { x: 0, y: Math.PI / 2, z: 0 },
       0.8);
 
-    // Ceiling fan (rotating)
+    // Vintage wall clock
+    await loadModel('wallClock', ASSETS.wallClock,
+      new THREE.Vector3(0, 2.4, -5.8),
+      { x: 0, y: 0, z: 0 },
+      0.02);
+
+    // Ceiling fan (rotating overhead)
     this.ceilingFanModel = await loadModel('ceilingFan', ASSETS.ceilingFan,
-      new THREE.Vector3(0, 3.8, 0),
-      null, 0.6);
+      new THREE.Vector3(0, 3.4, 0),
+      null, 0.25);
 
     // Exit door
     this.exitDoor = await loadModel('exitDoor', ASSETS.door,
-      new THREE.Vector3(0, 0, -5),
-      { x: 0, y: Math.PI, z: 0 },
-      1.2);
+      new THREE.Vector3(0, 0, -6.0),
+      { x: 0, y: 0, z: 0 },
+      1.0);
   }
 
   /**

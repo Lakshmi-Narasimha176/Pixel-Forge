@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/death_screen.gd" id="1_ds"]
+
+[node name="DeathScreen" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ds")
+
+[node name="BloodOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.2, 0.02, 0.02, 0.9)
+
+[node name="CenterBox" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.1, 0.1, 1)
+theme_override_font_size = 40
+text = "YOU HAVE FALLEN"
+horizontal_alignment = 1
+
+[node name="RuleLabel" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "THE RESURRECTION RULE:
+Death is not an escape. The entity brings you back."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ResurrectBtn" type="Button" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "Resurrect At Checkpoint"
+
+[node name="MainMenuBtn" type="Button" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "Main Menu"
