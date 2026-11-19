@@ -41,5 +41,40 @@ func load_json(relative_path: String, required_keys: Array[String] = []) -> Vari
 	return data
 
 
+func get_levels() -> Array:
+	var data = load_json("story/levels.json")
+	if data is Dictionary:
+		return data.get("levels", [])
+	return []
+
+
+func get_puzzles() -> Array:
+	var data = load_json("puzzles/puzzles.json")
+	if data is Dictionary:
+		return data.get("puzzles", [])
+	return []
+
+
+func get_characters() -> Array:
+	var data = load_json("characters/characters.json")
+	if data is Dictionary:
+		return data.get("characters", [])
+	return []
+
+
+func get_dialogues() -> Array:
+	var data = load_json("story/dialogue.json")
+	if data is Dictionary:
+		return data.get("dialogue", [])
+	return []
+
+
+func get_lore_clues() -> Array:
+	var data = load_json("story/lore_clues.json")
+	if data is Dictionary:
+		return data.get("lore_clues", [])
+	return []
+
+
 func clear_cache() -> void:
 	_cache.clear()

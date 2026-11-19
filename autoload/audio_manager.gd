@@ -401,7 +401,7 @@ func play_jumpscare() -> void:
 		p.play()
 
 
-func play_enemy_sfx(type: String, action: String = "growl") -> void:
+func play_enemy_sfx(_type: String, action: String = "growl") -> void:
 	var key := action
 	var stream: AudioStream = _enemy_sfx.get(key, _enemy_sfx.get("growl"))
 	if stream:

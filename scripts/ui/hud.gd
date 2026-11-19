@@ -103,8 +103,13 @@ func _update_bag_label(count: int, has_wep: bool) -> void:
 		var wep_text = "Baseball Bat (LMB)" if has_wep else "Unarmed"
 		bag_label.text = "Blood Bags [Q]: %d  |  %s" % [count, wep_text]
 
-func _on_objective_updated(text: String) -> void:
+func _on_objective_updated(objective: Variant) -> void:
 	if objective_label:
+		var text: String = ""
+		if objective is Dictionary:
+			text = str(objective.get("description", objective.get("title", "")))
+		elif objective is String:
+			text = objective
 		objective_label.text = "Objective:\n" + text
 
 func _on_player_died() -> void:
@@ -116,11 +121,23 @@ func set_prompt(text: String) -> void:
 	if prompt_label:
 		prompt_label.text = text
 
-func show_subtitle(text: String, duration: float = 3.5) -> void:
+func show_subtitle(speaker_or_text: String, text_or_duration: Variant = "", duration: float = 3.5) -> void:
+	var final_text := ""
+	var dur := 3.5
+	if text_or_duration is String and not (text_or_duration as String).is_empty():
+		final_text = "%s: %s" % [speaker_or_text, text_or_duration]
+		dur = duration
+	elif text_or_duration is float or text_or_duration is int:
+		final_text = speaker_or_text
+		dur = float(text_or_duration)
+	else:
+		final_text = speaker_or_text
+		dur = duration
+
 	if subtitle_label and subtitle_panel:
-		subtitle_label.text = text
+		subtitle_label.text = final_text
 		subtitle_panel.visible = true
-		subtitle_timer = duration
+		subtitle_timer = dur
 
 func _update_all() -> void:
 	_on_health_changed(GameManager.player_health, GameManager.max_health)
