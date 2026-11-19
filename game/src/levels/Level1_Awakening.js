@@ -343,62 +343,38 @@ export class Level1_Awakening extends LevelEventEmitter {
       }
     };
 
-    // Load original horror room environment (1:1 scale, 6.07m x 3.30m x 6.71m)
-    await loadModel('room', ASSETS.room,
-      new THREE.Vector3(0, 0, 0), null, 1.0);
+    // Load all level assets concurrently via Promise.all
+    const [
+      room,
+      flashlight,
+      walkie,
+      bloodBag,
+      bible,
+      doll,
+      bloodWall,
+      clock,
+      fan,
+      door
+    ] = await Promise.all([
+      loadModel('room', ASSETS.room, new THREE.Vector3(0, 0, 0), null, 1.0),
+      loadModel('flashlight', ASSETS.flashlight, new THREE.Vector3(1.2, 0.88, -0.8), { x: 0, y: Math.PI * 0.4, z: 0 }, 0.1),
+      loadModel('walkieTalkie', ASSETS.walkieTalkie, new THREE.Vector3(-1.4, 0.88, -0.8), { x: 0, y: -Math.PI * 0.3, z: 0 }, 0.12),
+      loadModel('bloodBag', ASSETS.bloodBag, new THREE.Vector3(-1.4, 0.88, -0.3), { x: Math.PI / 2, y: 0, z: 0.2 }, 0.01),
+      loadModel('devilsBible', ASSETS.devilsBible, new THREE.Vector3(2.0, 0.85, -2.0), { x: 0, y: Math.PI * 0.15, z: 0 }, 0.7),
+      loadModel('cursedDoll', ASSETS.cursedDoll, new THREE.Vector3(-2.2, 0.45, -2.2), { x: 0, y: Math.PI * 0.2, z: 0 }, 0.4),
+      loadModel('bloodWall', ASSETS.bloodWall, new THREE.Vector3(2.95, 1.25, 0), { x: 0, y: -Math.PI / 2, z: 0 }, 1.0),
+      loadModel('wallClock', ASSETS.wallClock, new THREE.Vector3(0, 2.2, -3.25), { x: 0, y: 0, z: 0 }, 0.6),
+      loadModel('ceilingFan', ASSETS.ceilingFan, new THREE.Vector3(0, 2.8, 0), null, 0.9),
+      loadModel('exitDoor', ASSETS.door, new THREE.Vector3(0, 0, -3.3), { x: 0, y: 0, z: 0 }, 1.0)
+    ]);
 
-    // Flashlight on examination table (size ~20cm)
-    this.flashlightModel = await loadModel('flashlight', ASSETS.flashlight,
-      new THREE.Vector3(1.2, 0.88, -0.8),
-      { x: 0, y: Math.PI * 0.4, z: 0 },
-      0.1);
-
-    // Walkie-talkie on side medical desk (size ~22cm)
-    this.walkieTalkieModel = await loadModel('walkieTalkie', ASSETS.walkieTalkie,
-      new THREE.Vector3(-1.4, 0.88, -0.8),
-      { x: 0, y: -Math.PI * 0.3, z: 0 },
-      0.12);
-
-    // Real Blood Bag collectible pickup on medical desk (realistic IV bag ~29cm tall)
-    this.bloodBagModel = await loadModel('bloodBag', ASSETS.bloodBag,
-      new THREE.Vector3(-1.4, 0.88, -0.3),
-      { x: Math.PI / 2, y: 0, z: 0.2 },
-      0.01);
-
-    // Devil's Bible on stand
-    this.devilsBibleModel = await loadModel('devilsBible', ASSETS.devilsBible,
-      new THREE.Vector3(2.0, 0.85, -2.0),
-      { x: 0, y: Math.PI * 0.15, z: 0 },
-      0.7);
-
-    // Cursed porcelain doll
-    this.cursedDollModel = await loadModel('cursedDoll', ASSETS.cursedDoll,
-      new THREE.Vector3(-2.2, 0.45, -2.2),
-      { x: 0, y: Math.PI * 0.2, z: 0 },
-      0.4);
-
-    // Blood splatter wall (aligned flush with right room wall)
-    await loadModel('bloodWall', ASSETS.bloodWall,
-      new THREE.Vector3(2.95, 1.25, 0),
-      { x: 0, y: -Math.PI / 2, z: 0 },
-      1.0);
-
-    // Vintage wall clock mounted on north wall
-    await loadModel('wallClock', ASSETS.wallClock,
-      new THREE.Vector3(0, 2.2, -3.25),
-      { x: 0, y: 0, z: 0 },
-      0.6);
-
-    // Ceiling fan rotating overhead
-    this.ceilingFanModel = await loadModel('ceilingFan', ASSETS.ceilingFan,
-      new THREE.Vector3(0, 2.8, 0),
-      null, 0.9);
-
-    // Exit door in north wall
-    this.exitDoor = await loadModel('exitDoor', ASSETS.door,
-      new THREE.Vector3(0, 0, -3.3),
-      { x: 0, y: 0, z: 0 },
-      1.0);
+    this.flashlightModel = flashlight;
+    this.walkieTalkieModel = walkie;
+    this.bloodBagModel = bloodBag;
+    this.devilsBibleModel = bible;
+    this.cursedDollModel = doll;
+    this.ceilingFanModel = fan;
+    this.exitDoor = door;
   }
 
   /**

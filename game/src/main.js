@@ -417,6 +417,11 @@ async function boot() {
   // Show Horror Main Menu
   menuSystem.showMain();
 
+  // Auto-start if ?start=1 is in URL
+  if (new URLSearchParams(window.location.search).has('start')) {
+    setTimeout(() => startNewGame(), 300);
+  }
+
   // Click anywhere to lock pointer during gameplay
   window.addEventListener('click', () => {
     if (gameStarted && !isPaused && menuSystem.activeScreen === 'none' && !controls.isLocked) {
