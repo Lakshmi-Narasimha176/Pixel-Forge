@@ -201,7 +201,7 @@ subtitle_text = "Picked up a Blood Bag. Press [Q] anytime to heal."
 shape = SubResource("BoxShape_pickup")
 
 [node name="Model" parent="Interactables/BloodBag" instance=ExtResource("7_blood")]
-transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
+transform = Transform3D(0.012, 0, 0, 0, 0.012, 0, 0, 0, 0.012, 0, 0, 0)
 
 [node name="ExitGate" type="Area3D" parent="Interactables"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -15)

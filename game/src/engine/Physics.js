@@ -32,6 +32,9 @@ export class Physics {
     /** Maximum step-up height. */
     this.stepHeight = 0.35;
 
+    /** Player eye height above ground. */
+    this.eyeHeight = 1.6;
+
     /** Height of the collision ray origin above feet. */
     this.wallCheckHeight = 0.8;
 
@@ -133,16 +136,16 @@ export class Physics {
     pos.y += dy;
 
     // Ground ray from slightly above feet downward
-    const groundOrigin = new THREE.Vector3(pos.x, pos.y + 0.5, pos.z);
+    const groundOrigin = new THREE.Vector3(pos.x, pos.y, pos.z);
     this._raycaster.set(groundOrigin, this._tempDown);
-    this._raycaster.far = 1.0 + Math.abs(dy);
+    this._raycaster.far = this.eyeHeight + 0.5 + Math.abs(dy);
     this._raycaster.near = 0;
 
     const groundHits = this._raycaster.intersectObjects(this.colliders, false);
     if (groundHits.length > 0) {
       const groundY = groundHits[0].point.y;
-      if (pos.y <= groundY + 0.05) {
-        pos.y = groundY;
+      if (pos.y <= groundY + this.eyeHeight + 0.05) {
+        pos.y = groundY + this.eyeHeight;
         this.verticalVelocity = 0;
         this.grounded = true;
       } else {
@@ -151,8 +154,8 @@ export class Physics {
     } else {
       this.grounded = false;
       // Failsafe floor at y = 0
-      if (pos.y < 0) {
-        pos.y = 0;
+      if (pos.y < this.eyeHeight) {
+        pos.y = this.eyeHeight;
         this.verticalVelocity = 0;
         this.grounded = true;
       }

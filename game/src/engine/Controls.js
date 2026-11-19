@@ -30,12 +30,15 @@ export class FPSControls {
     camera.position.set(0, 0, 0); // local offset handled by headBob
 
     /** @type {boolean} */
-    this.enabled = false;
+    this.enabled = true;
 
     // ── Input state ──
     /** @private */ this._keys = { forward: false, backward: false, left: false, right: false, sprint: false, crouch: false };
     /** @private */ this._mouseDX = 0;
     /** @private */ this._mouseDY = 0;
+    /** @private */ this._isMouseDown = false;
+    /** @private */ this._lastMouseX = 0;
+    /** @private */ this._lastMouseY = 0;
 
     // ── Movement tuning ──
     /** Walk speed (units/s) */
@@ -45,15 +48,15 @@ export class FPSControls {
     /** Crouch speed (units/s) */
     this.crouchSpeed = 2.0;
     /** Mouse sensitivity */
-    this.sensitivity = 0.002;
+    this.sensitivity = 0.0022;
     /** Standing eye height */
-    this.standHeight = 1.7;
+    this.standHeight = 1.6;
     /** Crouching eye height */
     this.crouchHeight = 1.0;
 
     // ── Head bob ──
     /** @private */ this._bobTimer = 0;
-    /** @private */ this._bobAmount = 0.04;    // metres
+    /** @private */ this._bobAmount = 0.035;    // metres
     /** @private */ this._bobFreqWalk = 8;      // Hz
     /** @private */ this._bobFreqSprint = 12;
 
@@ -77,6 +80,8 @@ export class FPSControls {
 
     // ── Bind listeners ──
     this._onMouseMove = this._onMouseMove.bind(this);
+    this._onMouseDown = this._onMouseDown.bind(this);
+    this._onMouseUp = this._onMouseUp.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
     this._onLockChange = this._onLockChange.bind(this);
@@ -85,18 +90,29 @@ export class FPSControls {
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('keyup', this._onKeyUp);
     document.addEventListener('mousemove', this._onMouseMove);
+    window.addEventListener('mousedown', this._onMouseDown);
+    window.addEventListener('mouseup', this._onMouseUp);
   }
 
   /* ── Pointer lock ── */
 
   /** Request pointer lock. */
   lock() {
-    this.domElement.requestPointerLock();
+    try {
+      if (document.pointerLockElement !== this.domElement) {
+        const p = this.domElement.requestPointerLock();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      }
+    } catch (e) {}
   }
 
   /** Release pointer lock. */
   unlock() {
-    document.exitPointerLock();
+    try {
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+    } catch (e) {}
   }
 
   /** @returns {boolean} */
@@ -112,10 +128,8 @@ export class FPSControls {
    * @returns {{ moveState: MoveState, speed: number }} current movement info
    */
   update(dt) {
-    if (!this.enabled) return { moveState: 'idle', speed: 0 };
-
     // ── Mouse look ──
-    if (this.isLocked) {
+    if (this.isLocked || this._isMouseDown) {
       this.yaw.rotation.y -= this._mouseDX * this.sensitivity;
       this._pitch -= this._mouseDY * this.sensitivity;
       this._pitch = Math.max(-Math.PI * 85 / 180, Math.min(Math.PI * 85 / 180, this._pitch));
@@ -177,8 +191,8 @@ export class FPSControls {
       this._bobTimer *= 0.9;
     }
 
-    // Apply height + bob to yaw (which holds the camera)
-    this.yaw.position.y = this._currentHeight + bobOffset;
+    // Camera local position takes head bob
+    this.camera.position.set(0, bobOffset, 0);
 
     return { moveState, speed };
   }
@@ -189,20 +203,46 @@ export class FPSControls {
     document.removeEventListener('keydown', this._onKeyDown);
     document.removeEventListener('keyup', this._onKeyUp);
     document.removeEventListener('mousemove', this._onMouseMove);
+    window.removeEventListener('mousedown', this._onMouseDown);
+    window.removeEventListener('mouseup', this._onMouseUp);
   }
 
   /* ── Private event handlers ── */
 
   /** @private */
   _onLockChange() {
-    this.enabled = this.isLocked;
+    this.enabled = true; // Always keep controls responding to input
+  }
+
+  /** @private */
+  _onMouseDown(e) {
+    if (e.button === 0) {
+      this._isMouseDown = true;
+      this._lastMouseX = e.clientX;
+      this._lastMouseY = e.clientY;
+    }
+  }
+
+  /** @private */
+  _onMouseUp(e) {
+    if (e.button === 0) {
+      this._isMouseDown = false;
+    }
   }
 
   /** @private */
   _onMouseMove(e) {
-    if (!this.isLocked) return;
-    this._mouseDX += e.movementX;
-    this._mouseDY += e.movementY;
+    if (this.isLocked) {
+      this._mouseDX += e.movementX;
+      this._mouseDY += e.movementY;
+    } else if (this._isMouseDown) {
+      const dx = e.clientX - this._lastMouseX;
+      const dy = e.clientY - this._lastMouseY;
+      this._mouseDX += dx;
+      this._mouseDY += dy;
+      this._lastMouseX = e.clientX;
+      this._lastMouseY = e.clientY;
+    }
   }
 
   /** @private */
