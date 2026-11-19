@@ -284,11 +284,6 @@ export class MenuSystem {
     this.activeScreen = 'none';
   }
 
-  hide() {
-    this._hideAll();
-    this.activeScreen = 'none';
-  }
-
   resume() {
     this.hide();
     this.onResume();
