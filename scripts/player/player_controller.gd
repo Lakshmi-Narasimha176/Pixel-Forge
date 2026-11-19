@@ -26,6 +26,9 @@ var _current_interactable: Node = null
 var _spawn_position: Vector3 = Vector3.ZERO
 var _footstep_timer: float = 0.0
 var _was_on_floor: bool = false
+var _bob_time: float = 0.0
+var _bob_base_y: float = 0.0
+var _prev_health: int = 100
 
 
 func _ready() -> void:
@@ -39,11 +42,23 @@ func _ready() -> void:
 	GameState.inventory_changed.connect(_on_inventory_changed)
 	GameState.player_died.connect(_on_player_died)
 	GameState.player_resurrected.connect(_on_player_resurrected)
+	if camera:
+		_bob_base_y = camera.position.y
+	_prev_health = GameState.health
+	GameState.health_changed.connect(_on_health_changed_vignette)
 
 
 func _on_inventory_changed() -> void:
 	if weapon_mesh:
 		weapon_mesh.visible = GameState.has_weapon
+
+
+func _on_health_changed_vignette(new_hp: int, _max_hp: int) -> void:
+	if new_hp < _prev_health and camera:
+		var t := create_tween()
+		t.tween_property(camera, "fov", 86.0, 0.08)
+		t.tween_property(camera, "fov", 75.0, 0.25)
+	_prev_health = new_hp
 
 
 func _on_player_died() -> void:
@@ -139,6 +154,15 @@ func _physics_process(delta: float) -> void:
 			AudioManager.play_footstep(surface, is_sprint, _is_crouching)
 	else:
 		_footstep_timer = 0.0
+
+	# Camera head bob
+	if camera and is_on_floor() and horizontal_speed > 0.5 and not _is_crouching:
+		var bob_speed := 8.5 if is_sprint else 5.5
+		var bob_amount := 0.024 if is_sprint else 0.015
+		_bob_time += delta * bob_speed
+		camera.position.y = _bob_base_y + sin(_bob_time) * bob_amount
+	elif camera:
+		camera.position.y = lerpf(camera.position.y, _bob_base_y, delta * 8.0)
 
 	_update_flashlight(delta)
 	_update_interaction_ray()
