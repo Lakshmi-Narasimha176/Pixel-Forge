@@ -1,0 +1,19 @@
+# PSX Anomaly Horror Modular Kit by bitkiln - materials of house_door_anomaly
+
+newmtl house_door_anomaly
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/door_interior_white_anomaly.png
+
+newmtl house_trim
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/kit_trim_white.png

@@ -1,0 +1,55 @@
+# PSX Anomaly Horror Modular Kit by bitkiln - materials of house_wall_anomaly
+
+newmtl house_trim
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/kit_trim_white.png
+
+newmtl house_wainscot
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/wainscot_oak_panel.png
+
+newmtl house_wall_anomaly
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/wallpaper_stripe_sprig_anomaly.png
+
+newmtl house_baseboard
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/trim_baseboard_oak.png
+
+newmtl house_rail
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/kit_rail_oak.png
+
+newmtl house_crown
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/trim_crown_molding_white.png

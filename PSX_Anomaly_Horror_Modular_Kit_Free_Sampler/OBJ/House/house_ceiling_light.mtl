@@ -1,0 +1,39 @@
+# PSX Anomaly Horror Modular Kit by bitkiln - materials of house_ceiling_light
+
+newmtl house_ceiling
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/ceiling_popcorn.png
+
+newmtl house_trim
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/kit_trim_white.png
+
+newmtl house_metal
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/kit_metal_alu.png
+
+newmtl house_light
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/kit_bulb_warm.png
+Ke 1.000 1.000 1.000
+map_Ke ../../Textures/kit_bulb_warm_emit.png

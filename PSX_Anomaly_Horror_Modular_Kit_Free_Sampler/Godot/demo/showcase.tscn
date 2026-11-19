@@ -1,0 +1,228 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://demo/showcase.gd" id="1"]
+[ext_resource type="Script" path="res://demo/fly_camera.gd" id="2"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_floor.tscn" id="3"]
+[ext_resource type="ArrayMesh" path="res://psx_anomaly_horror_modular_kit/meshes/House/house_ceiling.res" id="4"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_ceiling_light.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_wall.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_wall_door.tscn" id="7"]
+[ext_resource type="ArrayMesh" path="res://psx_anomaly_horror_modular_kit/meshes/House/house_wall_window.res" id="8"]
+[ext_resource type="ArrayMesh" path="res://psx_anomaly_horror_modular_kit/meshes/House/house_corner.res" id="9"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_door.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_window.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://psx_anomaly_horror_modular_kit/anomaly/house_wall_floral.tscn" id="12"]
+
+[sub_resource type="Environment" id="env"]
+background_mode = 1
+background_color = Color(0.07, 0.065, 0.08, 1.0)
+ambient_light_source = 2
+ambient_light_color = Color(0.82, 0.8, 0.84, 1.0)
+ambient_light_energy = 0.95
+tonemap_mode = 0
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.07, 0.065, 0.08, 1.0)
+fog_density = 1.0
+fog_depth_curve = 1.0
+fog_depth_begin = 20.0
+fog_depth_end = 70.0
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.12, 0.11, 0.12, 1.0)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="ground"]
+material = SubResource("ground_mat")
+size = Vector2(48.0, 18.0)
+
+[node name="Showcase" type="Node3D"]
+script = ExtResource("1")
+title = "PSX ANOMALY HORROR MODULAR KIT"
+subtitle = "free sampler   -   bitkiln.itch.io"
+other_scene = "res://demo/loop_house.tscn"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8829, -0.3699, 0.289, 0.0, 0.6157, 0.788, -0.4695, -0.6958, 0.5436, 0.0, 10.0, 0.0)
+light_color = Color(1.0, 0.95, 0.86, 1.0)
+light_energy = 0.9
+light_specular = 0.0
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 16.0, -0.02, 0.0)
+mesh = SubResource("ground")
+
+[node name="Pieces" type="Node3D" parent="."]
+
+[node name="Labels" type="Node3D" parent="."]
+
+[node name="house_floor" parent="Pieces" instance=ExtResource("3")]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.6, 0.0, -5.0)
+
+[node name="L_house_floor" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 1.6, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_floor\n+ house_floor_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="house_ceiling" type="MeshInstance3D" parent="Pieces"]
+transform = Transform3D(-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0, 4.8, 3.0, -5.0)
+mesh = ExtResource("4")
+
+[node name="L_house_ceiling" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 4.8, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(0.93, 0.87, 0.78, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_ceiling"
+font_size = 32
+outline_size = 8
+
+[node name="house_ceiling_light" parent="Pieces" instance=ExtResource("5")]
+transform = Transform3D(-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0, 8.0, 3.0, -5.0)
+
+[node name="L_house_ceiling_light" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 8.0, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_ceiling_light\n+ house_ceiling_light_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="house_wall" parent="Pieces" instance=ExtResource("6")]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 11.2, 0.0, -5.0)
+
+[node name="L_house_wall" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 11.2, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_wall\n+ house_wall_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="house_wall_door" parent="Pieces" instance=ExtResource("7")]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 14.4, 0.0, -5.0)
+
+[node name="L_house_wall_door" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 14.4, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_wall_door\n+ house_wall_door_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="house_wall_window" type="MeshInstance3D" parent="Pieces"]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 17.6, 0.0, -5.0)
+mesh = ExtResource("8")
+
+[node name="L_house_wall_window" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 17.6, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(0.93, 0.87, 0.78, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_wall_window"
+font_size = 32
+outline_size = 8
+
+[node name="house_corner" type="MeshInstance3D" parent="Pieces"]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 20.8, 0.0, -5.0)
+mesh = ExtResource("9")
+
+[node name="L_house_corner" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 20.8, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(0.93, 0.87, 0.78, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_corner"
+font_size = 32
+outline_size = 8
+
+[node name="house_door" parent="Pieces" instance=ExtResource("10")]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 24.0, 0.0, -5.0)
+
+[node name="L_house_door" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 24.0, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_door\n+ house_door_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="house_window" parent="Pieces" instance=ExtResource("11")]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 27.2, 0.0, -5.0)
+
+[node name="L_house_window" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 27.2, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_window\n+ house_window_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="house_wall_floral" parent="Pieces" instance=ExtResource("12")]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 30.4, 0.0, -5.0)
+
+[node name="L_house_wall_floral" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 0.342, 0.9397, 0.0, -0.9397, 0.342, 30.4, 0.02, -3.4)
+pixel_size = 0.0035
+modulate = Color(1.0, 0.62, 0.4, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "house_wall_floral\n+ house_wall_floral_anomaly (K)"
+font_size = 32
+outline_size = 8
+
+[node name="Title_House" type="Label3D" parent="Labels" groups=["labels"]]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -0.5, 3.6, -3.8)
+pixel_size = 0.01
+modulate = Color(1.0, 0.48, 0.24, 1.0)
+outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+text = "HOUSE"
+font_size = 72
+outline_size = 12
+horizontal_alignment = 0
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(0.7682, 0.0368, -0.6391, 0.0, 0.9983, 0.0575, 0.6402, -0.0442, 0.7669, -4.0, 1.7, 6.0)
+current = true
+fov = 70.0
+near = 0.05
+far = 200.0
+script = ExtResource("2")
+flying = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Help" type="Label" parent="HUD"]
+offset_left = 14.0
+offset_top = 10.0
+offset_right = 1260.0
+offset_bottom = 80.0
+theme_override_colors/font_color = Color(0.925, 0.871, 0.784, 1.0)
+theme_override_colors/font_outline_color = Color(0.0, 0.0, 0.0, 1.0)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 15
+
+[node name="Status" type="Label" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -34.0
+offset_right = 1200.0
+offset_bottom = -10.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.925, 0.871, 0.784, 1.0)
+theme_override_colors/font_outline_color = Color(0.0, 0.0, 0.0, 1.0)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 15

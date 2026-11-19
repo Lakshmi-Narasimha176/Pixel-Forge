@@ -1,0 +1,12 @@
+# PSX Anomaly Horror Modular Kit by bitkiln - materials of house_window
+
+newmtl house_window
+Ka 0.000 0.000 0.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ns 0
+d 1.0
+illum 1
+map_Kd ../../Textures/window_night_curtains.png
+Ke 1.000 1.000 1.000
+map_Ke ../../Textures/window_night_curtains_emit.png

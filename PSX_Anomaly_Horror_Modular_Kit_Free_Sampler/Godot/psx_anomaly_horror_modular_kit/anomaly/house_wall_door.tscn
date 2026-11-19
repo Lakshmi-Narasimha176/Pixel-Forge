@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://psx_anomaly_horror_modular_kit/anomaly_piece.gd" id="1"]
+[ext_resource type="ArrayMesh" path="res://psx_anomaly_horror_modular_kit/meshes/House/house_wall_door.res" id="2"]
+[ext_resource type="ArrayMesh" path="res://psx_anomaly_horror_modular_kit/meshes/House/house_wall_door_anomaly.res" id="3"]
+[ext_resource type="ConcavePolygonShape3D" path="res://psx_anomaly_horror_modular_kit/shapes/House/house_wall_door.res" id="4"]
+[ext_resource type="ConcavePolygonShape3D" path="res://psx_anomaly_horror_modular_kit/shapes/House/house_wall_door_anomaly.res" id="5"]
+
+[node name="house_wall_door" type="Node3D"]
+script = ExtResource("1")
+anomaly_mesh = ExtResource("3")
+mesh_change = true
+description = "the door to the next room is gone: plain wall where the doorway was"
+difficulty = 0
+
+[node name="Model" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2")
+
+[node name="Body" type="StaticBody3D" parent="."]
+
+[node name="Shape" type="CollisionShape3D" parent="Body"]
+shape = ExtResource("4")
+
+[node name="AnomalyModel" type="MeshInstance3D" parent="."]
+visible = false
+mesh = ExtResource("3")
+
+[node name="AnomalyBody" type="StaticBody3D" parent="."]
+
+[node name="Shape" type="CollisionShape3D" parent="AnomalyBody"]
+shape = ExtResource("5")
+disabled = true
