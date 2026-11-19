@@ -1,44 +1,112 @@
-# THE LAST REVENGE — Device 4 QA package
+# 🩸 THE LAST REVENGE — First-Person Horror Game
 
-Offline, read-only QA utilities for Godot and Unity. Python standard library only.
-No network access, runtime AI, background process, or third-party package.
+A realistic 3D psychological survival horror game built with **Three.js**, **WebGL**, **GLSL Shaders**, and the **Web Audio API**.
 
-## Requirements
-- Python 3.9 or newer.
-- Windows PowerShell.
-- A Godot or Unity project folder for project audits.
+---
 
-## Verify the QA tool
-```powershell
-python --version
-python tools\qa\qa.py inspect
-python tools\qa\qa.py --help
+## 🎮 Play the Game
+
+### Quick Start
+```bash
+# Navigate to the game directory
+cd game
+
+# Install dependencies (first time only)
+npm install
+
+# Start the local development server
+npm run dev
 ```
 
-## Commands
-Run from the repository root. Device 3's integrated content in `data/` is
-authoritative for content checks; the standalone `device3_story_package/` copy
-and the local `.venv/` are excluded from QA scans.
+Then open the local URL in your browser (e.g. `http://localhost:5173/`).
+
+### Production Build
+```bash
+cd game
+npm run build
+npm run preview
+```
+
+---
+
+## 🕹️ Controls
+
+| Key / Action | Action |
+|---|---|
+| **W, A, S, D** | Walk Forward / Left / Backward / Right |
+| **Mouse** | Look around (Pointer Lock) |
+| **Shift** | Sprint (consumes stamina, increases footstep volume) |
+| **C** | Crouch (silent movement, sneak past stalkers) |
+| **E** | Interact (pick up items, open doors, examine puzzles) |
+| **F** | Toggle Flashlight (consumes battery over time) |
+| **Q** | Use Blood Bag (Restores +25 HP) |
+| **1 - 5** | Quick-select Inventory Slots |
+| **Esc** | Pause Game / Settings Menu |
+
+---
+
+## 📖 Story & Chapters
+
+You wake up trapped in a decrepit, blood-soaked asylum and meat facility. A static voice crackles through a walkie-talkie: *"Get out... before HE finds you."*
+
+### Chapter 1: The Awakening
+- Wake in the dark starting room (`horror_room.glb`).
+- Discover the flashlight and crackling walkie-talkie.
+- Beware the cursed porcelain doll (`cursed_porcelain_doll_-_antique_horror_prop.glb`) whose head tracks your every movement.
+
+### Chapter 2: The Corridor
+- Navigate the long decaying hallway (`horror_corridor_5.glb`).
+- Encounter the wandering spirit (`horror_ghost_character_-_blood_stained_spirit.glb`).
+- Arm yourself with the blood-stained baseball bat (`baseball_bat_covered_in_blood.glb`).
+- Watch out for scurrying street rats and sudden corridor apparitions.
+
+### Chapter 3: The Slaughterhouse
+- Enter the meat processing plant (`butcher_meat_hook_rail_-_cured_ham__sausages.glb`, `dead_pig.glb`, `psx_raw_meat_pack__low-poly_2_types.glb`).
+- Evade **The Butcher** (`horror_butcher_fat_killer_bloody_cleaver.glb`), a lethal stalker who patrols with a massive meat cleaver.
+- Sneak to locate the electronic Security Keycard and scavenge Blood Bags for survival.
+
+### Chapter 4: The Soviet Facility
+- Penetrate the Cold War interrogation bunker (`horror_soviet_room.glb`).
+- Survive psychological apparitions of the Horror Woman (`horror_woman.glb`) causing intense VHS static distortions.
+- Solve the antique clock riddle (`vintage_wooden_wall_clock_-.glb`) to unlock the secret subterranean blast doors.
+
+### Chapter 5: The Escape
+- Sprint through the crumbling collapse tunnel (`tunnel.glb`) under emergency strobe lights.
+- Break through into the night storm to reach the weathered farmhouse sanctuary (`weathered_red_saltbox_farmhouse.glb`).
+
+---
+
+## ⚙️ Architecture & Engine Features
+
+- **Custom GLSL Post-Processing Pipeline** (`Renderer.js`):
+  - Dynamic CRT scanlines and film grain.
+  - Deep vignette darkening edges.
+  - Cold, desaturated horror color grading.
+  - Chromatic aberration spike filter triggered during jump scares.
+- **Dynamic Horror Lighting** (`LightingSystem.js`):
+  - Directional camera flashlight with real-time shadow casting, battery drain, and intermittent flicker.
+  - Flickering fluorescent tube and blood-red meat light simulations.
+  - Volumetric exponential distance fog (`FogExp2`).
+- **Positional 3D Audio Engine** (`AudioManager.js`):
+  - Synthesized impulse responses for claustrophobic indoor reverb.
+  - Distance-based enemy footstep and breath tracking.
+  - Heartbeat audio cues scaling dynamically with player health and sanity.
+- **Sanity & Fear System** (`HorrorEffects.js`):
+  - Sanity depletion in pitch darkness or near paranormal anomalies.
+  - Screen shake, distortion, and blood splatter overlays upon taking damage.
+- **Complete UI System** (`HUD.js`, `MenuSystem.js`):
+  - Horror typography and aesthetic styling.
+  - Health bar, battery indicator, sanity meter, subtitle narration, and death/victory screens.
+
+---
+
+## 🛠️ QA Utilities (Device 4 Package)
 
 ```powershell
+# Verify QA environment
+python tools\qa\qa.py inspect
+
+# Content and asset validation
 python tools\qa\qa.py validate-json data --id-field id --out reports\content-validation.txt
 python tools\qa\qa.py audit-assets data --out reports\asset-audit.txt
-python tools\qa\qa.py audit-project GAME_PROJECT --out reports\project-audit.txt
 ```
-
-## Command behavior
-- `inspect`: checks Python version, Windows platform and standard-library availability.
-- `validate-json INPUT`: validates one JSON file or all JSON files in a directory. Duplicate object keys fail. `--id-field id` optionally checks ID uniqueness across scanned files.
-- `audit-assets PROJECT`: finds byte-identical files using SHA-256 in 1 MB chunks and checks common resource-path fields in JSON. Device 4's content audit targets `data/`; `.venv/` and `device3_story_package/` are always skipped.
-- `audit-project PROJECT`: detects Godot using `project.godot`, or Unity using `ProjectSettings/ProjectVersion.txt` and `Assets/`. Godot `scenes`, `scripts`, and `assets` folders are informational, not mandatory.
-
-## Reports and exit codes
-Each command prints a plain-text PASS/FAIL report and writes it to `--out`.
-Exit code `0` means all checks passed; `1` means at least one check failed.
-
-## Safety and limitations
-- Source project files are read only; reports are written only to the selected output path.
-- Do not point `--out` at a source file.
-- JSON resource paths are checked relative to the selected audit root (`data/` for the integrated content audit). Confirm Device 3's actual schema before relying on these checks.
-- Unity GUID references and engine-specific binary resource formats are not resolved.
-- Static checks do not prove scenes run or gameplay progression works. Use `docs/TEST_CHECKLIST.md` for manual playtesting.
