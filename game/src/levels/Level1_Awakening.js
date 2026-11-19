@@ -12,16 +12,15 @@ import * as THREE from 'three';
  * GLB files are in the repo root (one level up from game/)
  */
 const ASSETS = {
-  room: '../horror_room.glb',
-  flashlight: '../horror_game_flashlight_download_game-ready.glb',
-  walkieTalkie: '../psx-style_horror_walkie-talkie.glb',
-  devilsBible: '../devils_bible_-_dark_fantasy_book.glb',
-  cursedDoll: '../cursed_porcelain_doll_-_antique_horror_prop.glb',
-  bloodWall: '../abandoned_horror_wall_with_blood_splatter.glb',
-  wallClock: '../vintage_wooden_wall_clock_-.glb',
-  ceilingFan: '../old_rusty_ceiling_fan.glb',
-  // PSX modular kit pieces for the door
-  door: '../PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb'
+  room: '/horror_room.glb',
+  flashlight: '/horror_game_flashlight_download_game-ready.glb',
+  walkieTalkie: '/psx-style_horror_walkie-talkie.glb',
+  devilsBible: '/devils_bible_-_dark_fantasy_book.glb',
+  cursedDoll: '/cursed_porcelain_doll_-_antique_horror_prop.glb',
+  bloodWall: '/abandoned_horror_wall_with_blood_splatter.glb',
+  wallClock: '/vintage_wooden_wall_clock_-.glb',
+  ceilingFan: '/old_rusty_ceiling_fan.glb',
+  door: '/PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb'
 };
 
 /**
