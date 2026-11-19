@@ -534,7 +534,7 @@ func _build_switches() -> void:
 			"on": true
 		})
 
-func _create_switch_node(pos: Vector3, label: String) -> Node3D:
+func _create_switch_node(pos: Vector3, _lbl_text: String) -> Node3D:
 	var root := Node3D.new()
 	root.position = pos
 	var base := MeshInstance3D.new()
@@ -786,7 +786,7 @@ func _build_items() -> void:
 	})
 
 	# 3. Mira's Key (in Horror Corridor area)
-	var mkey_mesh := fit("key_or_path", 0, 0.15)
+	# Mira key torus
 	var tm := TorusMesh.new()
 	tm.inner_radius = 0.03
 	tm.outer_radius = 0.06
@@ -1232,8 +1232,8 @@ func _bat_attack() -> void:
 
 	# Raycast forward to check hit
 	var fwd := -cam.global_transform.basis.z
-	var ray_start := cam.global_position
-	var ray_end := ray_start + fwd * 2.2
+	# ray start
+	# raycast sweep
 
 	# 1. Hit Lily (Horror Girl)
 	if girl_alive and girl.position.distance_to(player.position) < 2.5:
@@ -1561,8 +1561,8 @@ func _update_ui(dt: float) -> void:
 		if msg_t <= 0.0: hud_msg.text = ""
 
 	# Threat: Heartbeat + color drain scale with Butcher's proximity
-	var d := butcher.position.distance_to(player.position)
-	var t := clampf(1.0 - d / 14.0, 0.0, 1.0) if b_state != "patrol" or d < 9.0 else 0.0
+	var dist_b := butcher.position.distance_to(player.position)
+	var t := clampf(1.0 - dist_b / 14.0, 0.0, 1.0) if b_state != "patrol" or dist_b < 9.0 else 0.0
 	threat = lerpf(threat, t, minf(1.0, 3.0 * dt))
 	post_mat.set_shader_parameter("desat", threat * 0.7)
 	post_mat.set_shader_parameter("vignette", 1.0 + threat * 0.5)
