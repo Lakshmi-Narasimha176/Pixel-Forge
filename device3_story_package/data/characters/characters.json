@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "characters": [
+    {
+      "id": "char_protagonist",
+      "name": "Arin Vale",
+      "role": "protagonist",
+      "alive_at_start": false,
+      "backstory": "Arin was a careful logistics planner for the Red Harbour gang. He learned to read routes, habits and lies, but refused to take part in a civilian massacre. He secretly copied the gang's ledger and planned to give it to an investigator. His closest friend, Dev, discovered the plan.",
+      "traits": [
+        "intelligent",
+        "strategic",
+        "adaptable"
+      ],
+      "goal": "Discover who arranged his murder and return to expose the truth.",
+      "secret": "Arin hid a duplicate ledger inside a maintenance locker before he died."
+    },
+    {
+      "id": "char_butcher",
+      "name": "Marek 'The Butcher' Voss",
+      "role": "antagonist_level_2",
+      "alive_at_start": false,
+      "backstory": "Marek grew up protecting a younger sister in a violent dock district. The gang recruited him as muscle and rewarded obedience. After his sister died in a gang operation, Marek blamed the people named by his handler and accepted a death contract.",
+      "traits": [
+        "physically strong",
+        "impatient",
+        "uses heavy weapons"
+      ],
+      "goal": "Kill every name on his contract and return to finish what he calls justice.",
+      "secret": "His handler altered one name on the contract; Marek never checked the original."
+    },
+    {
+      "id": "char_strategist",
+      "name": "Silas Rook",
+      "role": "antagonist_level_3",
+      "alive_at_start": false,
+      "backstory": "Silas built the gang's surveillance and blackmail network. He survived by predicting betrayal before it happened. When the gang planned to discard him, he arranged his own death contract, believing he could manipulate its rules.",
+      "traits": [
+        "deceptive",
+        "patient",
+        "trap-maker",
+        "firearms"
+      ],
+      "goal": "Complete his contract and return with control over the gang.",
+      "secret": "Silas knows the contract can be satisfied through a proxy, but hides that the proxy must act freely and know the truth."
+    },
+    {
+      "id": "char_friend",
+      "name": "Dev Malik",
+      "role": "friend_antagonist_level_5",
+      "alive_at_start": true,
+      "backstory": "Dev and Arin grew up together and built the gang's delivery routes. Dev's family was threatened after Arin copied the ledger. Dev agreed to stage Arin's death to protect them, but then chose a real killing to prevent Arin from exposing the gang and Dev's own role in it.",
+      "traits": [
+        "psychological manipulation",
+        "infiltration",
+        "conceals motives"
+      ],
+      "goal": "Keep the ledger and his family safe, even if Arin must stay dead.",
+      "secret": "Dev killed Arin after Arin refused to surrender the ledger. Dev later died during a failed attempt to destroy the evidence and arrived in the dead world."
+    },
+    {
+      "id": "char_warden",
+      "name": "The Warden",
+      "role": "afterlife_guide",
+      "alive_at_start": false,
+      "backstory": "The Warden was once a clerk who recorded death contracts. After discovering that handlers forged names and exploited grief, the Warden refused to erase the records and was bound to the archive.",
+      "traits": [
+        "precise",
+        "cryptic",
+        "cannot lie about written rules"
+      ],
+      "goal": "Make the contract system expose its own fraud.",
+      "secret": "The Warden can explain rules but cannot choose a proxy or interfere in a person's decision."
+    }
+  ]
+}

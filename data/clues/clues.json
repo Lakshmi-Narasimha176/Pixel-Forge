@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "clue_01",
+      "level_id": "level_1",
+      "description": "A wet transit ticket stamped with Arin's route code.",
+      "meaning": "The code belongs to the Red Harbour delivery network.",
+      "type": "environment"
+    },
+    {
+      "id": "clue_02",
+      "level_id": "level_1",
+      "description": "A broken watch stopped at 02:17.",
+      "meaning": "The recorded time matches the death archive entry.",
+      "type": "environment"
+    },
+    {
+      "id": "clue_03",
+      "level_id": "level_1",
+      "description": "The Warden's ledger index describes unfinished death contracts.",
+      "meaning": "The dead world stores agreements and evidence.",
+      "type": "document"
+    },
+    {
+      "id": "clue_04",
+      "level_id": "level_1",
+      "description": "A torn death record with the route code written in the margin.",
+      "meaning": "Someone connected Arin's murder to a gang route.",
+      "type": "document"
+    },
+    {
+      "id": "clue_05",
+      "level_id": "level_2",
+      "description": "Marek's contract lists Arin and two dock supervisors.",
+      "meaning": "The targets were selected by someone else.",
+      "type": "document"
+    },
+    {
+      "id": "clue_06",
+      "level_id": "level_2",
+      "description": "Marek says Arin personally ordered the operation.",
+      "meaning": "Marek's testimony is sincere but based on a false briefing.",
+      "type": "testimony"
+    },
+    {
+      "id": "clue_07",
+      "level_id": "level_2",
+      "description": "Original dispatch sheet has no authorisation from Arin.",
+      "meaning": "The contract handler inserted Arin's name after the event.",
+      "type": "document"
+    },
+    {
+      "id": "clue_08",
+      "level_id": "level_2",
+      "description": "Marek's final statement admits he acted without checking the source.",
+      "meaning": "Marek's testimony is sincere but based on a false briefing.",
+      "type": "testimony"
+    },
+    {
+      "id": "clue_09",
+      "level_id": "level_3",
+      "description": "A decoy map routes intruders into a locked evidence room.",
+      "meaning": "Silas uses predictable assumptions as traps.",
+      "type": "environment"
+    },
+    {
+      "id": "clue_10",
+      "level_id": "level_3",
+      "description": "Silas's recorded testimony says Marek received the target list from a handler.",
+      "meaning": "Silas's testimony confirms that he used traps to kill every named target on his own contract before Arin arrived.",
+      "type": "testimony"
+    },
+    {
+      "id": "clue_11",
+      "level_id": "level_3",
+      "description": "A handwritten proxy-clause analysis with the words 'knowledge + free choice'.",
+      "meaning": "A proxy can close a contract only with informed consent.",
+      "type": "document"
+    },
+    {
+      "id": "clue_12",
+      "level_id": "level_3",
+      "description": "A coded route ledger links Dev to the night Arin died.",
+      "meaning": "The final trap record proves Silas's last named target died; the Warden records completion and Silas returns.",
+      "type": "document"
+    },
+    {
+      "id": "clue_13",
+      "level_id": "level_4",
+      "description": "The original contract page, handler amendment and Warden's rule index.",
+      "meaning": "Together they prove the contract was forged and expose the proxy clause.",
+      "type": "document"
+    },
+    {
+      "id": "clue_14",
+      "level_id": "level_4",
+      "description": "A one-way archive message receipt addressed to Dev.",
+      "meaning": "Dev received the complete evidence before choosing to act.",
+      "type": "document"
+    },
+    {
+      "id": "clue_15",
+      "level_id": "level_4",
+      "description": "The Warden's return entry records Dev's voluntary closure action.",
+      "meaning": "Arin's return is rule‑comcompliant, not a supernatural exception.",
+      "type": "document"
+    },
+    {
+      "id": "clue_16",
+      "level_id": "level_5",
+      "description": "A scorched keycard from the evidence‑room fire.",
+      "meaning": "Dev died in the same place he tried to destroy the records.",
+      "type": "environment"
+    },
+    {
+      "id": "clue_17",
+      "level_id": "level_5",
+      "description": "A witness says Dev was seen entering alone after Arin's death.",
+      "meaning": "Dev's later actions connect him to the evidence‑room fire.",
+      "type": "testimony"
+    },
+    {
+      "id": "clue_18",
+      "level_id": "level_5",
+      "description": "Three accounts: Dev's first claim of coercion, Silas's claim of deliberate betrayal, and the dispatch record.",
+      "meaning": "The records support that Dev was pressured first but independently chose to kill Arin.",
+      "type": "document"
+    },
+    {
+      "id": "clue_19",
+      "level_id": "level_5",
+      "description": "Dev's recorded confession, matched to the original ledger and time‑stamped route record.",
+      "meaning": "Dev's confession confirms he first murdered Arin before receiving the full evidence. Later, after receiving the complete contract and proof, Dev freely destroyed the handler's control record, the original named target; the Warden verified the evidence, recorded completion, and Arin returned. Dev subsequently died in the evidence-room fire while trying to destroy the ledger.",
+      "type": "recording"
+    }
+  ]
+}

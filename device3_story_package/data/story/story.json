@@ -1,0 +1,203 @@
+{
+  "schema_version": "1.0",
+  "game_id": "the_last_revenge",
+  "title": "THE LAST REVENGE",
+  "theme": "THE UNKNOWN",
+  "resurrection_rule": {
+    "id": "rule_satisfaction_contract",
+    "conditions": [
+      "A dead person's contract lists specific living targets.",
+      "The contract-holder must personally cause each listed target's death, unless the proxy clause is lawfully invoked.",
+      "The contract-holder must sincerely believe the revenge is complete when the final target dies.",
+      "The Warden records completion; the contract-holder then returns to life at the instant of their own death."
+    ],
+    "proxy_clause": "A contract-holder may name a proxy only after revealing the complete contract and evidence of its fraud. The proxy must understand the consequence and freely choose to act. The proxy's action counts as the contract-holder's final act because the contract-holder relinquishes control and accepts the outcome.",
+    "loophole": "The contract says the holder must complete the revenge, not that the holder must remain dead. A proxy who freely acts after full disclosure can close the contract. The holder returns, while the proxy remains in the dead world if already dead.",
+    "limits": [
+      "A coerced or deceived proxy does not count.",
+      "A target not named in the original contract cannot be substituted.",
+      "The Warden cannot waive conditions.",
+      "A return restores the body but does not erase memories or the dead-world connection."
+    ]
+  },
+  "levels": [
+    {
+      "id": "level_1",
+      "number": 1,
+      "name": "The Awakening",
+      "purpose": "Teach movement through narrative discovery and establish the murder mystery.",
+      "sequence": [
+        {
+          "step": 1,
+          "event": "Arin wakes in an abandoned transit station with no memory of the final moments.",
+          "dialogue_id": "dlg_level_1",
+          "clue_ids": [
+            "clue_01",
+            "clue_02"
+          ],
+          "puzzle_id": "puzzle_01"
+        },
+        {
+          "step": 2,
+          "event": "The Warden explains that the dead world is an archive of unfinished contracts, not a place of random punishment.",
+          "dialogue_id": "dlg_level_1",
+          "clue_ids": [
+            "clue_03"
+          ]
+        },
+        {
+          "step": 3,
+          "event": "Arin finds his own death record. The signature field is torn away, but a familiar route code remains.",
+          "clue_ids": [
+            "clue_04"
+          ],
+          "unlock": "level_2"
+        }
+      ],
+      "reveal": "Arin was murdered, and the route code points to the gang's old dock warehouse.",
+      "next_mystery": "Why was Arin's death recorded as a contract-related killing?"
+    },
+    {
+      "id": "level_2",
+      "number": 2,
+      "name": "The Butcher",
+      "purpose": "Introduce the first contract-holder and expose the handler's manipulation.",
+      "sequence": [
+        {
+          "step": 1,
+          "event": "Marek blocks the warehouse exit and claims Arin is one of the names responsible for his sister's death.",
+          "dialogue_id": "dlg_level_2",
+          "clue_ids": [
+            "clue_05",
+            "clue_06"
+          ],
+          "puzzle_id": "puzzle_02"
+        },
+        {
+          "step": 2,
+          "event": "Arin discovers the forged contract entry and confronts Marek with the original dispatch record.",
+          "clue_ids": [
+            "clue_07"
+          ]
+        },
+        {
+          "step": 3,
+          "event": "Marek fights Arin. After defeat, Marek's final recorded target is confirmed and his contract closes; the Warden marks his revenge complete.",
+          "clue_ids": [
+            "clue_08"
+          ],
+          "unlock": "level_3"
+        }
+      ],
+      "reveal": "Marek's anger was exploited by a handler who altered the target list.",
+      "next_mystery": "Who altered the list, and why did the handler want Marek to kill Arin?"
+    },
+    {
+      "id": "level_3",
+      "number": 3,
+      "name": "The Strategist",
+      "purpose": "Reveal the proxy clause and connect Silas to Arin's murder.",
+      "sequence": [
+        {
+          "step": 1,
+          "event": "Silas controls a records office filled with false routes, decoy files and traps.",
+          "dialogue_id": "dlg_level_3",
+          "clue_ids": [
+            "clue_09",
+            "clue_10"
+          ],
+          "puzzle_id": "puzzle_03"
+        },
+        {
+          "step": 2,
+          "event": "Arin reconstructs the original contract and discovers Silas's notes about the proxy clause.",
+          "clue_ids": [
+            "clue_11"
+          ],
+          "puzzle_id": "puzzle_04"
+        },
+        {
+          "step": 3,
+          "event": "Arin defeats Silas. Silas's contract closes because he believes his listed revenge targets are dead; the records reveal Dev's route code and a hidden ledger location.",
+          "clue_ids": [
+            "clue_12"
+          ],
+          "unlock": "level_4"
+        }
+      ],
+      "reveal": "Silas manipulated both gangsters and knew the resurrection rule could be exploited.",
+      "next_mystery": "Why did Dev help arrange Arin's death, and can the contract loophole return Arin?"
+    },
+    {
+      "id": "level_4",
+      "number": 4,
+      "name": "The Impossible Return",
+      "purpose": "Execute the proxy loophole and establish the persistent connection.",
+      "sequence": [
+        {
+          "step": 1,
+          "event": "Arin reaches the contract archive and assembles the full evidence chain.",
+          "dialogue_id": "dlg_level_4",
+          "clue_ids": [
+            "clue_13"
+          ],
+          "puzzle_id": "puzzle_05"
+        },
+        {
+          "step": 2,
+          "event": "The Warden explains that a proxy must know the truth and choose freely. Arin sends the evidence through the archive's one-way message gate to Dev.",
+          "clue_ids": [
+            "clue_14"
+          ]
+        },
+        {
+          "step": 3,
+          "event": "Dev, alive in the living world, chooses to expose the forged contract and destroy the handler's control record. The Warden accepts the act as the final contract condition; Arin returns to life.",
+          "clue_ids": [
+            "clue_15"
+          ],
+          "unlock": "level_5"
+        }
+      ],
+      "reveal": "Arin returns because Dev freely acts after learning the complete truth, not because the Warden grants an exception.",
+      "persistent_connection": "Arin retains the dead-world mark because the contract archive recorded his death and return in the same ledger. He can still perceive echoes and hear the Warden near places tied to the contract.",
+      "next_mystery": "Why did Dev choose to help only after receiving the evidence, and what happened to him afterward?"
+    },
+    {
+      "id": "level_5",
+      "number": 5,
+      "name": "The Betrayer",
+      "purpose": "Resolve the murder, explain Dev's arrival and close the emotional arc.",
+      "sequence": [
+        {
+          "step": 1,
+          "event": "Arin follows the dead-world echo to the location where Dev died during his attempt to destroy the ledger evidence.",
+          "dialogue_id": "dlg_level_5",
+          "clue_ids": [
+            "clue_16",
+            "clue_17"
+          ],
+          "puzzle_id": "puzzle_06"
+        },
+        {
+          "step": 2,
+          "event": "Conflicting accounts are compared against the original ledger, dispatch record and Dev's recorded confession.",
+          "clue_ids": [
+            "clue_18"
+          ]
+        },
+        {
+          "step": 3,
+          "event": "Dev admits he first agreed to stage Arin's death under family pressure, then chose to murder him when Arin refused to surrender the ledger, before receiving the full evidence. Later, alive in the living world and after receiving the complete contract and proof, Dev freely performed the proxy's final act by destroying the handler's control record, the original named target. The Warden verified the evidence, recorded completion, and Arin returned to life. Dev subsequently died in the evidence-room fire while trying to destroy the ledger. Arin decides whether to expose Dev's actions and preserve the evidence.",
+          "dialogue_id": "dlg_level_5",
+          "clue_ids": [
+            "clue_19"
+          ],
+          "ending": "ending_truth"
+        }
+      ],
+      "reveal": "Dev murdered Arin to protect his family and himself; coercion explains his first choice but does not excuse the final killing.",
+      "resolution": "Arin exposes the gang and preserves the ledger. He does not erase Dev's guilt or let the gang's handler escape accountability."
+    }
+  ]
+}
