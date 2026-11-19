@@ -1,9 +1,15 @@
 extends Node3D
-## THE LAST REVENGE - an 8-part survival-horror campaign built from the Pixel-Forge GLB assets.
-## Story + chapters: horror/story.gd.  Gallery of every model: press G in the menu.
+## THE LAST REVENGE - An 8-part survival-horror campaign built from Pixel-Forge GLB assets.
 ##
-## Core rules: the Butcher hunts by SIGHT (light makes you visible) and SOUND (running is loud, crouching is quiet).
-## Your flashlight SLOWS him when you keep it on him. Throw the bat (T) to pull him away.
+## Abel Crane (The Butcher / Father): Hunts by sight and sound in the slaughterhouse.
+## Ada (Ghost / Sister): In the vintage living room, communicates via walkie-talkie.
+## Mira (The Woman / Mother): Haunts the horror corridor, key near her area.
+## Pearl (Cursed Doll): Sits on dresser, weeping & crying with 3D audio, watching Nora.
+## Lily (Horror Girl / Little Sister): Transparent coming-and-going motion; holds Father's Key!
+## Bat: Slay Lily with the bloody baseball bat to get Father's Key.
+## Street Rat: Scurries and bites player dealing damage.
+## Light Switches & Breaker: Flipping switches can cause short circuit; main breaker restores power.
+## Tunnel: Underground exit behind the slaughterhouse.
 
 const Story = preload("res://horror/story.gd")
 const KIT := "res://PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/"
@@ -39,7 +45,6 @@ const MODELS := {
 }
 
 # ---------------------------------------------------------------- floor plan
-# Cell (i,j) is centred on world (2i, 2j); +x east, +z south.
 const ROOMS := [
 	{"id": "hall", "i": 1, "j": 3, "w": 13, "h": 1, "paper": "sprig"},
 	{"id": "bed", "i": 1, "j": 1, "w": 4, "h": 2, "paper": "sprig"},
@@ -64,16 +69,19 @@ const DOORS := [
 	{"i": 9, "j": 1, "s": "E", "k": "door", "n": "Kitchen door"},
 	{"i": 5, "j": 5, "s": "E", "k": "arch", "n": ""},
 	{"i": 8, "j": 5, "s": "E", "k": "arch", "n": ""},
-	{"i": 10, "j": 5, "s": "E", "k": "door", "lock": "slaughter", "n": "Slaughter room door"},
+	{"i": 10, "j": 5, "s": "E", "k": "door", "lock": "slaughter", "n": "Slaughter room door (Father's Room)"},
 	{"i": 13, "j": 4, "s": "N", "k": "door", "lock": "slaughter", "n": "Slaughter room back door"},
+	{"i": 1, "j": 3, "s": "W", "k": "door", "lock": "corridor", "n": "Corridor door (Mira's Wing)"},
 	{"i": 7, "j": 6, "s": "S", "k": "door", "lock": "exit", "exit": true, "n": "Front door"},
 ]
 const WINDOWS := [
 	[2, 1, "N"], [4, 1, "N"], [1, 2, "W"], [5, 1, "N"], [8, 1, "N"], [11, 1, "N"], [13, 1, "N"],
 	[1, 3, "W"], [13, 3, "E"], [2, 6, "S"], [4, 6, "S"], [10, 6, "S"], [12, 6, "S"], [13, 5, "E"],
 ]
-# light fixtures: [i, j, power]  (power 0 = dead fixture)
-const BULBS := [[3, 3, 1.0], [7, 3, 1.0], [11, 3, 1.0], [7, 5, 1.0], [11, 2, 0.9], [9, 5, 0.8], [2, 1, 0.0], [8, 1, 0.0], [3, 5, 0.0], [12, 5, 0.0]]
+const BULBS := [
+	[3, 3, 1.0], [7, 3, 1.0], [11, 3, 1.0], [7, 5, 1.0], [11, 2, 0.9], [9, 5, 0.8],
+	[2, 1, 0.8], [8, 1, 0.8], [3, 5, 0.8], [12, 5, 0.8]
+]
 const SIDE := {
 	"N": {"dx": 0, "dz": -1, "rot": 0.0, "axis": "x"},
 	"S": {"dx": 0, "dz": 1, "rot": PI, "axis": "x"},
@@ -131,18 +139,29 @@ var butcher: CharacterBody3D
 var state := "menu"
 var yaw := 0.0
 var pitch := 0.0
+var health := 100.0
+var max_health := 100.0
 var stamina := 1.0
 var battery := 1.0
 var flash_on := false
-var has_key := false
+var has_father_key := false
+var has_mira_key := false
 var has_bible := false
+var has_bat := false
+var has_walkie := false
+var bat_in_hand: Node3D = null
+var bat_swinging := false
+var bat_swing_t := 0.0
+var house_power := true
+var short_circuit_t := 0.0
 var batteries := 0
 var step_t := 0.0
 var noise_cd := 0.0
 var time := 0.0
 var shake := 0.0
 var rng := RandomNumberGenerator.new()
-# butcher AI
+
+# butcher AI (Father: Abel Crane)
 var b_state := "patrol"
 var b_path: Array = []
 var b_target := Vector3.ZERO
@@ -153,29 +172,53 @@ var b_stuck := 0.0
 var b_prev := Vector3.ZERO
 var b_model: Node3D
 var b_step := 0.0
+var b_stun := 0.0
 var enraged := false
-# apparitions
-var girl: Node3D
-var doll: Node3D
-var ghost: Node3D
-var woman: Node3D
-var rat: Node3D
-var rat_t := 5.0
-var woman_t := 25.0
-var woman_life := 0.0
-var scare_t := 18.0
-var fan: Node3D
+
+# apparitions & entities
+var girl: CharacterBody3D       # Lily (Horror Girl - holds Father's Key)
+var girl_model: Node3D
+var girl_alpha := 0.0
+var girl_alive := true
+var girl_flicker_t := 0.0
+var doll: Node3D                 # Pearl (Cursed Doll - weeping)
+var p_doll_cry: AudioStreamPlayer3D
+var ghost: Node3D                # Ada (Sister Spirit - Living Room)
+var woman: Node3D                # Mira (The Woman - Corridor)
+var rat: CharacterBody3D         # Street Rat - bites player
+var rat_bite_cd := 0.0
+var rat_alive := true
+var fan: Node3D                  # Rusted Fan - squeaking
+var p_fan: AudioStreamPlayer3D
+var clock: Node3D                # Vintage Wall Clock - ticking
+var p_clock: AudioStreamPlayer3D
+var tunnel_zone: Node3D
+
+# mini-missions checklist
+var missions := [
+	{"id": "bat", "text": "Find the Bloody Baseball Bat in the house", "done": false},
+	{"id": "walkie", "text": "Find Ada's Walkie-Talkie in the Vintage Living Room", "done": false},
+	{"id": "lily", "text": "Defeat Lily (Horror Girl) with the bat to claim Father's Key", "done": false},
+	{"id": "mira_key", "text": "Collect Mira's Key in the Horror Corridor wing", "done": false},
+	{"id": "bible", "text": "Unlock Slaughterhouse & seize the Devil's Bible", "done": false},
+	{"id": "escape", "text": "Escape through the Underground Tunnel to freedom", "done": false},
+]
+
 # ui
 var hud_obj: Label
 var hud_prompt: Label
 var hud_msg: Label
 var hud_warn: Label
+var hud_controls: Label
+var hud_missions: Label
+var bar_health: ProgressBar
 var bar_stam: ProgressBar
 var bar_batt: ProgressBar
 var overlay: ColorRect
 var overlay_label: Label
 var post_mat: ShaderMaterial
 var msg_t := 0.0
+
 # audio
 var snd := {}
 var p_heart: AudioStreamPlayer
@@ -200,7 +243,7 @@ func _ready() -> void:
 	_build_audio()
 	_build_hud()
 	_reset_run()
-	_show_overlay("THE LAST REVENGE\n\nENTER  start the hunt\nG  asset gallery (all characters + environments)\n\nWASD move   SHIFT run   C crouch   F flashlight   E interact   ESC pause\nFind the brass key. Unlock the slaughter room. Take the Devil's Bible. Escape.\nThe Butcher hears footsteps and sees light.")
+	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt\n[G]  Asset Gallery\n\nCONTROLS:\nWASD: Move   |   Mouse: Look   |   Shift: Sprint   |   C: Crouch\nF: Flashlight   |   E: Interact   |   LMB / T: Bat Attack   |   Esc: Pause\n\nLORE & OBJECTIVES:\n* Abel Crane (The Butcher / Father) hunts in the slaughterhouse.\n* Ada (Sister) speaks through the Walkie-Talkie in the Living Room.\n* Lily (Little Sister) flickers in the dark and holds Father's Key.\n* Slay Lily with the Bloody Bat to take the Key, then seize the Devil's Bible.\n* Beware: light switches trigger short circuits! Use the Master Breaker to reset power.\n* Escape through the secret Underground Tunnel!")
 	if autostart:
 		autostart = false
 		_start()
@@ -208,16 +251,16 @@ func _ready() -> void:
 		hud_warn.text = "%d model(s) are Git LFS stubs - run `git lfs pull` and reopen the project." % missing.size()
 
 # ---------------------------------------------------------------- helpers
-func _kit(name: String) -> PackedScene:
-	if not kit_cache.has(name):
-		kit_cache[name] = load(KIT + name + ".glb")
-	return kit_cache[name]
+func _kit(piece_name: String) -> PackedScene:
+	if not kit_cache.has(piece_name):
+		kit_cache[piece_name] = load(KIT + piece_name + ".glb")
+	return kit_cache[piece_name]
 
-func piece(name: String, pos: Vector3, rot := 0.0) -> Node3D:
-	var ps: PackedScene = _kit(name)
+func piece(piece_name: String, pos: Vector3, rot := 0.0) -> Node3D:
+	var ps: PackedScene = _kit(piece_name)
 	var n: Node3D
 	if ps == null:
-		if not missing.has(name): missing.append(name)
+		if not missing.has(piece_name): missing.append(piece_name)
 		n = Node3D.new()
 	else:
 		n = ps.instantiate()
@@ -226,11 +269,11 @@ func piece(name: String, pos: Vector3, rot := 0.0) -> Node3D:
 	level_root.add_child(n)
 	return n
 
-func add_box(center: Vector3, size: Vector3, layer := 1, parent: Node = null) -> StaticBody3D:
+func add_box(center: Vector3, box_size: Vector3, layer := 1, parent: Node = null) -> StaticBody3D:
 	var b := StaticBody3D.new()
 	var cs := CollisionShape3D.new()
 	var bs := BoxShape3D.new()
-	bs.size = size
+	bs.size = box_size
 	cs.shape = bs
 	b.add_child(cs)
 	b.position = center
@@ -254,8 +297,7 @@ func _aabb(n: Node, xf: Transform3D) -> AABB:
 			has = true
 	return res
 
-## Load a root-folder GLB, scale it to `height` (or longest side `length`), stand it on y=0, centre it on x/z.
-func fit(key_or_path: String, height := 0.0, length := 0.0, face_x := false) -> Node3D:
+func fit(key_or_path: String, height := 0.0, target_length := 0.0, face_x := false) -> Node3D:
 	var path: String = MODELS.get(key_or_path, key_or_path)
 	var holder := Node3D.new()
 	var ps = null
@@ -276,9 +318,9 @@ func fit(key_or_path: String, height := 0.0, length := 0.0, face_x := false) -> 
 	var bb := _aabb(inst, Transform3D.IDENTITY)
 	var k := 1.0
 	if height > 0.0 and bb.size.y > 0.0: k = height / bb.size.y
-	elif length > 0.0:
+	elif target_length > 0.0:
 		var m := maxf(bb.size.x, maxf(bb.size.y, bb.size.z))
-		if m > 0.0: k = length / m
+		if m > 0.0: k = target_length / m
 	inst.scale = Vector3.ONE * k
 	inst.position = Vector3(-(bb.position.x + bb.size.x / 2.0) * k, -bb.position.y * k, -(bb.position.z + bb.size.z / 2.0) * k)
 	if face_x: rot.rotation.y = -PI / 2.0
@@ -319,7 +361,7 @@ func _build_environment() -> void:
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0.01, 0.012, 0.018)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.13, 0.15, 0.22)
+	env.ambient_light_color = Color(0.12, 0.14, 0.20)
 	env.ambient_light_energy = 0.55
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.05
@@ -341,13 +383,14 @@ func _build_environment() -> void:
 	env.adjustment_contrast = 1.08
 	we.environment = env
 	add_child(we)
-	# moonlight through the windows (soft, no shadows)
+
 	var moon := DirectionalLight3D.new()
 	moon.light_color = Color(0.45, 0.55, 0.9)
 	moon.light_energy = 0.08
 	moon.rotation_degrees = Vector3(-55, 30, 0)
 	moon.shadow_enabled = false
 	add_child(moon)
+
 	var ground := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(260, 260)
@@ -425,6 +468,7 @@ func _build_level() -> void:
 				e.door = d
 				doors.append(d)
 				interact.append({"kind": "door", "door": d})
+
 	# corner posts
 	for a in range(0, 16):
 		for b in range(0, 9):
@@ -435,6 +479,7 @@ func _build_level() -> void:
 			var n := int(N) + int(S) + int(W) + int(E)
 			if n < 2 or (n == 2 and ((N and S) or (W and E))): continue
 			piece("house_corner", Vector3((a - 1) * CELL, 0, b * CELL))
+
 	# floors, ceilings, fixtures
 	var bulb_at := {}
 	for b in BULBS: bulb_at["%d,%d" % [b[0], b[1]]] = b[2]
@@ -444,17 +489,70 @@ func _build_level() -> void:
 		piece("house_floor", p)
 		if bulb_at.has(key):
 			piece("house_ceiling_light", p)
-			if bulb_at[key] > 0.0:
-				var l := OmniLight3D.new()
-				l.position = Vector3(p.x, 2.5, p.z)
-				l.light_color = Color(1.0, 0.78, 0.5)
-				l.omni_range = 9.0
-				l.light_energy = 1.7 * bulb_at[key]
-				l.shadow_enabled = false
-				level_root.add_child(l)
-				bulbs.append({"light": l, "base": l.light_energy, "mode": "on", "t": 0.0, "pos": p})
+			var l := OmniLight3D.new()
+			l.position = Vector3(p.x, 2.5, p.z)
+			l.light_color = Color(1.0, 0.82, 0.58)
+			l.omni_range = 9.0
+			l.light_energy = 1.6 * bulb_at[key]
+			l.shadow_enabled = false
+			level_root.add_child(l)
+			var rm_id: String = room_of.get(key, {}).get("id", "hall")
+			bulbs.append({"light": l, "base": l.light_energy, "mode": "on", "t": 0.0, "pos": p, "room": rm_id})
 		else:
 			piece("house_ceiling", p)
+
+	# Build Room Light Switches
+	_build_switches()
+
+func _build_switches() -> void:
+	# Main Master Breaker at entrance foyer
+	var main_sw := _create_switch_node(Vector3(13.2, 1.4, 7.8), "Main Power Breaker")
+	interact.append({
+		"kind": "main_switch",
+		"node": main_sw,
+		"pos": Vector3(13.2, 1.4, 7.8),
+		"label": "Toggle Main Breaker",
+	})
+
+	# Room switches placed on walls
+	var sw_data := [
+		{"room": "living", "pos": Vector3(2.1, 1.35, 7.9), "lbl": "Living Room Light Switch"},
+		{"room": "bed", "pos": Vector3(2.1, 1.35, 3.9), "lbl": "Bedroom Light Switch"},
+		{"room": "bath", "pos": Vector3(10.1, 1.35, 3.9), "lbl": "Bathroom Light Switch"},
+		{"room": "kitchen", "pos": Vector3(20.1, 1.35, 3.9), "lbl": "Kitchen Light Switch"},
+		{"room": "dining", "pos": Vector3(18.1, 1.35, 7.9), "lbl": "Dining Room Light Switch"},
+		{"room": "slaughter", "pos": Vector3(22.1, 1.35, 7.9), "lbl": "Slaughterhouse Light Switch"},
+	]
+	for sw in sw_data:
+		var node := _create_switch_node(sw.pos, sw.lbl)
+		interact.append({
+			"kind": "room_switch",
+			"room": sw.room,
+			"node": node,
+			"pos": sw.pos,
+			"label": "Flip " + sw.lbl,
+			"on": true
+		})
+
+func _create_switch_node(pos: Vector3, label: String) -> Node3D:
+	var root := Node3D.new()
+	root.position = pos
+	var base := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.12, 0.18, 0.05)
+	base.mesh = bm
+	base.material_override = _mat(Color(0.2, 0.2, 0.22), 0.5, 0.5)
+	root.add_child(base)
+
+	var lever := MeshInstance3D.new()
+	var lm := BoxMesh.new()
+	lm.size = Vector3(0.04, 0.08, 0.06)
+	lever.mesh = lm
+	lever.material_override = _mat(Color(0.8, 0.2, 0.1), 0.3, 0.8)
+	lever.position.z = 0.03
+	root.add_child(lever)
+	add_child(root)
+	return root
 
 func _build_nav() -> void:
 	for key in cells: nav[key] = []
@@ -513,22 +611,76 @@ func _build_furniture() -> void:
 	block(14.0, 7.55, 1.4, 0.45, 0.8, wood)                        # foyer table
 
 func _build_dressing() -> void:
+	# Hanging dead pigs in the Slaughterhouse
 	for p in [[22.6, 8.0], [25.6, 11.8], [22.4, 11.0]]:
 		var pig := fit("pig", 1.25)
 		pig.position = Vector3(p[0], 3.0 - 1.55, p[1])
 		add_child(pig)
-	var m := fit("meat", 0, 0.7); m.position = Vector3(24.2, 0.9, 12.5); add_child(m)
-	var bb := fit("bloodbag", 0, 0.32); bb.position = Vector3(24.8, 0.9, 10.1); add_child(bb)
-	var bw := fit("bloodwall", 0, 5.2); bw.position = Vector3(24, 0, 7.2); add_child(bw)
-	var clk := fit("clock", 0, 0.55); clk.position = Vector3(1.17, 1.8, 9.6); clk.rotation.y = PI / 2.0; add_child(clk)
+
+	# Meat hook rail hung from the ceiling of the Slaughterhouse
+	var hook := fit("hook", 0, 3.4)
+	hook.position = Vector3(24.0, 2.5, 10.5)
+	add_child(hook)
+
+	# Multiple gruesome blood wall splatters
+	for bpos in [Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8)]:
+		var bw := fit("bloodwall", 0, 4.8)
+		bw.position = bpos
+		add_child(bw)
+
+	# Vintage wooden wall clock (with functional ticking sound)
+	clock = fit("clock", 0, 0.6)
+	clock.position = Vector3(1.17, 1.8, 9.6)
+	clock.rotation.y = PI / 2.0
+	add_child(clock)
+	p_clock = AudioStreamPlayer3D.new()
+	p_clock.unit_size = 2.0
+	p_clock.max_distance = 18.0
+	clock.add_child(p_clock)
+
+	# Old rusty ceiling fan (spinning with creaking sound)
 	fan = fit("fan", 0, 1.3)
-	fan.position = Vector3(23.0, 3.0 - (fan.get_meta("size", Vector3(0, 0.6, 0)) as Vector3).y, 3.0)
+	fan.position = Vector3(23.0, 2.4, 3.0)
 	add_child(fan)
-	var toilet := fit("toilet", 2.3); toilet.position = Vector3(-4.5, 0, 6.0); toilet.rotation.y = PI / 2.0; add_child(toilet)
-	var bat := fit("bat", 0, 0.85); bat.position = Vector3(8.0, 0.05, 12.3); bat.rotation.z = 0.0; add_child(bat)
+	p_fan = AudioStreamPlayer3D.new()
+	p_fan.unit_size = 2.5
+	p_fan.max_distance = 22.0
+	fan.add_child(p_fan)
+
+	# Wooden outhouse / toilet inside bathroom
+	var toilet := fit("toilet", 2.2)
+	toilet.position = Vector3(11.4, 0, 2.1)
+	toilet.rotation.y = PI
+	add_child(toilet)
+
+	# Vintage Living Room set (Ada's parlor domain)
+	var parlor := fit("parlor", 2.7)
+	parlor.position = Vector3(5.0, 0, 9.8)
+	add_child(parlor)
+
+	# Horror Corridor 5 (Mira's domain extending West from hallway)
+	var corr := fit("corridor", 2.8)
+	corr.position = Vector3(-3.5, 0, 6.0)
+	corr.rotation.y = PI / 2.0
+	add_child(corr)
+
+	# Underground Tunnel (The secret exit route)
+	var tunnel := fit("tunnel", 3.0)
+	tunnel.position = Vector3(25.0, -0.2, 18.0)
+	add_child(tunnel)
+
+	# Underground Tunnel Exit trigger
+	tunnel_zone = Node3D.new()
+	tunnel_zone.position = Vector3(25.0, 0, 26.0)
+	add_child(tunnel_zone)
+	interact.append({
+		"kind": "tunnel_exit",
+		"pos": Vector3(25.0, 0.8, 26.0),
+		"label": "Escape Through Tunnel to Surface"
+	})
 
 func _build_characters() -> void:
-	# Butcher: patrols, hears you, sees your light. Static mesh, animated by code (stride bob, lean, sway).
+	# 1. The Butcher (Father: Abel Crane)
 	butcher = CharacterBody3D.new()
 	butcher.collision_layer = 4
 	butcher.collision_mask = 1
@@ -543,78 +695,208 @@ func _build_characters() -> void:
 	butcher.add_child(b_model)
 	butcher.position = Vector3(24.0, 0.05, 8.6)
 	add_child(butcher)
+
 	p_butcher = AudioStreamPlayer3D.new()
-	p_butcher.unit_size = 3.0
-	p_butcher.max_distance = 30.0
+	p_butcher.unit_size = 3.5
+	p_butcher.max_distance = 32.0
 	butcher.add_child(p_butcher)
+
 	var carry := OmniLight3D.new()
 	carry.light_color = Color(1.0, 0.25, 0.15)
 	carry.light_energy = 0.0
-	carry.omni_range = 3.0
+	carry.omni_range = 3.5
 	carry.position.y = 1.6
 	butcher.add_child(carry)
 	butcher.set_meta("eye_light", carry)
-	# Girl: weeping-angel rule - she only moves while you are not looking at her.
-	girl = fit("girl", 1.68)
-	girl.position = Vector3(3.2, 0, 3.9)
+
+	# 2. Lily (Horror Girl - Possessed Youngest Sister)
+	# Transparent coming and going motion; holds Father's Key!
+	girl = CharacterBody3D.new()
+	girl.collision_layer = 4
+	girl.collision_mask = 1
+	var g_cs := CollisionShape3D.new()
+	var g_cap := CapsuleShape3D.new()
+	g_cap.radius = 0.32
+	g_cap.height = 1.65
+	g_cs.shape = g_cap
+	g_cs.position.y = 0.82
+	girl.add_child(g_cs)
+	girl_model = fit("girl", 1.68)
+	girl.add_child(girl_model)
+	girl.position = Vector3(4.2, 0, 5.9)
 	add_child(girl)
-	# Doll: on the dresser, turns to watch you.
+
+	# 3. Pearl (Cursed Porcelain Doll - in bedroom, continuously weeping)
 	doll = fit("doll", 0.55)
 	doll.position = Vector3(1.75, 0.8, 4.6)
 	add_child(doll)
-	# Ghost: drifts through the dining room.
+	p_doll_cry = AudioStreamPlayer3D.new()
+	p_doll_cry.unit_size = 2.0
+	p_doll_cry.max_distance = 16.0
+	doll.add_child(p_doll_cry)
+
+	# 4. Ada (Ghost - Sister spirit in Vintage Living Room)
 	ghost = fit("ghost", 1.7, 0, true)
-	ghost.position = Vector3(19.0, 0.35, 8.0)
+	ghost.position = Vector3(5.2, 0.35, 9.5)
 	add_child(ghost)
-	# Woman: appears at the end of the hall, vanishes when approached.
+
+	# 5. Mira (The Woman - Mother in Horror Corridor)
 	woman = fit("woman", 1.7)
-	woman.visible = false
+	woman.position = Vector3(-3.2, 0, 6.0)
+	woman.visible = true
 	add_child(woman)
-	# Rat: scurries along the skirting boards.
-	rat = fit("rat", 0, 0.45, true)
-	rat.visible = false
+
+	# 6. Street Rat (Runs and bites human)
+	rat = CharacterBody3D.new()
+	rat.collision_layer = 4
+	rat.collision_mask = 1
+	var r_cs := CollisionShape3D.new()
+	var r_box := BoxShape3D.new()
+	r_box.size = Vector3(0.3, 0.2, 0.5)
+	r_cs.shape = r_box
+	r_cs.position.y = 0.1
+	rat.add_child(r_cs)
+	var r_mesh := fit("rat", 0, 0.45, true)
+	rat.add_child(r_mesh)
+	rat.position = Vector3(15.0, 0, 3.8)
 	add_child(rat)
 
 func _build_items() -> void:
-	var key_spots := [Vector3(7.4, 0.58, 1.55), Vector3(16.2, 0.8, 1.7), Vector3(23.2, 0.92, 1.5)]
-	_add_pickup("key", key_spots[rng.randi() % key_spots.size()], "Take the brass key")
-	var bspots := [Vector3(4.6, 0.6, 1.55), Vector3(11.3, 0.66, 1.65), Vector3(14.0, 0.84, 7.5), Vector3(5.2, 0.44, 9.4), Vector3(22.0, 0.94, 4.4), Vector3(19.0, 0.78, 10.0), Vector3(27.0, 0.05, 12.4), Vector3(17.6, 0.05, 4.7)]
-	bspots.shuffle()
-	for i in 5: _add_pickup("battery", bspots[i], "Take the battery")
+	# 1. Bloody Baseball Bat (Weapon pickup)
+	var bat_pickup := fit("bat", 0, 0.9)
+	bat_pickup.position = Vector3(15.2, 0.1, 2.5)
+	bat_pickup.rotation.z = 1.2
+	add_child(bat_pickup)
+	interact.append({
+		"kind": "bat_pickup",
+		"node": bat_pickup,
+		"pos": Vector3(15.2, 0.3, 2.5),
+		"label": "Take Bloody Baseball Bat (Weapon)"
+	})
+
+	# 2. Walkie-Talkie (Ada's communication device in Vintage Living Room)
+	var walkie := fit("walkie", 0, 0.26)
+	walkie.position = Vector3(5.2, 0.55, 9.4)
+	add_child(walkie)
+	interact.append({
+		"kind": "walkie",
+		"node": walkie,
+		"pos": Vector3(5.2, 0.55, 9.4),
+		"label": "Take Ada's Walkie-Talkie"
+	})
+
+	# 3. Mira's Key (in Horror Corridor area)
+	var mkey_mesh := fit("key_or_path", 0, 0.15)
+	var tm := TorusMesh.new()
+	tm.inner_radius = 0.03
+	tm.outer_radius = 0.06
+	var mi := MeshInstance3D.new()
+	mi.mesh = tm
+	mi.material_override = _mat(Color(0.8, 0.3, 0.3), 0.3, 0.8)
+	mi.position = Vector3(-4.0, 0.6, 6.0)
+	add_child(mi)
+	interact.append({
+		"kind": "mira_key",
+		"node": mi,
+		"pos": Vector3(-4.0, 0.6, 6.0),
+		"label": "Take Mira's Corridor Key"
+	})
+
+	# 4. Raw Meat Pack (Kitchen counter - can be eaten to heal HP)
+	var meat := fit("meat", 0, 0.65)
+	meat.position = Vector3(23.4, 0.92, 1.55)
+	add_child(meat)
+	interact.append({
+		"kind": "meat",
+		"node": meat,
+		"pos": Vector3(23.4, 0.92, 1.55),
+		"label": "Eat Raw Meat (+15 HP)"
+	})
+
+	# 5. Blood Bags (Restores +35 HP)
+	var bb1 := fit("bloodbag", 0, 0.32)
+	bb1.position = Vector3(11.2, 0.85, 1.6)
+	add_child(bb1)
+	interact.append({
+		"kind": "bloodbag",
+		"node": bb1,
+		"pos": Vector3(11.2, 0.85, 1.6),
+		"label": "Use Blood Bag (+35 HP)"
+	})
+
+	var bb2 := fit("bloodbag", 0, 0.32)
+	bb2.position = Vector3(24.8, 0.92, 10.1)
+	add_child(bb2)
+	interact.append({
+		"kind": "bloodbag",
+		"node": bb2,
+		"pos": Vector3(24.8, 0.92, 10.1),
+		"label": "Use Blood Bag (+35 HP)"
+	})
+
+	# 6. Devil's Bible (Altar in Slaughterhouse)
 	var bible := fit("bible", 0.34)
 	bible.position = Vector3(24.0, 0.93, 10.0)
-	bible.rotation.x = 0.0
 	add_child(bible)
 	var glow := OmniLight3D.new()
 	glow.light_color = Color(1.0, 0.1, 0.05)
-	glow.light_energy = 2.0
+	glow.light_energy = 2.2
 	glow.omni_range = 5.0
 	glow.position = Vector3(24.0, 1.4, 10.0)
 	add_child(glow)
-	interact.append({"kind": "bible", "node": bible, "pos": Vector3(24.0, 1.1, 10.0), "label": "Take the Devil's Bible", "glow": glow})
+	interact.append({
+		"kind": "bible",
+		"node": bible,
+		"pos": Vector3(24.0, 1.1, 10.0),
+		"label": "Seize the Devil's Bible",
+		"glow": glow
+	})
 
-func _add_pickup(kind: String, pos: Vector3, label: String) -> void:
+	# 7. Flashlight Batteries scattered
+	var bspots := [
+		Vector3(4.6, 0.6, 1.55), Vector3(11.3, 0.66, 1.65), Vector3(14.0, 0.84, 7.5),
+		Vector3(22.0, 0.94, 4.4), Vector3(19.0, 0.78, 10.0), Vector3(27.0, 0.05, 12.4)
+	]
+	bspots.shuffle()
+	for i in 4: _add_battery(bspots[i])
+
+func _add_battery(pos: Vector3) -> void:
 	var mi := MeshInstance3D.new()
-	if kind == "key":
-		var tm := TorusMesh.new()
-		tm.inner_radius = 0.035
-		tm.outer_radius = 0.06
-		mi.mesh = tm
-		mi.material_override = _mat(Color(0.85, 0.65, 0.2), 0.3, 0.9)
-	else:
-		var cm := CylinderMesh.new()
-		cm.top_radius = 0.03
-		cm.bottom_radius = 0.03
-		cm.height = 0.16
-		mi.mesh = cm
-		var bm := _mat(Color(0.1, 0.1, 0.1), 0.4, 0.5)
-		bm.emission_enabled = true
-		bm.emission = Color(0.1, 1.0, 0.4)
-		bm.emission_energy_multiplier = 1.2
-		mi.material_override = bm
+	var cm := CylinderMesh.new()
+	cm.top_radius = 0.03
+	cm.bottom_radius = 0.03
+	cm.height = 0.16
+	mi.mesh = cm
+	var bm := _mat(Color(0.1, 0.1, 0.1), 0.4, 0.5)
+	bm.emission_enabled = true
+	bm.emission = Color(0.1, 1.0, 0.4)
+	bm.emission_energy_multiplier = 1.2
+	mi.material_override = bm
 	mi.position = pos
 	add_child(mi)
-	interact.append({"kind": kind, "node": mi, "pos": pos, "label": label})
+	interact.append({"kind": "battery", "node": mi, "pos": pos, "label": "Take Battery (+50%)"})
+
+func _spawn_father_key(pos: Vector3) -> void:
+	var mi := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 0.04
+	tm.outer_radius = 0.08
+	mi.mesh = tm
+	var mat := _mat(Color(1.0, 0.85, 0.2), 0.2, 0.9)
+	mat.emission_enabled = true
+	mat.emission = Color(1.0, 0.7, 0.1)
+	mat.emission_energy_multiplier = 1.5
+	mi.material_override = mat
+	mi.position = pos
+	add_child(mi)
+	interact.append({
+		"kind": "father_key",
+		"node": mi,
+		"pos": pos,
+		"label": "Take Father's Slaughterhouse Key"
+	})
+	say("Lily dropped Father's Brass Key! Take it.")
+	play("stinger", -4.0)
 
 func _build_player() -> void:
 	player = CharacterBody3D.new()
@@ -628,29 +910,39 @@ func _build_player() -> void:
 	cs.position.y = 0.85
 	player.add_child(cs)
 	add_child(player)
+
 	cam = Camera3D.new()
 	cam.fov = 72
 	cam.near = 0.05
-	cam.far = 120
+	cam.far = 140
 	cam.position.y = 1.62
 	player.add_child(cam)
+
 	flash = SpotLight3D.new()
 	flash.light_color = Color(1.0, 0.94, 0.82)
 	flash.light_energy = 6.0
-	flash.spot_range = 28.0
-	flash.spot_angle = 30.0
+	flash.spot_range = 30.0
+	flash.spot_angle = 32.0
 	flash.spot_angle_attenuation = 0.6
 	flash.shadow_enabled = true
 	flash.light_volumetric_fog_energy = 1.4
 	flash.position = Vector3(0.16, -0.12, -0.1)
 	flash.visible = false
 	cam.add_child(flash)
+
 	var fl := fit("flashlight", 0, 0.27, true)
 	fl.position = Vector3(0.19, -0.2, -0.34)
 	fl.rotation.y = PI
 	cam.add_child(fl)
 	for m in fl.find_children("*", "MeshInstance3D", true, false):
 		(m as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	# First-person Bloody Baseball Bat (hidden until equipped)
+	bat_in_hand = fit("bat", 0, 0.75)
+	bat_in_hand.position = Vector3(0.3, -0.25, -0.45)
+	bat_in_hand.rotation = Vector3(0.2, -0.4, 0.3)
+	bat_in_hand.visible = false
+	cam.add_child(bat_in_hand)
 
 # ------------------------------------------------------------------ audio
 func _wav(fn: Callable, secs: float, loop := false) -> AudioStreamWAV:
@@ -678,18 +970,41 @@ func _build_audio() -> void:
 	snd["heart"] = _wav(func(t, _d): return (sin(TAU * 58.0 * t) * exp(-t * 18.0) + sin(TAU * 52.0 * (t - 0.17)) * exp(-(t - 0.17) * 18.0) * (1.0 if t > 0.17 else 0.0)) * 0.9, 0.5)
 	snd["step"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * 0.5 + sin(TAU * 90.0 * t)) * exp(-t * 26.0) * 0.8, 0.22)
 	snd["bstep"] = _wav(func(t, _d): return (sin(TAU * 55.0 * t * exp(-t * 3.0)) + r.randf_range(-1, 1) * 0.3) * exp(-t * 9.0), 0.45)
-	snd["stinger"] = _wav(func(t, d): return (sin(TAU * 110.0 * t) + sin(TAU * 116.5 * t) + sin(TAU * 185.0 * t) * 0.7 + r.randf_range(-1, 1) * 0.4) * exp(-t * 2.0) * 0.35, 1.8)
+	snd["stinger"] = _wav(func(t, _d): return (sin(TAU * 110.0 * t) + sin(TAU * 116.5 * t) + sin(TAU * 185.0 * t) * 0.7 + r.randf_range(-1, 1) * 0.4) * exp(-t * 2.0) * 0.35, 1.8)
 	snd["door"] = _wav(func(t, d): return sin(TAU * (150.0 + 90.0 * sin(t * 3.0)) * t) * sin(PI * t / d) * 0.35 + r.randf_range(-1, 1) * 0.05, 0.8)
 	snd["click"] = _wav(func(t, _d): return r.randf_range(-1, 1) * exp(-t * 120.0), 0.06)
 	snd["drone"] = _wav(func(t, _d): return (sin(TAU * 41.0 * t) + sin(TAU * 41.5 * t) + sin(TAU * 61.5 * t) * 0.5 + r.randf_range(-1, 1) * 0.05) * 0.2, 4.0, true)
+
+	# New sound effects:
+	snd["clock_tick"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 220.0) + sin(TAU * 1200.0 * t) * exp(-t * 80.0)) * 0.6, 0.1)
+	snd["fan_creak"] = _wav(func(t, _d): return (sin(TAU * (80.0 + 30.0 * sin(t * 8.0)) * t) * (0.3 + 0.7 * absf(sin(t * 4.0)))) * 0.4, 1.5, true)
+	snd["doll_cry"] = _wav(func(t, _d): return (sin(TAU * (320.0 + 80.0 * sin(t * 5.0) + 40.0 * sin(t * 13.0)) * t) * (0.4 + 0.6 * sin(t * 2.5))) * 0.35, 2.5, true)
+	snd["rat_squeak"] = _wav(func(t, _d): return sin(TAU * (2200.0 + 400.0 * sin(t * 40.0)) * t) * exp(-t * 12.0) * 0.5, 0.18)
+	snd["rat_bite"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 30.0) + sin(TAU * 2400.0 * t) * exp(-t * 20.0)) * 0.7, 0.25)
+	snd["bat_swing"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * 0.5 + sin(TAU * (120.0 + 300.0 * t / 0.3) * t)) * sin(PI * t / 0.3) * 0.6, 0.3)
+	snd["ghost_hit"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 8.0) + sin(TAU * 650.0 * t) * exp(-t * 14.0)) * 0.8, 0.4)
+	snd["spark"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * (1.0 if sin(t * 120.0) > 0.3 else 0.1) * exp(-t * 6.0)) * 0.8, 0.5)
+	snd["radio"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * 0.4 + sin(TAU * 880.0 * t) * 0.2) * exp(-t * 4.0), 0.6)
+	snd["eat"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 40.0) + sin(TAU * 200.0 * t) * exp(-t * 20.0)) * 0.6, 0.35)
+	snd["heal"] = _wav(func(t, _d): return sin(TAU * (220.0 + 110.0 * t) * t) * exp(-t * 3.0) * 0.6, 0.6)
+
 	p_heart = AudioStreamPlayer.new(); p_heart.stream = snd["heart"]; add_child(p_heart)
 	p_sfx = AudioStreamPlayer.new(); add_child(p_sfx)
 	p_amb = AudioStreamPlayer.new(); p_amb.stream = snd["drone"]; p_amb.volume_db = -10.0; add_child(p_amb)
 
-func play(name: String, vol := 0.0) -> void:
-	if not snd.has(name): return
+	# Start 3D ambient emitters
+	p_fan.stream = snd["fan_creak"]
+	p_fan.volume_db = -6.0
+	p_fan.play()
+
+	p_doll_cry.stream = snd["doll_cry"]
+	p_doll_cry.volume_db = -4.0
+	p_doll_cry.play()
+
+func play(sname: String, vol := 0.0) -> void:
+	if not snd.has(sname): return
 	var p := AudioStreamPlayer.new()
-	p.stream = snd[name]
+	p.stream = snd[sname]
 	p.volume_db = vol
 	add_child(p)
 	p.finished.connect(p.queue_free)
@@ -718,32 +1033,63 @@ func _build_hud() -> void:
 	post_mat.shader = load("res://horror/post.gdshader")
 	rect.material = post_mat
 	post.add_child(rect)
+
 	var hud := CanvasLayer.new()
 	hud.layer = 10
 	add_child(hud)
+
 	hud_obj = _label("", Vector2(24, 20), 20)
+	hud_missions = _label("", Vector2(24, 52), 15, Color(0.95, 0.8, 0.4))
+
 	hud_prompt = _label("", Vector2(0, 0), 22, Color(1, 1, 1))
 	hud_prompt.set_anchors_preset(Control.PRESET_CENTER)
 	hud_prompt.position = Vector2(-160, 60)
+
 	hud_msg = _label("", Vector2(0, 0), 20, Color(0.9, 0.85, 0.6))
 	hud_msg.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	hud_msg.position = Vector2(-380, -130)
+	hud_msg.position = Vector2(-380, -140)
+
 	hud_warn = _label("", Vector2(24, 690), 14, Color(1, 0.5, 0.3))
+
+	# Bars: Health, Stamina, Flashlight Battery
+	var lbl_hp := _label("HEALTH", Vector2(24, 595), 12, Color(1, 0.3, 0.3))
+	bar_health = ProgressBar.new(); bar_health.max_value = 100.0; bar_health.show_percentage = false
+	bar_health.position = Vector2(24, 615); bar_health.size = Vector2(180, 8)
+	var sb_hp := StyleBoxFlat.new(); sb_hp.bg_color = Color(0.85, 0.15, 0.15)
+	bar_health.add_theme_stylebox_override("fill", sb_hp)
+
+	var lbl_stam := _label("STAMINA", Vector2(24, 627), 12, Color(0.4, 0.8, 1.0))
 	bar_stam = ProgressBar.new(); bar_stam.max_value = 1.0; bar_stam.show_percentage = false
-	bar_stam.position = Vector2(24, 640); bar_stam.size = Vector2(180, 8)
+	bar_stam.position = Vector2(24, 645); bar_stam.size = Vector2(180, 8)
+
+	var lbl_batt := _label("BATTERY", Vector2(24, 657), 12, Color(0.9, 0.9, 0.3))
 	bar_batt = ProgressBar.new(); bar_batt.max_value = 1.0; bar_batt.show_percentage = false
-	bar_batt.position = Vector2(24, 660); bar_batt.size = Vector2(180, 8)
-	for n in [hud_obj, hud_prompt, hud_msg, hud_warn, bar_stam, bar_batt]: hud.add_child(n)
+	bar_batt.position = Vector2(24, 675); bar_batt.size = Vector2(180, 8)
+
+	# Bottom Controls Helper Bar
+	hud_controls = _label(
+		"[WASD] Move   [Shift] Sprint   [C] Crouch   [F] Flashlight   [E] Interact   [LMB / T] Bat Attack   [Esc] Pause",
+		Vector2(0, -32),
+		14,
+		Color(1, 1, 0.8, 0.85)
+	)
+	hud_controls.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	hud_controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	for n in [hud_obj, hud_missions, hud_prompt, hud_msg, hud_warn, lbl_hp, bar_health, lbl_stam, bar_stam, lbl_batt, bar_batt, hud_controls]:
+		hud.add_child(n)
+
 	var dot := ColorRect.new()
-	dot.color = Color(1, 1, 1, 0.5)
+	dot.color = Color(1, 1, 1, 0.6)
 	dot.set_anchors_preset(Control.PRESET_CENTER)
 	dot.size = Vector2(4, 4)
 	dot.position = Vector2(-2, -2)
 	hud.add_child(dot)
+
 	overlay = ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.82)
+	overlay.color = Color(0, 0, 0, 0.85)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay_label = _label("", Vector2(0, 0), 26, Color(0.9, 0.85, 0.8))
+	overlay_label = _label("", Vector2(0, 0), 22, Color(0.9, 0.85, 0.8))
 	overlay_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	overlay_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -759,10 +1105,16 @@ func say(text: String, secs := 5.0) -> void:
 	hud_msg.text = text
 	msg_t = secs
 
-func objective() -> String:
-	if not has_key: return "Find the brass key"
-	if not has_bible: return "Unlock the slaughter room and take the Devil's Bible"
-	return "ESCAPE - the front door is open"
+func radio_message(msg: String) -> void:
+	play("radio", 0.0)
+	say(msg, 7.0)
+
+func complete_mission(mid: String) -> void:
+	for m in missions:
+		if m.id == mid and not m.done:
+			m.done = true
+			play("stinger", -12.0)
+			say("OBJECTIVE COMPLETE: " + m.text, 5.0)
 
 # ------------------------------------------------------------------- run
 func _reset_run() -> void:
@@ -770,14 +1122,21 @@ func _reset_run() -> void:
 	player.velocity = Vector3.ZERO
 	yaw = PI
 	pitch = 0.0
+	health = 100.0
 	stamina = 1.0
 	battery = 1.0
 	flash_on = false
 	flash.visible = false
-	has_key = false
+	has_father_key = false
+	has_mira_key = false
 	has_bible = false
+	has_bat = false
+	has_walkie = false
 	batteries = 0
 	enraged = false
+	house_power = true
+	girl_alive = true
+	rat_alive = true
 	b_state = "patrol"
 	b_path = []
 	butcher.position = Vector3(24.0, 0.05, 8.6)
@@ -786,6 +1145,7 @@ func _reset_run() -> void:
 		d.target = 0.0
 		d.amount = 0.0
 		d.locked = d.lock != ""
+	for m in missions: m.done = false
 	post_mat.set_shader_parameter("flash", 0.0)
 	post_mat.set_shader_parameter("desat", 0.0)
 
@@ -794,17 +1154,18 @@ func _start() -> void:
 	state = "play"
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	p_amb.play()
-	say("The radio crackles: \"Key first. Don't let him hear you.\"", 7.0)
+	say("The radio whispers from the living room: 'Nora... come find me.'", 7.0)
 
 func _die() -> void:
 	state = "dead"
 	play("stinger")
 	post_mat.set_shader_parameter("flash", 0.85)
-	_show_overlay("YOU DIED\n\nThe Butcher found you.\n\nENTER  try again     G  gallery")
+	_show_overlay("YOU DIED\n\nThe Butcher butchered your flesh.\n\n[ENTER] Try Again     [G] Gallery")
 
 func _win() -> void:
 	state = "won"
-	_show_overlay("YOU ESCAPED\n\nThe Devil's Bible burns behind you.\n\nENTER  play again     G  gallery")
+	complete_mission("escape")
+	_show_overlay("YOU ESCAPED\n\nYou fled through the collapsing underground tunnel.\nThe Devil's Bible burns behind you in the ruins of the Hollis estate.\n\n[ENTER] Play Again     [G] Gallery")
 
 func noise(pos: Vector3, radius: float) -> void:
 	if state != "play": return
@@ -825,6 +1186,9 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and state == "play":
 		yaw -= event.relative.x * 0.0022
 		pitch = clampf(pitch - event.relative.y * 0.0022, -1.45, 1.45)
+	elif event is InputEventMouseButton and event.pressed and state == "play":
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			_bat_attack()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.physical_keycode:
 			KEY_ENTER, KEY_KP_ENTER:
@@ -837,12 +1201,17 @@ func _input(event: InputEvent) -> void:
 			KEY_ESCAPE:
 				if state == "play":
 					state = "pause"
-					_show_overlay("PAUSED\n\nENTER  resume     G  gallery")
-				elif state == "pause": state = "play"; overlay.visible = false; Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+					_show_overlay("PAUSED\n\n[ENTER] Resume     [G] Gallery")
+				elif state == "pause":
+					state = "play"
+					overlay.visible = false
+					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			KEY_F:
 				if state == "play": _toggle_flash()
 			KEY_E:
 				if state == "play": _interact()
+			KEY_T, KEY_B:
+				if state == "play": _bat_attack()
 	if event is InputEventKey and event.pressed and (event.physical_keycode == KEY_ENTER) and state == "pause":
 		state = "play"; overlay.visible = false; Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -853,6 +1222,46 @@ func _toggle_flash() -> void:
 	flash_on = not flash_on
 	flash.visible = flash_on
 	play("click")
+
+func _bat_attack() -> void:
+	if not has_bat or bat_swinging: return
+	bat_swinging = true
+	bat_swing_t = 0.35
+	play("bat_swing", -2.0)
+	noise(player.position, 6.0)
+
+	# Raycast forward to check hit
+	var fwd := -cam.global_transform.basis.z
+	var ray_start := cam.global_position
+	var ray_end := ray_start + fwd * 2.2
+
+	# 1. Hit Lily (Horror Girl)
+	if girl_alive and girl.position.distance_to(player.position) < 2.5:
+		if fwd.dot((girl.position - player.position).normalized()) > 0.4:
+			girl_alive = false
+			play("ghost_hit", 4.0)
+			say("You struck Lily! Her spirit dissolves into ash...")
+			_spawn_father_key(girl.position + Vector3(0, 0.4, 0))
+			girl.visible = false
+			complete_mission("lily")
+			radio_message("Ada (radio): Lily is free now... take Father's key and burn the Bible.")
+			return
+
+	# 2. Hit Street Rat
+	if rat_alive and rat.position.distance_to(player.position) < 2.0:
+		rat_alive = false
+		rat.visible = false
+		play("rat_squeak", 4.0)
+		say("You crushed the vicious street rat!")
+		return
+
+	# 3. Hit Butcher (Father) -> Stun him!
+	if butcher.position.distance_to(player.position) < 2.6:
+		b_stun = 3.0
+		play("ghost_hit", 4.0)
+		shake = 1.0
+		say("You staggered the Butcher with the bat! RUN!", 4.0)
+		noise(player.position, 14.0)
 
 func _find_focus():
 	var f := -cam.global_transform.basis.z
@@ -868,7 +1277,7 @@ func _find_focus():
 		var d := to.length()
 		if d > 2.3: continue
 		var cs := f.dot(to / d)
-		if cs < 0.86: continue
+		if cs < 0.84: continue
 		var score := d * 0.6 + (1.0 - cs) * 6.0
 		if score < best_score:
 			best_score = score
@@ -882,17 +1291,32 @@ func _interact() -> void:
 		"door":
 			var d: MainDoor = it.door
 			if d.locked:
-				if d.lock == "slaughter" and has_key:
-					d.locked = false
-					for o in doors: if o.lock == "slaughter": o.locked = false
-					say("The key turns. Something moves on the other side.")
-					play("click")
-				elif d.lock == "exit" and has_bible:
-					d.locked = false
-				else:
-					say("Locked." if d.lock != "exit" else "The front door will not budge. Not yet.")
-					play("click", -6.0)
-					return
+				if d.lock == "slaughter":
+					if has_father_key:
+						d.locked = false
+						for o in doors: if o.lock == "slaughter": o.locked = false
+						say("Father's key unlocks the heavy slaughterhouse door.")
+						play("click")
+					else:
+						say("Locked by Abel Crane. Lily holds Father's key!")
+						play("click", -6.0)
+						return
+				elif d.lock == "corridor":
+					if has_mira_key:
+						d.locked = false
+						say("Mira's key unlocks the corridor wing.")
+						play("click")
+					else:
+						say("Locked. Mira's corridor key is needed.")
+						play("click", -6.0)
+						return
+				elif d.lock == "exit":
+					if has_bible:
+						d.locked = false
+					else:
+						say("The front door is barred from the outside. Find the underground tunnel exit!")
+						play("click", -6.0)
+						return
 			if d.exit and not d.locked:
 				_win()
 				return
@@ -900,36 +1324,120 @@ func _interact() -> void:
 			else: d.open_from(player.position)
 			play("door")
 			noise(d.pos, 6.0)
-		"key":
-			has_key = true
+
+		"bat_pickup":
+			has_bat = true
 			it.taken = true
 			(it.node as Node3D).visible = false
-			say("Brass key. It smells of old iron.")
+			bat_in_hand.visible = true
 			play("click")
+			complete_mission("bat")
+			say("Picked up Bloody Baseball Bat! Press LMB or T to attack.")
+
+		"walkie":
+			has_walkie = true
+			it.taken = true
+			(it.node as Node3D).visible = false
+			play("radio")
+			complete_mission("walkie")
+			radio_message("Ada (radio): Nora... I'm trapped here with the others. Slay Lily to release Father's key.")
+
+		"mira_key":
+			has_mira_key = true
+			it.taken = true
+			(it.node as Node3D).visible = false
+			play("click")
+			complete_mission("mira_key")
+			say("Found Mira's Corridor Key! It smells of dried lavender.")
+
+		"father_key":
+			has_father_key = true
+			it.taken = true
+			(it.node as Node3D).visible = false
+			play("click")
+			say("Found Father's Brass Key! You can now unlock the Slaughterhouse.")
+
+		"meat":
+			it.taken = true
+			(it.node as Node3D).visible = false
+			health = minf(max_health, health + 15.0)
+			play("eat")
+			say("Ate raw meat pack (+15 HP). You swallow down the nausea.")
+
+		"bloodbag":
+			it.taken = true
+			(it.node as Node3D).visible = false
+			health = minf(max_health, health + 35.0)
+			play("heal")
+			say("Applied blood bag transfusion (+35 HP). Vitality restored!")
+
 		"battery":
 			it.taken = true
 			(it.node as Node3D).visible = false
 			battery = minf(1.0, battery + 0.5)
 			batteries += 1
-			say("Battery +50%")
 			play("click")
+			say("Battery +50%")
+
 		"bible":
 			it.taken = true
 			(it.node as Node3D).visible = false
 			(it.glow as OmniLight3D).visible = false
 			has_bible = true
 			enraged = true
-			for d in doors: if d.lock == "exit": d.locked = false
+			complete_mission("bible")
+			for d in doors:
+				if d.lock == "exit": d.locked = false
+				if d.lock == "tunnel": d.locked = false
 			for b in bulbs: b.mode = "flicker"
-			play("stinger")
+			play("stinger", 4.0)
 			b_state = "chase"
 			b_last_seen = player.position
-			say("The Butcher screams. RUN to the front door!", 8.0)
+			say("The Butcher roars in fury! ESCAPE THROUGH THE TUNNEL!", 8.0)
+			radio_message("Ada (radio): RUN NORA! THE TUNNEL UNDER THE SLAUGHTERHOUSE!")
+
+		"room_switch":
+			it.on = not it.on
+			play("click")
+			# Short circuit trigger: 65% chance or when turning light on
+			if it.on and rng.randf() < 0.65:
+				_trigger_short_circuit()
+			else:
+				say("Flipped light switch: " + ("ON" if it.on else "OFF"))
+
+		"main_switch":
+			house_power = not house_power
+			play("spark")
+			if house_power:
+				say("Main Breaker ENGAGED. House power restored.")
+				# Power restore triggers Lily's violent flickering!
+				girl_flicker_t = 3.5
+				play("stinger", -8.0)
+			else:
+				say("Main Breaker TRIPPED. The house plunges into darkness.")
+				for b in bulbs: b.mode = "off"
+
+		"tunnel_exit":
+			if has_bible:
+				_win()
+			else:
+				say("You cannot leave without the Devil's Bible! It holds your family's souls.")
+
+func _trigger_short_circuit() -> void:
+	house_power = false
+	short_circuit_t = 12.0
+	play("spark", 4.0)
+	shake = 1.4
+	post_mat.set_shader_parameter("flash", 0.7)
+	say("SHORT CIRCUIT! The fuse blew - entire house current is OFF! Reset at Main Breaker.", 6.0)
+	for b in bulbs: b.mode = "off"
+	# Lily flickers into existence during darkness!
+	girl_flicker_t = 5.0
 
 # -------------------------------------------------------------- main loop
 func _physics_process(dt: float) -> void:
 	time += dt
-	if fan != null: fan.rotation.y += dt * 1.1
+	if fan != null: fan.rotation.y += dt * 1.6
 	for d in doors: d.update(dt)
 	_update_lights(dt)
 	if state != "play":
@@ -942,6 +1450,10 @@ func _physics_process(dt: float) -> void:
 	_update_ui(dt)
 
 func _update_lights(dt: float) -> void:
+	if not house_power:
+		for b in bulbs: (b.light as OmniLight3D).light_energy = 0.0
+		return
+
 	for b in bulbs:
 		var k := 1.0
 		b.t -= dt
@@ -955,7 +1467,7 @@ func _update_lights(dt: float) -> void:
 			_: k = 0.96 + sin(time * 9.0 + b.pos.x * 3.0) * 0.03
 		(b.light as OmniLight3D).light_energy = b.base * k
 
-func _animate_idle(dt: float) -> void:
+func _animate_idle(_dt: float) -> void:
 	if ghost != null: ghost.position.y = 0.35 + sin(time * 1.3) * 0.08
 	if b_model != null: b_model.rotation.z = sin(time * 0.8) * 0.02
 
@@ -967,10 +1479,13 @@ func _update_player(dt: float) -> void:
 	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN): mv.y -= 1
 	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT): mv.x += 1
 	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): mv.x -= 1
+
 	var crouch := Input.is_physical_key_pressed(KEY_C) or Input.is_physical_key_pressed(KEY_CTRL)
 	var sprint := Input.is_physical_key_pressed(KEY_SHIFT) and mv.y > 0.0 and stamina > 0.0 and not crouch
-	if sprint: stamina = maxf(0.0, stamina - 0.2 * dt)
-	else: stamina = minf(1.0, stamina + 0.13 * dt)
+
+	if sprint: stamina = maxf(0.0, stamina - 0.22 * dt)
+	else: stamina = minf(1.0, stamina + 0.14 * dt)
+
 	var speed := 4.3 if sprint else (1.15 if crouch else 2.2)
 	var wish := (fwd * mv.y + right * mv.x)
 	if wish.length() > 0.0: wish = wish.normalized() * speed
@@ -978,6 +1493,7 @@ func _update_player(dt: float) -> void:
 	player.velocity.z = lerpf(player.velocity.z, wish.z, minf(1.0, 12.0 * dt))
 	player.velocity.y = -2.0
 	player.move_and_slide()
+
 	var moving := Vector2(player.velocity.x, player.velocity.z).length() > 0.4
 	if moving:
 		step_t += Vector2(player.velocity.x, player.velocity.z).length() * dt
@@ -988,33 +1504,63 @@ func _update_player(dt: float) -> void:
 		if noise_cd <= 0.0:
 			noise_cd = 0.3
 			noise(player.position, 11.0 if sprint else (1.8 if crouch else 5.2))
+
+	# Flashlight logic
 	if flash_on:
 		battery = maxf(0.0, battery - 0.0042 * dt)
 		if battery <= 0.0:
-			flash_on = false; flash.visible = false
+			flash_on = false
+			flash.visible = false
 		elif battery < 0.2:
 			flash.light_energy = 6.0 * (1.0 if rng.randf() > 0.25 else 0.1)
 		else: flash.light_energy = 6.0
+
+	# First-person bat swing animation
+	if bat_swinging:
+		bat_swing_t -= dt
+		if bat_swing_t <= 0.0:
+			bat_swinging = false
+			bat_in_hand.position = Vector3(0.3, -0.25, -0.45)
+			bat_in_hand.rotation = Vector3(0.2, -0.4, 0.3)
+		else:
+			var swing_prog := 1.0 - (bat_swing_t / 0.35)
+			bat_in_hand.position = Vector3(0.3 - sin(swing_prog * PI) * 0.4, -0.25 + sin(swing_prog * PI) * 0.2, -0.45 - sin(swing_prog * PI) * 0.3)
+			bat_in_hand.rotation = Vector3(0.2 + swing_prog * 1.5, -0.4 - swing_prog * 1.2, 0.3 - swing_prog * 1.0)
+
 	var eye := 1.0 if crouch else 1.62
 	cam.position.y = lerpf(cam.position.y, eye + sin(time * 9.0) * 0.02 * float(moving), minf(1.0, 9.0 * dt))
 	shake = maxf(0.0, shake - dt * 1.6)
 	cam.rotation = Vector3(pitch + (rng.randf() - 0.5) * shake * 0.03, yaw, sin(time * 5.0) * 0.003 * float(moving))
 	player.rotation = Vector3.ZERO
 
+	# Check player death
+	if health <= 0.0: _die()
+
 func _update_ui(dt: float) -> void:
-	hud_obj.text = "%s\nBatteries found: %d    Key: %s" % [objective(), batteries, "yes" if has_key else "no"]
+	hud_obj.text = "THE LAST REVENGE | Flashlight: %s | Bat: %s" % ["ON" if flash_on else "OFF", "EQUIPPED" if has_bat else "NONE"]
+	bar_health.value = health
 	bar_stam.value = stamina
 	bar_batt.value = battery
+
+	# Build missions summary
+	var m_str := "MISSIONS:\n"
+	for m in missions:
+		m_str += "%s %s\n" % ["[X]" if m.done else "[ ]", m.text]
+	hud_missions.text = m_str
+
 	var f = _find_focus()
 	if f == null: hud_prompt.text = ""
 	elif f.kind == "door":
 		var d: MainDoor = f.door
-		hud_prompt.text = "[E] %s %s%s" % ["Close" if d.target > 0.0 else "Open", d.label, "  (locked)" if d.locked else ""]
-	else: hud_prompt.text = "[E] " + f.label
+		hud_prompt.text = "[E] %s %s%s" % ["Close" if d.target > 0.0 else "Open", d.label, " (LOCKED)" if d.locked else ""]
+	else:
+		hud_prompt.text = "[E] " + f.label
+
 	if msg_t > 0.0:
 		msg_t -= dt
 		if msg_t <= 0.0: hud_msg.text = ""
-	# fear: heartbeat + colour drain scale with the Butcher's proximity
+
+	# Threat: Heartbeat + color drain scale with Butcher's proximity
 	var d := butcher.position.distance_to(player.position)
 	var t := clampf(1.0 - d / 14.0, 0.0, 1.0) if b_state != "patrol" or d < 9.0 else 0.0
 	threat = lerpf(threat, t, minf(1.0, 3.0 * dt))
@@ -1045,11 +1591,17 @@ func b_model_yaw() -> float:
 	return butcher.rotation.y
 
 func _room_lit(p: Vector3) -> bool:
+	if not house_power: return false
 	for b in bulbs:
 		if (b.pos as Vector3).distance_to(p) < 6.5 and b.mode != "off" and b.base > 0.0: return true
 	return false
 
 func _update_butcher(dt: float) -> void:
+	if b_stun > 0.0:
+		b_stun -= dt
+		butcher.velocity = Vector3.ZERO
+		return
+
 	var seen := _can_see_player()
 	if seen:
 		if b_state != "chase": play("stinger", -8.0)
@@ -1063,6 +1615,7 @@ func _update_butcher(dt: float) -> void:
 			b_target = b_last_seen
 			b_path = []
 			b_wait = 4.0
+
 	var speed := 0.0
 	match b_state:
 		"patrol":
@@ -1080,12 +1633,16 @@ func _update_butcher(dt: float) -> void:
 		"chase":
 			b_target = b_last_seen
 			speed = 3.9 if enraged else 3.35
+
 	if speed > 0.0: _walk_to(b_target, speed, dt)
 	else: butcher.velocity = Vector3.ZERO
-	# kill
-	if butcher.position.distance_to(player.position) < 0.95 and state == "play":
+
+	# Butcher kill attack
+	if butcher.position.distance_to(player.position) < 1.1 and state == "play":
+		health -= 100.0
 		_die()
-	# presentation: stride bob, lean, blood-red eyes while chasing
+
+	# Presentation: Stride bob, lean, red eyes
 	var moving := speed > 0.0
 	b_step += dt * speed * 2.0
 	b_model.position.y = absf(sin(b_step)) * 0.05 * float(moving)
@@ -1105,15 +1662,12 @@ func _pick_patrol() -> void:
 	if b_path.size() > 1: b_path.pop_front()
 
 func player_cell_bias(keys: Array) -> String:
-	if rng.randf() < 0.4:
-		return cell_key_at(player.position)
-	var k: String = keys[rng.randi() % keys.size()]
-	return k
+	if rng.randf() < 0.4: return cell_key_at(player.position)
+	return keys[rng.randi() % keys.size()]
 
 func _walk_to(target: Vector3, speed: float, dt: float) -> void:
 	var goal := target
 	if b_state == "chase" or b_state == "investigate" or b_path.size() == 0:
-		# follow the cell graph towards the target so doors get used
 		var from_k := cell_key_at(butcher.position)
 		var to_k := cell_key_at(target)
 		if from_k != to_k and (b_path.size() == 0 or b_path[b_path.size() - 1] != to_k or rng.randf() < 0.02):
@@ -1141,7 +1695,6 @@ func _walk_to(target: Vector3, speed: float, dt: float) -> void:
 		butcher.velocity = dir * speed
 		butcher.velocity.y = -2.0
 		butcher.move_and_slide()
-		# stuck? sidestep
 		b_stuck += dt if butcher.position.distance_to(b_prev) < 0.01 else 0.0
 		b_prev = butcher.position
 		if b_stuck > 1.2:
@@ -1156,79 +1709,71 @@ func _looking_at(p: Vector3, cos_min := 0.6) -> bool:
 	return f.dot(to.normalized()) > cos_min
 
 func _update_characters(dt: float) -> void:
-	# Girl (weeping angel): frozen while seen, creeps closer when you look away.
-	var gd := girl.position.distance_to(player.position)
-	var seen := _looking_at(girl.position) and _los(cam.global_position, girl.position + Vector3(0, 1.2, 0))
-	var to_p := player.position - girl.position
-	girl.rotation.y = lerp_angle(girl.rotation.y, atan2(to_p.x, to_p.z), minf(1.0, 3.0 * dt)) if not seen else girl.rotation.y
-	if not seen and gd < 16.0 and gd > 1.3:
-		girl.position += Vector3(to_p.x, 0, to_p.z).normalized() * 1.1 * dt
-	if gd < 1.2:
-		shake = 1.2
-		post_mat.set_shader_parameter("flash", 0.5)
-		play("stinger", -6.0)
-		stamina = maxf(0.0, stamina - 0.4)
-		girl.position = Vector3(3.2, 0, 3.9)
-		say("Something cold touched your neck.")
-	# Doll watches you.
+	# 1. Lily (Horror Girl - transparent coming and going motion)
+	if girl_alive:
+		if girl_flicker_t > 0.0:
+			girl_flicker_t -= dt
+			# Intense flickering
+			girl.visible = (sin(time * 24.0) > 0.0)
+		else:
+			# Gentle coming and going transparent motion
+			girl_alpha = 0.5 + sin(time * 2.0) * 0.5
+			girl.visible = (girl_alpha > 0.3)
+
+		var gd := girl.position.distance_to(player.position)
+		var seen := _looking_at(girl.position) and _los(cam.global_position, girl.position + Vector3(0, 1.2, 0))
+		var to_p := player.position - girl.position
+
+		if not seen and gd < 18.0 and gd > 1.3:
+			girl.position += Vector3(to_p.x, 0, to_p.z).normalized() * 1.2 * dt
+			girl.rotation.y = lerp_angle(girl.rotation.y, atan2(to_p.x, to_p.z), minf(1.0, 4.0 * dt))
+
+		if gd < 1.2:
+			shake = 1.2
+			post_mat.set_shader_parameter("flash", 0.5)
+			play("stinger", -4.0)
+			health = maxf(0.0, health - 15.0)
+			say("Lily's ghostly cold hand tore into your chest (-15 HP)!")
+			girl.position = Vector3(4.2, 0, 5.9)
+
+	# 2. Pearl (Cursed Doll watches player & cries)
 	var dd := player.position - doll.global_position
 	doll.rotation.y = lerp_angle(doll.rotation.y, atan2(dd.x, dd.z), minf(1.0, 2.0 * dt))
-	# Ghost drifts through the dining room.
-	ghost.position = Vector3(19.0 + sin(time * 0.4) * 1.6, 0.35 + sin(time * 1.3) * 0.1, 10.0 + cos(time * 0.3) * 2.4)
-	ghost.rotation.y = time * 0.4 + PI / 2.0
-	# Woman at the end of the hall: appears, stares, vanishes when you get close or look for long.
+
+	# 3. Ada (Ghost drifts through Living Room)
+	ghost.position = Vector3(5.2 + sin(time * 0.5) * 1.4, 0.35 + sin(time * 1.2) * 0.1, 9.5 + cos(time * 0.4) * 1.8)
+	ghost.rotation.y = time * 0.5 + PI / 2.0
+
+	# 4. Mira (The Woman in Horror Corridor)
 	if woman.visible:
-		woman_life -= dt
 		var wp := player.position - woman.position
 		woman.rotation.y = atan2(wp.x, wp.z)
-		if wp.length() < 4.5 or woman_life <= 0.0:
-			woman.visible = false
-			woman_t = rng.randf_range(30.0, 55.0)
-			play("stinger", -10.0)
-	else:
-		woman_t -= dt
-		if woman_t <= 0.0 and room_of.get(cell_key_at(player.position), {}).get("id", "") == "hall":
-			var fwd := Vector3(-sin(yaw), 0, -cos(yaw))
-			woman.position = Vector3(clampf(player.position.x + fwd.x * 10.0, 3.0, 26.0), 0, 6.0)
-			woman.visible = true
-			woman_life = 5.0
-			say("...", 2.0)
-	# Rat scurries around.
-	rat_t -= dt
-	if not rat.visible and rat_t <= 0.0:
-		rat.visible = true
-		var side := 1.0 if rng.randf() > 0.5 else -1.0
-		rat.position = Vector3(player.position.x - side * 7.0, 0.0, 5.3 + rng.randf() * 1.4)
-		rat.set_meta("dir", side)
-		rat.rotation.y = PI / 2.0 if side > 0.0 else -PI / 2.0
-	elif rat.visible:
-		var s: float = rat.get_meta("dir")
-		rat.position.x += s * 3.4 * dt
-		rat.position.y = absf(sin(time * 26.0)) * 0.012
-		if absf(rat.position.x - player.position.x) > 10.0 and (rat.position.x - player.position.x) * s > 0.0:
-			rat.visible = false
-			rat_t = rng.randf_range(10.0, 22.0)
+
+	# 5. Street Rat (Runs toward player and bites!)
+	if rat_alive:
+		var rd := rat.position.distance_to(player.position)
+		if rd < 8.0:
+			var rdir := (player.position - rat.position).normalized()
+			rat.position += Vector3(rdir.x, 0, rdir.z) * 2.2 * dt
+			rat.rotation.y = atan2(rdir.x, rdir.z)
+
+		rat_bite_cd -= dt
+		if rd < 0.9 and rat_bite_cd <= 0.0:
+			rat_bite_cd = 2.5
+			health = maxf(0.0, health - 5.0)
+			play("rat_bite", 2.0)
+			play("rat_squeak", 0.0)
+			shake = 0.5
+			post_mat.set_shader_parameter("flash", 0.25)
+			say("The street rat bit your ankle! (-5 HP)", 3.0)
 
 func _update_director(dt: float) -> void:
-	scare_t -= dt
-	if scare_t <= 0.0:
-		scare_t = rng.randf_range(16.0, 32.0)
-		var pick := rng.randi() % 3
-		var pk := cell_key_at(player.position)
-		match pick:
-			0:
-				for b in bulbs:
-					if (b.pos as Vector3).distance_to(player.position) < 8.0:
-						b.mode = "flicker"
-						get_tree().create_timer(2.5).timeout.connect(func(): b.mode = "on")
-			1:
-				play("door", -4.0)
-				for d in doors:
-					if d.target > 0.0 and d.pos.distance_to(player.position) < 12.0:
-						d.speed = 9.0
-						d.close()
-						noise(d.pos, 10.0)
-						break
-			2:
-				play("stinger", -14.0)
-				say("Footsteps. Not yours.", 3.0)
+	# Periodic clock tick sound
+	if clock != null and int(time) != int(time - dt):
+		p_clock.stream = snd["clock_tick"]
+		p_clock.play()
+
+	# Random house fright events
+	if rng.randf() < 0.003:
+		play("door", -4.0)
+		say("A door slammed in the darkness...", 3.0)
