@@ -24,4 +24,3 @@ func interact(_player: Node) -> void:
 	var target_angle := _initial_rotation_y + (open_angle if is_open else 0.0)
 	var tween := create_tween()
 	tween.tween_property(self, "rotation_degrees:y", target_angle, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-

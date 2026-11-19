@@ -46,4 +46,3 @@ func change_level(level_num: int) -> void:
 
 func resurrect() -> void:
 	GameState.trigger_resurrection()
-

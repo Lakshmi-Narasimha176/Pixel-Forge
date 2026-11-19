@@ -56,4 +56,3 @@ func _update_current_objective() -> void:
 			return
 	current_objective = {}
 	objective_updated.emit(current_objective)
-

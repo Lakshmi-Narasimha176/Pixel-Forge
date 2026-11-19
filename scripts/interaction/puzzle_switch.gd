@@ -38,4 +38,3 @@ func interact(_player: Node) -> void:
 		elif puzzle_id == "puzzle_l4_anchors" and count >= 3:
 			GameState.set_flag("l4_portal_unlocked", true)
 			GameState.show_subtitle("System", "All soul anchors aligned! Void rift opened.", 4.0)
-
