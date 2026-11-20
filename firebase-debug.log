@@ -1,0 +1,103 @@
+[debug] [2026-11-20T06:46:18.780Z] ----------------------------------------------------------------------
+[debug] [2026-11-20T06:46:18.787Z] Command:       /opt/homebrew/Cellar/node/26.13.1_2/bin/node /opt/homebrew/bin/firebase deploy --only hosting --project orvexgames-49f8a
+[debug] [2026-11-20T06:46:18.788Z] CLI Version:   15.24.0
+[debug] [2026-11-20T06:46:18.788Z] Platform:      darwin
+[debug] [2026-11-20T06:46:18.788Z] Node Version:  v26.13.1
+[debug] [2026-11-20T06:46:18.788Z] Detected Agent: antigravity
+[debug] [2026-11-20T06:46:18.789Z] Time:          Fri Nov 20 2026 12:16:18 GMT+0530 (India Standard Time)
+[debug] [2026-11-20T06:46:18.789Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-11-20T06:46:22.181Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-11-20T06:46:22.182Z] > authorizing via signed-in user (mallikarjunr444@gmail.com)
+[debug] [2026-11-20T06:46:22.182Z] [iam] checking project orvexgames-49f8a for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-11-20T06:46:22.207Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:22.207Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:22.209Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/orvexgames-49f8a:testIamPermissions [none]
+[debug] [2026-11-20T06:46:22.209Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/orvexgames-49f8a:testIamPermissions  x-goog-user-project=orvexgames-49f8a
+[debug] [2026-11-20T06:46:22.209Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/orvexgames-49f8a:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-11-20T06:46:23.824Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/orvexgames-49f8a:testIamPermissions 200
+[debug] [2026-11-20T06:46:23.824Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/orvexgames-49f8a:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-11-20T06:46:23.826Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:23.826Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:23.826Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/orvexgames-49f8a [none]
+[debug] [2026-11-20T06:46:24.653Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/orvexgames-49f8a 200
+[debug] [2026-11-20T06:46:24.654Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/orvexgames-49f8a {"projectId":"orvexgames-49f8a","projectNumber":"808734268673","displayName":"orvexgames","name":"projects/orvexgames-49f8a","resources":{"hostingSite":"orvexgames-49f8a"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_3ec61e91-b1e5-4130-a39f-9b12906d675a"}
+[info] 
+[info] === Deploying to 'orvexgames-49f8a'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2026-11-20T06:46:24.659Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:24.659Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:24.659Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/orvexgames-49f8a/sites/orvexgames-49f8a [none]
+[debug] [2026-11-20T06:46:25.876Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/orvexgames-49f8a/sites/orvexgames-49f8a 200
+[debug] [2026-11-20T06:46:25.877Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/orvexgames-49f8a/sites/orvexgames-49f8a {"name":"projects/orvexgames-49f8a/sites/orvexgames-49f8a","defaultUrl":"https://orvexgames-49f8a.web.app","type":"DEFAULT_SITE"}
+[debug] [2026-11-20T06:46:25.881Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:25.882Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:46:25.883Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/orvexgames-49f8a/versions [none]
+[debug] [2026-11-20T06:46:25.883Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/orvexgames-49f8a/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-11-20T06:46:28.035Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/orvexgames-49f8a/versions 200
+[debug] [2026-11-20T06:46:28.035Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/orvexgames-49f8a/versions {"name":"projects/808734268673/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[orvexgames-49f8a]: beginning deploy... 
+[info] i  hosting[orvexgames-49f8a]: found 9 files in build/web 
+[debug] [2026-11-20T06:46:28.052Z] [hosting] uploading with 200 concurrency
+[debug] [2026-11-20T06:46:28.052Z] [hosting] hash cache [YnVpbGQvd2Vi] not populated
+[debug] [2026-11-20T06:49:53.691Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:53.695Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:53.701Z] [hosting] hash cache [YnVpbGQvd2Vi] stored for 9 files
+[debug] [2026-11-20T06:49:53.702Z] [hosting][hash queue][FINAL] {"max":205632,"min":6,"avg":24554.555555555555,"active":0,"complete":9,"success":9,"errored":0,"retried":0,"total":9,"elapsed":205649}
+[debug] [2026-11-20T06:49:53.704Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/808734268673/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e:populateFiles [none]
+[debug] [2026-11-20T06:49:53.704Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/808734268673/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e:populateFiles {"files":{"/index.audio.worklet.js":"c18aeb2f6a72ea1897124a0eefd92b7d4229483deb6404d1161e3be48ebda6cc","/index.audio.position.worklet.js":"31877ef2b7964019e2de87b58d7af1480c24db6bd7faa7c8933adec44cb26abb","/index.apple-touch-icon.png":"528259fca467b497dea5735bfcba1ca7552cbbc1392607dbe1242d7f1c6ce8af","/index.html":"3f2aed01d28cca82ac1ba0e05a5d2e94d83240988d1fdafec449a4316635382f","/index.png":"13d46db8bf872902460be4d1a43ec97d7c60f5d1119d8ab1e515cc11d2e55661","/index.icon.png":"4226e9a9b7ffaa35859a1d9a49fd5cfebf1a8d0b6cb24522527bf330c2c7de89","/index.js":"dc17fc93ecdc0f1408909b61c96d3d60c00189d63ffd2c5af03bd5efa9815f05","/index.wasm":"a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f","/index.pck":"17cf31cdb45f6e5b614b5077ef36919c05a65f438a7c3ccba6e0475d67d04b79"}}
+[debug] [2026-11-20T06:49:55.188Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/808734268673/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e:populateFiles 200
+[debug] [2026-11-20T06:49:55.189Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/808734268673/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e:populateFiles {"uploadRequiredHashes":["c18aeb2f6a72ea1897124a0eefd92b7d4229483deb6404d1161e3be48ebda6cc","31877ef2b7964019e2de87b58d7af1480c24db6bd7faa7c8933adec44cb26abb","4226e9a9b7ffaa35859a1d9a49fd5cfebf1a8d0b6cb24522527bf330c2c7de89","13d46db8bf872902460be4d1a43ec97d7c60f5d1119d8ab1e515cc11d2e55661","a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f","dc17fc93ecdc0f1408909b61c96d3d60c00189d63ffd2c5af03bd5efa9815f05","528259fca467b497dea5735bfcba1ca7552cbbc1392607dbe1242d7f1c6ce8af","3f2aed01d28cca82ac1ba0e05a5d2e94d83240988d1fdafec449a4316635382f","17cf31cdb45f6e5b614b5077ef36919c05a65f438a7c3ccba6e0475d67d04b79"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files"}
+[debug] [2026-11-20T06:49:55.194Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.194Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.195Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.195Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.196Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.196Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.197Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.197Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.197Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.197Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.203Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.203Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.203Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.206Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.207Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.208Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.209Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.209Z] Checked if tokens are valid: true, expires at: 1795160744462
+[debug] [2026-11-20T06:49:55.210Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/c18aeb2f6a72ea1897124a0eefd92b7d4229483deb6404d1161e3be48ebda6cc [none]
+[debug] [2026-11-20T06:49:55.210Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/c18aeb2f6a72ea1897124a0eefd92b7d4229483deb6404d1161e3be48ebda6cc [stream]
+[debug] [2026-11-20T06:49:55.220Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/31877ef2b7964019e2de87b58d7af1480c24db6bd7faa7c8933adec44cb26abb [none]
+[debug] [2026-11-20T06:49:55.220Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/31877ef2b7964019e2de87b58d7af1480c24db6bd7faa7c8933adec44cb26abb [stream]
+[debug] [2026-11-20T06:49:55.221Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/4226e9a9b7ffaa35859a1d9a49fd5cfebf1a8d0b6cb24522527bf330c2c7de89 [none]
+[debug] [2026-11-20T06:49:55.221Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/4226e9a9b7ffaa35859a1d9a49fd5cfebf1a8d0b6cb24522527bf330c2c7de89 [stream]
+[debug] [2026-11-20T06:49:55.225Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/13d46db8bf872902460be4d1a43ec97d7c60f5d1119d8ab1e515cc11d2e55661 [none]
+[debug] [2026-11-20T06:49:55.225Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/13d46db8bf872902460be4d1a43ec97d7c60f5d1119d8ab1e515cc11d2e55661 [stream]
+[debug] [2026-11-20T06:49:55.227Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f [none]
+[debug] [2026-11-20T06:49:55.228Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/a1a6d45d70363dcf625dfe3cc3e860358292574d5394411f9747d3aafb30030f [stream]
+[debug] [2026-11-20T06:49:55.229Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/dc17fc93ecdc0f1408909b61c96d3d60c00189d63ffd2c5af03bd5efa9815f05 [none]
+[debug] [2026-11-20T06:49:55.229Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/dc17fc93ecdc0f1408909b61c96d3d60c00189d63ffd2c5af03bd5efa9815f05 [stream]
+[debug] [2026-11-20T06:49:55.230Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/528259fca467b497dea5735bfcba1ca7552cbbc1392607dbe1242d7f1c6ce8af [none]
+[debug] [2026-11-20T06:49:55.230Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/528259fca467b497dea5735bfcba1ca7552cbbc1392607dbe1242d7f1c6ce8af [stream]
+[debug] [2026-11-20T06:49:55.231Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/3f2aed01d28cca82ac1ba0e05a5d2e94d83240988d1fdafec449a4316635382f [none]
+[debug] [2026-11-20T06:49:55.231Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/3f2aed01d28cca82ac1ba0e05a5d2e94d83240988d1fdafec449a4316635382f [stream]
+[debug] [2026-11-20T06:49:55.235Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/17cf31cdb45f6e5b614b5077ef36919c05a65f438a7c3ccba6e0475d67d04b79 [none]
+[debug] [2026-11-20T06:49:55.235Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/17cf31cdb45f6e5b614b5077ef36919c05a65f438a7c3ccba6e0475d67d04b79 [stream]
+[debug] [2026-11-20T06:49:55.242Z] [hosting][populate queue][FINAL] {"max":1523,"min":1523,"avg":1523,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1556}
+[debug] [2026-11-20T06:49:55.243Z] [hosting] uploads queued: 9
+[debug] [2026-11-20T06:49:56.570Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/dc17fc93ecdc0f1408909b61c96d3d60c00189d63ffd2c5af03bd5efa9815f05 200
+[debug] [2026-11-20T06:49:56.571Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/dc17fc93ecdc0f1408909b61c96d3d60c00189d63ffd2c5af03bd5efa9815f05 [stream]
+[debug] [2026-11-20T06:49:56.617Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/c18aeb2f6a72ea1897124a0eefd92b7d4229483deb6404d1161e3be48ebda6cc 200
+[debug] [2026-11-20T06:49:56.618Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/c18aeb2f6a72ea1897124a0eefd92b7d4229483deb6404d1161e3be48ebda6cc [stream]
+[debug] [2026-11-20T06:49:56.633Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/528259fca467b497dea5735bfcba1ca7552cbbc1392607dbe1242d7f1c6ce8af 200
+[debug] [2026-11-20T06:49:56.634Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/528259fca467b497dea5735bfcba1ca7552cbbc1392607dbe1242d7f1c6ce8af [stream]
+[debug] [2026-11-20T06:49:56.635Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/31877ef2b7964019e2de87b58d7af1480c24db6bd7faa7c8933adec44cb26abb 200
+[debug] [2026-11-20T06:49:56.635Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/31877ef2b7964019e2de87b58d7af1480c24db6bd7faa7c8933adec44cb26abb [stream]
+[debug] [2026-11-20T06:49:56.672Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/4226e9a9b7ffaa35859a1d9a49fd5cfebf1a8d0b6cb24522527bf330c2c7de89 200
+[debug] [2026-11-20T06:49:56.672Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/4226e9a9b7ffaa35859a1d9a49fd5cfebf1a8d0b6cb24522527bf330c2c7de89 [stream]
+[debug] [2026-11-20T06:49:56.825Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/13d46db8bf872902460be4d1a43ec97d7c60f5d1119d8ab1e515cc11d2e55661 200
+[debug] [2026-11-20T06:49:56.825Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/13d46db8bf872902460be4d1a43ec97d7c60f5d1119d8ab1e515cc11d2e55661 [stream]
+[debug] [2026-11-20T06:49:56.864Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/3f2aed01d28cca82ac1ba0e05a5d2e94d83240988d1fdafec449a4316635382f 200
+[debug] [2026-11-20T06:49:56.868Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/orvexgames-49f8a/versions/40c55b6d106cbb9e/files/3f2aed01d28cca82ac1ba0e05a5d2e94d83240988d1fdafec449a4316635382f [stream]
