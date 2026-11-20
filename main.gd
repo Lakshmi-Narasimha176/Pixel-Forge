@@ -2227,14 +2227,17 @@ func _update_characters(dt: float) -> void:
 		var gd := girl.position.distance_to(player.position)
 		var to_p := player.position - girl.position
 
+		# Player flashlight slows and deters Lily from rushing
+		var being_lit := flash_on and _looking_at(girl.position) and _los(cam.global_position, girl.position + Vector3(0, 1.2, 0))
+		var walk_speed := 0.6 if being_lit else (1.1 if not has_bat else 1.35)
+
 		# Lily walks toward the entry / player with procedural walking stride motion
 		if gd < 24.0 and gd > 1.15:
-			var walk_speed := 1.45
 			var move_dir := Vector3(to_p.x, 0, to_p.z).normalized()
 			girl.position += move_dir * walk_speed * dt
 			girl.rotation.y = lerp_angle(girl.rotation.y, atan2(to_p.x, to_p.z), minf(1.0, 5.0 * dt))
 			# Procedural walk cycle: bobbing, sway, and eerie creeping lean
-			girl_walk_t += dt * 5.2
+			girl_walk_t += dt * (3.0 if being_lit else 5.2)
 			girl_model.position.y = abs(sin(girl_walk_t * 2.0)) * 0.08
 			girl_model.rotation.z = sin(girl_walk_t) * 0.05
 			girl_model.rotation.x = 0.06
@@ -2243,9 +2246,9 @@ func _update_characters(dt: float) -> void:
 			girl_model.rotation.z = lerpf(girl_model.rotation.z, 0.0, dt * 6.0)
 			girl_model.rotation.x = lerpf(girl_model.rotation.x, 0.0, dt * 6.0)
 
-		# 4 bites kill the human (each bite deals exactly 25 HP)
+		# 4 bites kill the human (each bite deals exactly 25 HP) with fair recovery window
 		if gd <= 1.25 and girl_hit_cd <= 0.0:
-			girl_hit_cd = 2.5
+			girl_hit_cd = 5.0
 			shake = 1.5
 			post_mat.set_shader_parameter("flash", 0.7)
 			play("ghost_bite", 4.0)
@@ -2253,12 +2256,15 @@ func _update_characters(dt: float) -> void:
 			health = maxf(0.0, health - 25.0)
 			var bites_rem := int(ceil(health / 25.0))
 			if bites_rem > 0:
-				say("Lily bit you (-25 HP)! 4 bites kill the human — %d bite%s left! Strike her when she flickers visible!" % [bites_rem, "s" if bites_rem != 1 else ""], 5.0)
+				if not has_bat:
+					say("Lily bit you (-25 HP)! 4 bites kill (%d left). RUN TO THE STUDY FOR THE BAT!" % bites_rem, 5.5)
+				else:
+					say("Lily bit you (-25 HP)! 4 bites kill (%d left). Shine flashlight to slow her or strike with bat!" % bites_rem, 5.5)
 			else:
 				say("Lily delivered the 4th fatal bite! You collapsed...", 5.0)
-			# Flicker and back off slightly to stalk again
+			# Flicker and retreat into shadows so player has time to maneuver
 			girl_flicker_t = 3.5
-			girl.position += (girl.position - player.position).normalized() * 3.0
+			girl.position += (girl.position - player.position).normalized() * 8.5
 
 	# 2. Pearl (Cursed Doll watches player & cries)
 	var dd := player.position - doll.global_position
