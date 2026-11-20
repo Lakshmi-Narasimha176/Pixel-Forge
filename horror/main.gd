@@ -667,6 +667,24 @@ func _build_dressing() -> void:
 	diorama.position = Vector3(24.8, 0, 9.5)
 	add_child(diorama)
 
+	# Ominous red light shining from inside Slaughterhouse through the doors
+	var sl_glow := OmniLight3D.new()
+	sl_glow.light_color = Color(1.0, 0.18, 0.1)
+	sl_glow.light_energy = 3.0
+	sl_glow.omni_range = 8.0
+	sl_glow.position = Vector3(23.0, 1.8, 10.0)
+	add_child(sl_glow)
+
+	# Father viewing window in dining room door (bars to see the Butcher inside)
+	var grate := MeshInstance3D.new()
+	var gm := BoxMesh.new()
+	gm.size = Vector3(0.12, 0.6, 0.45)
+	grate.mesh = gm
+	var gmat := _mat(Color(0.15, 0.15, 0.15), 0.3, 0.9)
+	grate.material_override = gmat
+	grate.position = Vector3(21.0, 1.5, 10.0)
+	add_child(grate)
+
 	# Blood-soaked walls continue through the house, not just the slaughter room.
 	for bpos in [
 		Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8),
@@ -724,6 +742,9 @@ func _build_dressing() -> void:
 	var corr := fit("corridor", 2.8)
 	corr.position = Vector3(-7.5, 0, 6.0)
 	corr.rotation.y = PI / 2.0
+	for c in corr.find_children("*", "MeshInstance3D", true, false):
+		if "backside" in c.name.to_lower():
+			(c as MeshInstance3D).visible = false
 	add_child(corr)
 
 	# Underground Tunnel (The secret entrance and exit route connecting to south house door)
@@ -1685,7 +1706,7 @@ func _interact() -> void:
 						b_state = "chase"
 						b_last_seen = player.position
 					else:
-						say("Locked by Abel Crane (Father). Lily holds Father's key! Defeat her with the bat.")
+						say("Locked: Slaughterhouse (Father's Room). You can hear Abel Crane breathing inside! Slay Lily with the bat to get Father's Key.", 7.0)
 						play("click", -6.0)
 						return
 				elif d.lock == "corridor":

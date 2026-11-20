@@ -611,8 +611,9 @@ func _collect_lore(it: Dictionary) -> void:
 	if lore_found.has(page.id):
 		return
 	super(it)
-	if cine_cam != null and CineData.FLASHBACKS.has(page.id):
-		_cs_start("flashback", {"id": page.id, "text": overlay_label.text})
+	# Safe readable lore reading: do not black out screen with broken (400,400) camera
+	play("book", -2.0)
+	play("stinger", -12.0)
 
 func _close_reading() -> void:
 	if state == "reading":
@@ -686,6 +687,9 @@ func _update_player(dt: float) -> void:
 		flash.light_energy = 6.0 * (1.0 if rng.randf() > 0.35 else 0.15)
 
 func _physics_process(dt: float) -> void:
+	if state == "reading":
+		if rat != null: rat.velocity = Vector3.ZERO
+		return
 	super(dt)
 	if state == "cinematic":
 		_unpause_audio()
