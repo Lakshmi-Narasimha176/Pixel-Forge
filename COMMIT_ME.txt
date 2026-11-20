@@ -1,0 +1,6 @@
+Copy the "horror" folder and PLUS_UPDATE.md into your Pixel-Forge project (overwrite horror/main.tscn), then:
+
+  cd Pixel-Forge
+  git add horror/main_plus.gd horror/main.tscn PLUS_UPDATE.md
+  git commit -m "Plus update: unblock doors, wall switches + breaker, blood decals, story audio"
+  git push origin main
