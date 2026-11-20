@@ -174,6 +174,7 @@ var b_model: Node3D
 var b_step := 0.0
 var b_stun := 0.0
 var enraged := false
+var butcher_confined := true
 
 # apparitions & entities
 var girl: CharacterBody3D       # Lily (Horror Girl - holds Father's Key)
@@ -1169,6 +1170,7 @@ func _reset_run() -> void:
 	flash_on = false
 	flash.visible = false
 	has_father_key = false
+	butcher_confined = true
 	has_mira_key = false
 	has_bible = false
 	has_bat = false
@@ -1288,7 +1290,7 @@ func _bat_attack() -> void:
 	# Raycast forward to check hit
 	var fwd := -cam.global_transform.basis.z
 	# 1. Hit Lily (Horror Girl)
-	if girl_alive and girl.visible and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 2.5, fwd):
+	if girl_alive and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 2.5, fwd):
 		girl_alive = false
 		play("ghost_hit", 4.0)
 		say("You struck Lily! Her spirit dissolves into ash...")
@@ -1361,11 +1363,15 @@ func _interact() -> void:
 				if d.lock == "slaughter":
 					if has_father_key:
 						d.locked = false
+						butcher_confined = false
 						for o in doors: if o.lock == "slaughter": o.locked = false
-						say("Father's key unlocks the heavy slaughterhouse door.")
-						play("click")
+						say("You unlocked Father's Slaughterhouse! The Butcher is awake!")
+						play("door")
+						play("stinger", 2.0)
+						b_state = "chase"
+						b_last_seen = player.position
 					else:
-						say("Locked by Abel Crane. Lily holds Father's key!")
+						say("Locked by Abel Crane (Father). Lily holds Father's key! Defeat her with the bat.")
 						play("click", -6.0)
 						return
 				elif d.lock == "corridor":
@@ -1644,6 +1650,9 @@ func _update_ui(dt: float) -> void:
 
 # ------------------------------------------------------------ the Butcher
 func _can_see_player() -> bool:
+	if butcher_confined:
+		var p_room: String = room_of.get(cell_key_at(player.position), {}).get("id", "")
+		if p_room != "slaughter": return false
 	var to := player.position - butcher.position
 	var d := to.length()
 	var lit := flash_on or _room_lit(player.position)
@@ -1723,6 +1732,12 @@ func _update_butcher(dt: float) -> void:
 	p_butcher.volume_db = 4.0
 
 func _pick_patrol() -> void:
+	if butcher_confined:
+		var s_cells := ["11,4", "11,5", "12,4", "12,5", "13,4", "13,5"]
+		var dest: String = s_cells[rng.randi() % s_cells.size()]
+		b_path = nav_path(cell_key_at(butcher.position), dest)
+		if b_path.size() > 1: b_path.pop_front()
+		return
 	var keys := cells.keys()
 	var pk: String = player_cell_bias(keys)
 	b_path = nav_path(cell_key_at(butcher.position), pk)
@@ -1747,7 +1762,11 @@ func _walk_to(target: Vector3, speed: float, dt: float) -> void:
 		var cur_k := cell_key_at(butcher.position)
 		var dr = door_between(cur_k, nk)
 		if dr != null and dr.kind == "door":
-			dr.locked = false
+			if dr.locked:
+				b_path = []
+				b_wait = 2.0
+				butcher.velocity = Vector3.ZERO
+				return
 			if dr.amount < 0.6:
 				dr.open_from(butcher.position)
 				if butcher.position.distance_to(dr.pos) < 1.6:
