@@ -222,7 +222,7 @@ var missions := [
 	{"id": "bible", "text": "Unlock the slaughterhouse and take the Devil's Bible", "required": true, "done": false},
 	{"id": "escape", "text": "Return to the underground tunnel and escape", "required": true, "done": false},
 	{"id": "ada", "text": "Free Ada's blood-stained spirit with the bat", "required": false, "done": false},
-	{"id": "mira_key", "text": "Find Mira's key beside the west corridor", "required": false, "done": false},
+	{"id": "mira_key", "text": "Find Mira's key down the hall (12m from corridor door)", "required": false, "done": false},
 	{"id": "mira", "text": "Unlock the west corridor and free the Butcher's wife", "required": false, "done": false},
 	{"id": "breaker", "text": "Restore power after causing a short circuit", "required": false, "done": false},
 	{"id": "memories", "text": "Recover all four family memories", "required": false, "done": false},
@@ -951,23 +951,30 @@ func _build_items() -> void:
 		"label": "Take Ada's Walkie-Talkie"
 	})
 
-	# 3. Mira's Key (near Horror Corridor entrance in hallway)
+	# 3. Mira's Corridor Key (Placed 12.5 meters away from corridor door at x=1.0, z=6.0)
 	var tm := TorusMesh.new()
 	tm.inner_radius = 0.035
 	tm.outer_radius = 0.07
 	var mi := MeshInstance3D.new()
 	mi.mesh = tm
-	var mk_mat := _mat(Color(0.9, 0.3, 0.3), 0.3, 0.8)
+	var mk_mat := _mat(Color(0.95, 0.25, 0.25), 0.3, 0.8)
 	mk_mat.emission_enabled = true
-	mk_mat.emission = Color(0.9, 0.2, 0.2)
-	mk_mat.emission_energy_multiplier = 1.6
+	mk_mat.emission = Color(1.0, 0.2, 0.2)
+	mk_mat.emission_energy_multiplier = 2.0
 	mi.material_override = mk_mat
-	mi.position = Vector3(2.2, 0.65, 6.0)
+	var key_pos := Vector3(13.5, 0.75, 6.0) # Exactly 12.5m from corridor door
+	mi.position = key_pos
 	add_child(mi)
+	var kglow := OmniLight3D.new()
+	kglow.light_color = Color(1.0, 0.3, 0.3)
+	kglow.light_energy = 1.8
+	kglow.omni_range = 2.5
+	kglow.position = key_pos + Vector3(0, 0.3, 0)
+	add_child(kglow)
 	interact.append({
 		"kind": "mira_key",
 		"node": mi,
-		"pos": Vector3(2.2, 0.65, 6.0),
+		"pos": key_pos,
 		"label": "Take Mira's Corridor Key"
 	})
 
@@ -1705,7 +1712,7 @@ func _interact() -> void:
 						say("Mira's key unlocks the corridor wing.")
 						play("click")
 					else:
-						say("Locked. Mira's corridor key is needed.")
+						say("Locked: Corridor door. Mira's key is down the hall (about 12 meters away).", 5.0)
 						play("click", -6.0)
 						return
 				elif d.lock == "front":
