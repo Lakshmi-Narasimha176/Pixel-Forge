@@ -559,10 +559,10 @@ func _plus_update(dt: float) -> void:
 	# Pearl's blood tears
 	var ph := fmod(time * 0.7, 1.0)
 	for i in _tears.size():
-		var tr := _tears[i] as MeshInstance3D
+		var tear_mesh := _tears[i] as MeshInstance3D
 		var pp := fmod(ph + 0.5 * i, 1.0)
-		tr.position.y = 0.41 - pp * 0.28
-		tr.visible = not pearl_comforted
+		tear_mesh.position.y = 0.41 - pp * 0.28
+		tear_mesh.visible = not pearl_comforted
 
 	# Lily's giggle
 	_giggle_t -= dt
