@@ -8,21 +8,27 @@ const CHAPTERS := [
 	{
 		"id": "the_hollis_house",
 		"title": "The Hollis House",
-		"intro": "Nora returns to the Hollis house after Ada's voice breaks through a dead walkie-talkie. Her father, Abel Crane, now hunts the rooms as the Butcher. Mira, his wife, haunts the corridor; Ada, Nora's younger sister, drifts through the vintage living room as a blood-stained spirit. A translucent girl named Lily holds the key to the slaughterhouse. Find the bat, free the spirits, take the Devil's Bible, and escape through the tunnel.",
-		"obj": "Find a way into the slaughterhouse and escape with the Devil's Bible.",
+		"intro": "Nora returns through the underground tunnel after Ada's voice breaks through a dead walkie-talkie. Her father, Abel Crane, now hunts the rooms as the Butcher. Mira, his wife, haunts the corridor; Ada, Nora's younger sister, drifts through the vintage living room as a blood-stained spirit. A translucent girl named Lily holds the key to the slaughterhouse. Restore power, find the bat, defeat Lily, take the Devil's Bible, and escape through the tunnel.",
+		"obj": "Follow the lanterns into the dining room, find Father's key, and escape with the Devil's Bible. Recover the family memories and free the spirits for the true ending.",
 	}
 ]
 
 const MINI_MISSIONS := [
-	{"id": "bat", "text": "Find the bloody baseball bat."},
-	{"id": "walkie", "text": "Find Ada's walkie-talkie and call her with R."},
-	{"id": "lily", "text": "Defeat Lily to claim Father's key."},
-	{"id": "ada", "text": "Lay Ada's blood-stained spirit to rest."},
-	{"id": "mira", "text": "Free Mira, the Butcher's wife, in the corridor."},
-	{"id": "breaker", "text": "Restore power at the master breaker after a short circuit."},
-	{"id": "mira_key", "text": "Collect Mira's corridor key beside the wing entrance."},
-	{"id": "bible", "text": "Take the Devil's Bible from the slaughterhouse."},
-	{"id": "escape", "text": "Return to the tunnel and escape."},
+	{"id": "power", "text": "Switch on the outside master breaker.", "required": true},
+	{"id": "enter", "text": "Follow the lanterns into the dining room.", "required": true},
+	{"id": "bat", "text": "Find the bloody baseball bat in the study.", "required": true},
+	{"id": "walkie", "text": "Find Ada's walkie-talkie; press R for contextual guidance.", "required": true},
+	{"id": "lily", "text": "Defeat Lily while she is visible.", "required": true},
+	{"id": "father_key", "text": "Collect Father's slaughterhouse key.", "required": true},
+	{"id": "bible", "text": "Take the Devil's Bible from the slaughterhouse.", "required": true},
+	{"id": "escape", "text": "Return to the tunnel and escape.", "required": true},
+	{"id": "ada", "text": "Lay Ada's blood-stained spirit to rest.", "required": false},
+	{"id": "mira_key", "text": "Collect Mira's corridor key beside the wing entrance.", "required": false},
+	{"id": "mira", "text": "Free Mira, the Butcher's wife, in the corridor.", "required": false},
+	{"id": "breaker", "text": "Restore power after a short circuit.", "required": false},
+	{"id": "memories", "text": "Recover all four family memories.", "required": false},
+	{"id": "pearl", "text": "Find Pearl's drawing and comfort the crying doll.", "required": false},
+	{"id": "rat", "text": "Stop the biting street rat.", "required": false},
 ]
 
 const LORE_PAGES := [
