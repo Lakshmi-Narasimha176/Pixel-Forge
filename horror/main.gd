@@ -194,6 +194,7 @@ var girl_meshes: Array = []
 var girl_alpha := 0.0
 var girl_alive := true
 var girl_flicker_t := 0.0
+var girl_walk_t := 0.0
 var ghost_alive := true
 var woman_alive := true
 var doll: Node3D                 # Pearl (Cursed Doll - weeping)
@@ -884,7 +885,8 @@ func _build_characters() -> void:
 		var apparition_mesh := mesh as MeshInstance3D
 		apparition_mesh.transparency = 0.5
 		girl_meshes.append(apparition_mesh)
-	girl.position = Vector3(4.2, 0, 5.9)
+	girl.position = Vector3(18.0, 0, 10.5)
+	girl.rotation.y = 0.0
 	add_child(girl)
 	p_girl = AudioStreamPlayer3D.new()
 	p_girl.unit_size = 3.0
@@ -1204,6 +1206,7 @@ func _build_audio() -> void:
 	snd["rat_bite"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 30.0) + sin(TAU * 2400.0 * t) * exp(-t * 20.0)) * 0.7, 0.25)
 	snd["bat_swing"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * 0.5 + sin(TAU * (120.0 + 300.0 * t / 0.3) * t)) * sin(PI * t / 0.3) * 0.6, 0.3)
 	snd["ghost_hit"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 8.0) + sin(TAU * 650.0 * t) * exp(-t * 14.0)) * 0.8, 0.4)
+	snd["ghost_bite"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 22.0) + sin(TAU * 260.0 * t) * exp(-t * 16.0)) * 0.85, 0.35)
 	snd["spark"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * (1.0 if sin(t * 120.0) > 0.3 else 0.1) * exp(-t * 6.0)) * 0.8, 0.5)
 	snd["radio"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * 0.4 + sin(TAU * 880.0 * t) * 0.2) * exp(-t * 4.0), 0.6)
 	snd["eat"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 40.0) + sin(TAU * 200.0 * t) * exp(-t * 20.0)) * 0.6, 0.35)
@@ -1478,9 +1481,11 @@ func _reset_run() -> void:
 	house_power = false
 	short_circuit_t = 0.0
 	girl_alive = true
-	girl.position = Vector3(4.2, 0, 5.9)
+	girl.position = Vector3(18.0, 0, 10.5)
+	girl.rotation.y = 0.0
 	girl.visible = true
 	girl_flicker_t = 0.0
+	girl_walk_t = 0.0
 	ghost_alive = true
 	ghost.visible = true
 	woman_alive = true
@@ -1730,6 +1735,7 @@ func _interact() -> void:
 					entered_house = true
 					complete_mission("enter")
 					say("You entered the Hollis house. Find the study and Ada's living room.", 6.0)
+					_manifest_girl(6.0)
 			play("door")
 			noise(d.pos, 6.0)
 
@@ -2219,21 +2225,40 @@ func _update_characters(dt: float) -> void:
 				(apparition_mesh as MeshInstance3D).transparency = 1.0 - girl_alpha
 
 		var gd := girl.position.distance_to(player.position)
-		var seen := _looking_at(girl.position) and _los(cam.global_position, girl.position + Vector3(0, 1.2, 0))
 		var to_p := player.position - girl.position
 
-		if not seen and gd < 18.0 and gd > 1.3:
-			girl.position += Vector3(to_p.x, 0, to_p.z).normalized() * 1.2 * dt
-			girl.rotation.y = lerp_angle(girl.rotation.y, atan2(to_p.x, to_p.z), minf(1.0, 4.0 * dt))
+		# Lily walks toward the entry / player with procedural walking stride motion
+		if gd < 24.0 and gd > 1.15:
+			var walk_speed := 1.45
+			var move_dir := Vector3(to_p.x, 0, to_p.z).normalized()
+			girl.position += move_dir * walk_speed * dt
+			girl.rotation.y = lerp_angle(girl.rotation.y, atan2(to_p.x, to_p.z), minf(1.0, 5.0 * dt))
+			# Procedural walk cycle: bobbing, sway, and eerie creeping lean
+			girl_walk_t += dt * 5.2
+			girl_model.position.y = abs(sin(girl_walk_t * 2.0)) * 0.08
+			girl_model.rotation.z = sin(girl_walk_t) * 0.05
+			girl_model.rotation.x = 0.06
+		else:
+			girl_model.position.y = lerpf(girl_model.position.y, 0.0, dt * 6.0)
+			girl_model.rotation.z = lerpf(girl_model.rotation.z, 0.0, dt * 6.0)
+			girl_model.rotation.x = lerpf(girl_model.rotation.x, 0.0, dt * 6.0)
 
-		if gd < 1.2 and girl_hit_cd <= 0.0:
-			girl_hit_cd = 2.0
-			shake = 1.2
-			post_mat.set_shader_parameter("flash", 0.5)
-			play("stinger", -4.0)
-			health = maxf(0.0, health - 15.0)
-			say("Lily's ghostly cold hand tore into your chest (-15 HP)! Strike only when she is visible!", 5.0)
-			girl.position = Vector3(4.2, 0, 5.9)
+		# 4 bites kill the human (each bite deals exactly 25 HP)
+		if gd <= 1.25 and girl_hit_cd <= 0.0:
+			girl_hit_cd = 2.5
+			shake = 1.5
+			post_mat.set_shader_parameter("flash", 0.7)
+			play("ghost_bite", 4.0)
+			play("stinger", -2.0)
+			health = maxf(0.0, health - 25.0)
+			var bites_rem := int(ceil(health / 25.0))
+			if bites_rem > 0:
+				say("Lily bit you (-25 HP)! 4 bites kill the human — %d bite%s left! Strike her when she flickers visible!" % [bites_rem, "s" if bites_rem != 1 else ""], 5.0)
+			else:
+				say("Lily delivered the 4th fatal bite! You collapsed...", 5.0)
+			# Flicker and back off slightly to stalk again
+			girl_flicker_t = 3.5
+			girl.position += (girl.position - player.position).normalized() * 3.0
 
 	# 2. Pearl (Cursed Doll watches player & cries)
 	var dd := player.position - doll.global_position
