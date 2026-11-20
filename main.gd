@@ -71,12 +71,13 @@ const DOORS := [
 	{"i": 8, "j": 5, "s": "E", "k": "arch", "n": ""},
 	{"i": 10, "j": 5, "s": "E", "k": "door", "lock": "slaughter", "n": "Slaughter room door (Father's Room)"},
 	{"i": 13, "j": 4, "s": "N", "k": "door", "lock": "slaughter", "n": "Slaughter room back door"},
+	{"i": 9, "j": 6, "s": "S", "k": "door", "tag": "tunnel_entry", "n": "Tunnel-side Dining Room Entrance"},
 	{"i": 1, "j": 3, "s": "W", "k": "door", "lock": "corridor", "n": "Corridor door (Mira's Wing)"},
 	{"i": 7, "j": 6, "s": "S", "k": "door", "lock": "front", "n": "Front door"},
 ]
 const WINDOWS := [
 	[2, 1, "N"], [4, 1, "N"], [1, 2, "W"], [5, 1, "N"], [8, 1, "N"], [11, 1, "N"], [13, 1, "N"],
-	[1, 3, "W"], [13, 3, "E"], [2, 6, "S"], [4, 6, "S"], [10, 6, "S"], [12, 6, "S"], [13, 5, "E"],
+	[13, 3, "E"], [2, 6, "S"], [4, 6, "S"], [10, 6, "S"], [12, 6, "S"], [13, 5, "E"],
 ]
 const BULBS := [
 	[3, 3, 1.0], [7, 3, 1.0], [11, 3, 1.0], [7, 5, 1.0], [11, 2, 0.9], [9, 5, 0.8],
@@ -98,6 +99,7 @@ class MainDoor extends RefCounted:
 	var speed := 2.6
 	var locked := false
 	var lock := ""
+	var tag := ""
 	var label := "Door"
 	var pos := Vector3.ZERO
 	var kind := "door"
@@ -149,6 +151,14 @@ var has_bible := false
 var has_bat := false
 var has_walkie := false
 var blood_bags := 0
+var entered_house := false
+var lore_found: Array[String] = []
+var pearl_comforted := false
+var short_circuits := 0
+var exhausted := false
+var girl_hit_cd := 0.0
+var girl_manifest_cd := 0.0
+var rat_squeak_cd := 0.0
 var bat_in_hand: Node3D = null
 var bat_swinging := false
 var bat_swing_t := 0.0
@@ -172,6 +182,7 @@ var b_stuck := 0.0
 var b_prev := Vector3.ZERO
 var b_model: Node3D
 var b_step := 0.0
+var b_footstep_t := 0.0
 var b_stun := 0.0
 var enraged := false
 var butcher_confined := true
@@ -187,6 +198,7 @@ var ghost_alive := true
 var woman_alive := true
 var doll: Node3D                 # Pearl (Cursed Doll - weeping)
 var p_doll_cry: AudioStreamPlayer3D
+var p_girl: AudioStreamPlayer3D
 var ghost: Node3D                # Ada (Sister Spirit - Living Room)
 var woman: Node3D                # Mira (The Woman - Corridor)
 var rat: CharacterBody3D         # Street Rat - bites player
@@ -198,17 +210,23 @@ var clock: Node3D                # Vintage Wall Clock - ticking
 var p_clock: AudioStreamPlayer3D
 var tunnel_zone: Node3D
 
-# mini-missions checklist
+# Required story objectives and optional mini-missions.
 var missions := [
-	{"id": "bat", "text": "Find the Bloody Baseball Bat in the house", "done": false},
-	{"id": "walkie", "text": "Find Ada's Walkie-Talkie and call your younger sister [R]", "done": false},
-	{"id": "lily", "text": "Defeat Lily (Horror Girl) with the bat to claim Father's Key", "done": false},
-	{"id": "ada", "text": "Lay Ada's blood-stained spirit to rest with the bat", "done": false},
-	{"id": "mira", "text": "Free Mira, the Butcher's wife, from the corridor", "done": false},
-	{"id": "breaker", "text": "Restore power at the master breaker after a short circuit", "done": false},
-	{"id": "mira_key", "text": "Collect Mira's Key in the Horror Corridor wing", "done": false},
-	{"id": "bible", "text": "Unlock Slaughterhouse & seize the Devil's Bible", "done": false},
-	{"id": "escape", "text": "Escape through the Underground Tunnel to freedom", "done": false},
+	{"id": "power", "text": "Switch on the master breaker beside the tunnel entrance", "required": true, "done": false},
+	{"id": "enter", "text": "Follow the lanterns and enter the dining room", "required": true, "done": false},
+	{"id": "bat", "text": "Find the bloody baseball bat in the study", "required": true, "done": false},
+	{"id": "walkie", "text": "Find Ada's walkie-talkie in the vintage living room", "required": true, "done": false},
+	{"id": "lily", "text": "Defeat Lily while she is visible to release Father's key", "required": true, "done": false},
+	{"id": "father_key", "text": "Collect Father's slaughterhouse key", "required": true, "done": false},
+	{"id": "bible", "text": "Unlock the slaughterhouse and take the Devil's Bible", "required": true, "done": false},
+	{"id": "escape", "text": "Return to the underground tunnel and escape", "required": true, "done": false},
+	{"id": "ada", "text": "Free Ada's blood-stained spirit with the bat", "required": false, "done": false},
+	{"id": "mira_key", "text": "Find Mira's key beside the west corridor", "required": false, "done": false},
+	{"id": "mira", "text": "Unlock the west corridor and free the Butcher's wife", "required": false, "done": false},
+	{"id": "breaker", "text": "Restore power after causing a short circuit", "required": false, "done": false},
+	{"id": "memories", "text": "Recover all four family memories", "required": false, "done": false},
+	{"id": "pearl", "text": "Find Pearl's drawing, then comfort the crying doll", "required": false, "done": false},
+	{"id": "rat", "text": "Stop the street rat terrorizing the house", "required": false, "done": false},
 ]
 
 # ui
@@ -235,6 +253,17 @@ var p_butcher: AudioStreamPlayer3D
 var heart_t := 0.0
 var threat := 0.0
 
+func _exit_tree() -> void:
+	_stop_audio_tree(self)
+	snd.clear()
+
+func _stop_audio_tree(node: Node) -> void:
+	if node is AudioStreamPlayer or node is AudioStreamPlayer3D:
+		node.stop()
+		node.stream = null
+	for child in node.get_children():
+		_stop_audio_tree(child)
+
 func _ready() -> void:
 	rng.randomize()
 	_build_environment()
@@ -250,7 +279,7 @@ func _ready() -> void:
 	_build_audio()
 	_build_hud()
 	_reset_run()
-	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt\n[G]  Asset Gallery\n\nCONTROLS:\nWASD: Move   |   Mouse: Look   |   Shift: Sprint   |   C: Crouch\nF: Flashlight   |   E: Interact   |   R: Radio   |   Q: Use Blood Bag\nLMB / T: Bat Attack   |   Esc: Pause\n\nLORE & OBJECTIVES:\n* Abel Crane, your father, hunts the Hollis house as the Butcher.\n* Mira is his wife. Your younger sister Ada is the blood-stained ghost in the living room.\n* Find the Bloody Bat, defeat Lily for Father's key, then search the slaughterhouse for the Devil's Bible.\n* Collect blood bags; use Q when hurt. Eat raw meat to restore health.\n* Room switches can short the whole house. Use the main breaker; every power change draws Lily near.\n* Begin in the tunnel, search the house, and escape back through it!")
+	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt     [G]  Asset Gallery\n\nWASD Move  |  Mouse Look  |  Shift Sprint  |  C Crouch\nF Flashlight  |  E Interact  |  R Radio  |  Q Blood Bag\nLMB / T Bat Attack  |  Esc Pause\n\nSTORY:\nYour father Abel is the Butcher. His wife Mira haunts the west corridor.\nYour younger sister Ada is the blood-stained spirit in the vintage living room.\nLily flickers between worlds with Father's key; Pearl cries in the bedroom.\n\nMISSION:\nFollow the tunnel lanterns and switch on the outside main breaker.\nFind the bat and radio, defeat Lily while visible, and take Father's key.\nUnlock the slaughterhouse, seize the Devil's Bible, and escape via the tunnel.\n\nOPTIONAL:\nRecover four memories, free Ada and Mira, and comfort Pearl for the true ending.\nCollect blood bags and batteries, eat raw meat, and beware the biting street rat.\nRoom switches can kill the whole house current. Every power change draws Lily near.")
 	if autostart:
 		autostart = false
 		_start()
@@ -322,6 +351,8 @@ func fit(key_or_path: String, height := 0.0, target_length := 0.0, face_x := fal
 	var rot := Node3D.new()
 	holder.add_child(rot)
 	rot.add_child(inst)
+	if key_or_path == "corridor":
+		inst.rotation.x = -PI / 2.0
 	var bb := _aabb(inst, Transform3D.IDENTITY)
 	var k := 1.0
 	if height > 0.0 and bb.size.y > 0.0: k = height / bb.size.y
@@ -456,6 +487,7 @@ func _build_level() -> void:
 				d.kind = "door"
 				d.label = e.def.n
 				d.lock = e.def.get("lock", "")
+				d.tag = e.def.get("tag", "")
 				d.locked = d.lock != ""
 				d.cx = e.cx; d.cz = e.cz; d.rot = e.rot
 				d.pos = Vector3(e.cx, 1.0, e.cz)
@@ -511,13 +543,15 @@ func _build_level() -> void:
 	_build_switches()
 
 func _build_switches() -> void:
-	# Main Master Breaker at entrance foyer
-	var main_sw := _create_switch_node(Vector3(13.2, 1.4, 7.8), "Main Power Breaker")
+	# The whole-house breaker is outside, beside the tunnel-side dining room entrance.
+	var breaker_pos := Vector3(19.15, 1.35, 13.18)
+	var main_sw := _create_switch_node(breaker_pos, "Main Power Breaker")
+	main_sw.rotation.y = PI
 	interact.append({
 		"kind": "main_switch",
 		"node": main_sw,
-		"pos": Vector3(13.2, 1.4, 7.8),
-		"label": "Toggle Main Breaker",
+		"pos": breaker_pos,
+		"label": "Toggle Whole-House Main Breaker",
 	})
 
 	# Room switches placed on walls
@@ -618,24 +652,39 @@ func _build_furniture() -> void:
 
 func _build_dressing() -> void:
 	# Hanging dead pigs in the Slaughterhouse
-	for p in [[22.6, 8.0], [25.6, 11.8], [22.4, 11.0]]:
+	for p in [[23.2, 9.0], [25.8, 11.8], [23.5, 12.0]]:
 		var pig := fit("pig", 1.25)
 		pig.position = Vector3(p[0], 3.0 - 1.55, p[1])
 		add_child(pig)
 
 	# Meat hook rail hung from the ceiling of the Slaughterhouse
 	var hook := fit("hook", 0, 3.4)
-	hook.position = Vector3(24.0, 2.5, 10.5)
+	hook.position = Vector3(24.5, 2.5, 10.5)
 	add_child(hook)
 
-	# Multiple gruesome blood wall splatters
+	# Slaughterhouse diorama environment props
+	var diorama := fit("diorama", 1.8)
+	diorama.position = Vector3(24.8, 0, 9.5)
+	add_child(diorama)
+
+	# Blood-soaked walls continue through the house, not just the slaughter room.
 	for bpos in [
 		Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8),
 		Vector3(22.0, 0, 12.5), Vector3(26.4, 0, 8.5), Vector3(3.0, 0, 4.0), Vector3(17.0, 0, 4.0),
+		Vector3(6.0, 0, 6.8), Vector3(12.0, 0, 6.8), Vector3(20.0, 0, 6.8), Vector3(4.0, 0, 11.8),
+		Vector3(0.5, 0, 6.0), Vector3(-4.0, 0, 6.0), Vector3(-8.0, 0, 6.0),
 	]:
 		var bw := fit("bloodwall", 0, 4.8)
 		bw.position = bpos
 		add_child(bw)
+	for pool in [
+		[Vector3(23.4, 0.018, 9.0), Vector2(2.2, 1.2)], [Vector3(25.2, 0.018, 11.4), Vector2(1.4, 2.0)],
+		[Vector3(15.0, 0.018, 6.2), Vector2(1.6, 0.8)], [Vector3(7.0, 0.018, 5.5), Vector2(1.0, 1.5)],
+		[Vector3(4.5, 0.018, 9.2), Vector2(1.5, 1.1)], [Vector3(16.2, 0.018, 2.6), Vector2(0.8, 1.3)],
+		[Vector3(20.0, 0.018, 5.8), Vector2(1.0, 0.7)], [Vector3(5.6, 0.018, 2.4), Vector2(1.2, 0.8)],
+		[Vector3(-3.0, 0.018, 6.0), Vector2(1.4, 1.4)], [Vector3(-6.5, 0.018, 6.0), Vector2(1.8, 1.0)],
+	]:
+		_add_blood_pool(pool[0], pool[1])
 
 	# Vintage wooden wall clock (with functional ticking sound)
 	clock = fit("clock", 0, 0.6)
@@ -662,31 +711,84 @@ func _build_dressing() -> void:
 	toilet.rotation.y = PI
 	add_child(toilet)
 
-	# Vintage Living Room set (Ada's parlor domain)
-	var parlor := fit("parlor", 2.7)
+	# Vintage Living Room set (Ada's parlor domain) - hide exterior walls so doors are fully open
+	var parlor := fit("parlor", 2.6)
 	parlor.position = Vector3(5.0, 0, 9.8)
+	for mesh in parlor.find_children("*", "MeshInstance3D", true, false):
+		var mname: String = mesh.name.to_lower()
+		if "duvar" in mname or "zemin" in mname or "tavan" in mname or "giris" in mname:
+			(mesh as MeshInstance3D).visible = false
 	add_child(parlor)
 
-	# Horror Corridor 5 (Mira's domain extending West from hallway)
+	# Horror Corridor 5 (Mira's domain extending West from hallway door at x=1.0, z=6.0)
 	var corr := fit("corridor", 2.8)
-	corr.position = Vector3(-3.5, 0, 6.0)
+	corr.position = Vector3(-7.5, 0, 6.0)
 	corr.rotation.y = PI / 2.0
 	add_child(corr)
 
-	# Underground Tunnel (The secret exit route)
-	var tunnel := fit("tunnel", 3.0)
-	tunnel.position = Vector3(25.0, -0.2, 18.0)
+	# Underground Tunnel (The secret entrance and exit route connecting to south house door)
+	var tunnel := fit("tunnel", 3.2)
+	tunnel.position = Vector3(18.0, 0.0, 20.0)
+	tunnel.rotation.y = PI / 2.0
 	add_child(tunnel)
 
-	# Underground Tunnel Exit trigger
+	# Underground Tunnel Exit trigger (return here with Devil's Bible to escape)
 	tunnel_zone = Node3D.new()
-	tunnel_zone.position = Vector3(25.0, 0, 26.0)
+	tunnel_zone.position = Vector3(18.0, 0, 24.5)
 	add_child(tunnel_zone)
 	interact.append({
 		"kind": "tunnel_exit",
-		"pos": Vector3(25.0, 0.8, 26.0),
+		"pos": Vector3(18.0, 0.8, 24.5),
 		"label": "Escape Through Tunnel to Surface"
 	})
+
+	# Path lanterns guiding player from inside the tunnel directly to the house entrance
+	for lamp_pos in [Vector3(18.0, 0, 23.5), Vector3(18.0, 0, 20.5), Vector3(18.0, 0, 17.5), Vector3(18.0, 0, 15.0), Vector3(18.6, 0, 13.5)]:
+		_add_path_lantern(lamp_pos)
+
+func _add_blood_pool(pos: Vector3, pool_size: Vector2) -> void:
+	var pool := MeshInstance3D.new()
+	var mesh := PlaneMesh.new()
+	mesh.size = pool_size
+	pool.mesh = mesh
+	var material := _mat(Color(0.24, 0.002, 0.006, 0.9), 0.22)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	pool.material_override = material
+	pool.position = pos
+	pool.rotation.y = rng.randf() * TAU
+	level_root.add_child(pool)
+
+func _add_path_lantern(pos: Vector3) -> void:
+	var root := Node3D.new()
+	root.position = pos
+	level_root.add_child(root)
+	var post := MeshInstance3D.new()
+	var post_mesh := CylinderMesh.new()
+	post_mesh.top_radius = 0.035
+	post_mesh.bottom_radius = 0.055
+	post_mesh.height = 1.15
+	post.mesh = post_mesh
+	post.material_override = _mat(Color(0.09, 0.07, 0.05), 0.8, 0.4)
+	post.position.y = 0.575
+	root.add_child(post)
+	var lamp := MeshInstance3D.new()
+	var lamp_mesh := SphereMesh.new()
+	lamp_mesh.radius = 0.09
+	lamp_mesh.height = 0.18
+	lamp.mesh = lamp_mesh
+	var glow_material := _mat(Color(1.0, 0.52, 0.16), 0.4)
+	glow_material.emission_enabled = true
+	glow_material.emission = Color(1.0, 0.24, 0.04)
+	glow_material.emission_energy_multiplier = 2.0
+	lamp.material_override = glow_material
+	lamp.position.y = 1.18
+	root.add_child(lamp)
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.42, 0.16)
+	light.light_energy = 0.85
+	light.omni_range = 5.0
+	light.position.y = 1.18
+	root.add_child(light)
 
 func _build_characters() -> void:
 	# 1. The Butcher (Father: Abel Crane)
@@ -739,6 +841,10 @@ func _build_characters() -> void:
 		girl_meshes.append(apparition_mesh)
 	girl.position = Vector3(4.2, 0, 5.9)
 	add_child(girl)
+	p_girl = AudioStreamPlayer3D.new()
+	p_girl.unit_size = 3.0
+	p_girl.max_distance = 24.0
+	girl.add_child(p_girl)
 
 	# 3. Pearl (Cursed Porcelain Doll - in bedroom, continuously weeping)
 	doll = fit("doll", 0.55)
@@ -748,6 +854,12 @@ func _build_characters() -> void:
 	p_doll_cry.unit_size = 2.0
 	p_doll_cry.max_distance = 16.0
 	doll.add_child(p_doll_cry)
+	interact.append({
+		"kind": "pearl",
+		"node": doll,
+		"pos": Vector3(1.75, 1.1, 4.6),
+		"label": "Comfort the Crying Porcelain Doll",
+	})
 
 	# 4. Ada (Ghost - Sister spirit in Vintage Living Room)
 	ghost = fit("ghost", 1.7, 0, true)
@@ -756,7 +868,7 @@ func _build_characters() -> void:
 
 	# 5. Mira (The Woman - Mother in Horror Corridor)
 	woman = fit("woman", 1.7)
-	woman.position = Vector3(-3.2, 0, 6.0)
+	woman.position = Vector3(-6.5, 0, 6.0)
 	woman.visible = true
 	add_child(woman)
 
@@ -776,15 +888,21 @@ func _build_characters() -> void:
 	add_child(rat)
 
 func _build_items() -> void:
-	# 1. Bloody Baseball Bat (Weapon pickup)
+	# 1. Bloody Baseball Bat (Weapon pickup) in Study
 	var bat_pickup := fit("bat", 0, 0.9)
-	bat_pickup.position = Vector3(15.2, 0.1, 2.5)
+	bat_pickup.position = Vector3(16.0, 0.82, 2.5)
 	bat_pickup.rotation.z = 1.2
 	add_child(bat_pickup)
+	var b_glow := OmniLight3D.new()
+	b_glow.light_color = Color(1.0, 0.2, 0.15)
+	b_glow.light_energy = 1.5
+	b_glow.omni_range = 3.0
+	b_glow.position = Vector3(16.0, 1.1, 2.5)
+	add_child(b_glow)
 	interact.append({
 		"kind": "bat_pickup",
 		"node": bat_pickup,
-		"pos": Vector3(15.2, 0.3, 2.5),
+		"pos": Vector3(16.0, 0.85, 2.5),
 		"label": "Take Bloody Baseball Bat (Weapon)"
 	})
 
@@ -799,20 +917,23 @@ func _build_items() -> void:
 		"label": "Take Ada's Walkie-Talkie"
 	})
 
-	# 3. Mira's Key (in Horror Corridor area)
-	# Mira key torus
+	# 3. Mira's Key (near Horror Corridor entrance in hallway)
 	var tm := TorusMesh.new()
-	tm.inner_radius = 0.03
-	tm.outer_radius = 0.06
+	tm.inner_radius = 0.035
+	tm.outer_radius = 0.07
 	var mi := MeshInstance3D.new()
 	mi.mesh = tm
-	mi.material_override = _mat(Color(0.8, 0.3, 0.3), 0.3, 0.8)
-	mi.position = Vector3(1.4, 0.6, 5.8)
+	var mk_mat := _mat(Color(0.9, 0.3, 0.3), 0.3, 0.8)
+	mk_mat.emission_enabled = true
+	mk_mat.emission = Color(0.9, 0.2, 0.2)
+	mk_mat.emission_energy_multiplier = 1.6
+	mi.material_override = mk_mat
+	mi.position = Vector3(2.2, 0.65, 6.0)
 	add_child(mi)
 	interact.append({
 		"kind": "mira_key",
 		"node": mi,
-		"pos": Vector3(1.4, 0.6, 5.8),
+		"pos": Vector3(2.2, 0.65, 6.0),
 		"label": "Take Mira's Corridor Key"
 	})
 
@@ -873,6 +994,39 @@ func _build_items() -> void:
 	]
 	bspots.shuffle()
 	for i in 4: _add_battery(bspots[i])
+	_build_lore_pages()
+
+func _build_lore_pages() -> void:
+	var placements := {
+		"abel_ledger": [Vector3(24.0, 0.94, 12.5), 0.2],
+		"ada_note": [Vector3(4.8, 0.54, 8.0), -0.4],
+		"mira_letter": [Vector3(1.25, 0.18, 6.5), 0.5],
+		"pearl_drawing": [Vector3(6.0, 0.54, 2.5), -0.2],
+	}
+	for page in Story.LORE_PAGES:
+		var placement: Array = placements[page.id]
+		_add_lore_page(page, placement[0], placement[1])
+
+func _add_lore_page(page: Dictionary, pos: Vector3, angle: float) -> void:
+	var paper := MeshInstance3D.new()
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(0.34, 0.012, 0.46)
+	paper.mesh = mesh
+	var material := _mat(Color(0.72, 0.65, 0.48), 0.95)
+	material.emission_enabled = true
+	material.emission = Color(0.2, 0.14, 0.06)
+	material.emission_energy_multiplier = 0.35
+	paper.material_override = material
+	paper.position = pos
+	paper.rotation.y = angle
+	level_root.add_child(paper)
+	interact.append({
+		"kind": "lore",
+		"node": paper,
+		"pos": pos + Vector3(0, 0.08, 0),
+		"label": "Read " + page.title,
+		"page": page,
+	})
 
 func _add_battery(pos: Vector3) -> void:
 	var mi := MeshInstance3D.new()
@@ -978,6 +1132,14 @@ func _wav(fn: Callable, secs: float, loop := false) -> AudioStreamWAV:
 		w.loop_end = n
 	return w
 
+func _recorded_sound(sname: String, path: String, loop := false) -> void:
+	if not ResourceLoader.exists(path): return
+	var stream := load(path) as AudioStream
+	if stream == null: return
+	if loop and stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+	snd[sname] = stream
+
 func _build_audio() -> void:
 	var r := RandomNumberGenerator.new()
 	r.seed = 7
@@ -1002,6 +1164,22 @@ func _build_audio() -> void:
 	snd["eat"] = _wav(func(t, _d): return (r.randf_range(-1, 1) * exp(-t * 40.0) + sin(TAU * 200.0 * t) * exp(-t * 20.0)) * 0.6, 0.35)
 	snd["heal"] = _wav(func(t, _d): return sin(TAU * (220.0 + 110.0 * t) * t) * exp(-t * 3.0) * 0.6, 0.6)
 
+	# Recorded library audio carries the scene; synthesized effects fill gaps such as fan/doll/radio.
+	_recorded_sound("heart", "res://assets/audio/player/heartbeat_slow.ogg")
+	_recorded_sound("heart_fast", "res://assets/audio/player/heartbeat_fast.ogg")
+	_recorded_sound("step", "res://assets/audio/footsteps/wood/footstep_wood_000.ogg")
+	_recorded_sound("bstep", "res://assets/audio/footsteps/concrete/footstep00.ogg")
+	_recorded_sound("stinger", "res://assets/audio/jumpscare/horror_effect1.ogg")
+	_recorded_sound("ghost_hit", "res://assets/audio/jumpscare/scream.ogg")
+	_recorded_sound("ritual", "res://assets/audio/jumpscare/horror_effect2.ogg")
+	_recorded_sound("butcher_growl", "res://assets/audio/enemy/monster_growl.ogg")
+	_recorded_sound("door", "res://assets/audio/interaction/creak1.ogg")
+	_recorded_sound("click", "res://assets/audio/interaction/metalClick.ogg")
+	_recorded_sound("bat_swing", "res://assets/audio/melee/knifeSlice2.ogg")
+	_recorded_sound("book", "res://assets/audio/interaction/bookOpen.ogg")
+	_recorded_sound("objective", "res://assets/audio/ui/confirmation_002.ogg")
+	_recorded_sound("drone", "res://assets/audio/ambient/lost_2.ogg", true)
+
 	p_heart = AudioStreamPlayer.new(); p_heart.stream = snd["heart"]; add_child(p_heart)
 	p_sfx = AudioStreamPlayer.new(); add_child(p_sfx)
 	p_amb = AudioStreamPlayer.new(); p_amb.stream = snd["drone"]; p_amb.volume_db = -10.0; add_child(p_amb)
@@ -1020,6 +1198,18 @@ func play(sname: String, vol := 0.0) -> void:
 	var p := AudioStreamPlayer.new()
 	p.stream = snd[sname]
 	p.volume_db = vol
+	add_child(p)
+	p.finished.connect(p.queue_free)
+	p.play()
+
+func play_at(sname: String, pos: Vector3, vol := 0.0) -> void:
+	if not snd.has(sname): return
+	var p := AudioStreamPlayer3D.new()
+	p.stream = snd[sname]
+	p.volume_db = vol
+	p.unit_size = 3.0
+	p.max_distance = 24.0
+	p.position = pos
 	add_child(p)
 	p.finished.connect(p.queue_free)
 	p.play()
@@ -1061,7 +1251,10 @@ func _build_hud() -> void:
 
 	hud_msg = _label("", Vector2(0, 0), 20, Color(0.9, 0.85, 0.6))
 	hud_msg.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	hud_msg.position = Vector2(-380, -140)
+	hud_msg.position = Vector2(-450, -155)
+	hud_msg.size = Vector2(900, 90)
+	hud_msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hud_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	hud_warn = _label("", Vector2(24, 690), 14, Color(1, 0.5, 0.3))
 
@@ -1082,8 +1275,8 @@ func _build_hud() -> void:
 
 	# Bottom Controls Helper Bar
 	hud_controls = _label(
-		"[WASD] Move   [Shift] Sprint   [C] Crouch   [F] Flashlight   [E] Interact   [LMB / T] Bat Attack   [Esc] Pause",
-		Vector2(0, -32),
+		"[WASD] Move   [Shift] Sprint   [C] Crouch   [F] Flashlight   [E] Interact   [LMB / T] Bat\n[R] Radio   [Q] Use Blood Bag   [Esc] Pause",
+		Vector2(0, -52),
 		14,
 		Color(1, 1, 0.8, 0.85)
 	)
@@ -1127,16 +1320,22 @@ func _use_walkie() -> void:
 	if not has_walkie:
 		say("You need Ada's walkie-talkie to reach her.")
 		return
-	if not girl_alive:
-		radio_message("Ada (radio): Lily's curse is broken. The Father's key is yours. Get the Devil's Bible and come back to the tunnel.")
+	if not house_power:
+		radio_message("Ada (radio): The main breaker is outside beside the dining room entrance. The static gets worse when Lily is near.")
+	elif not entered_house:
+		radio_message("Ada (radio): Follow the lanterns from the tunnel. The dining room door is unlocked.")
 	elif not has_bat:
-		radio_message("Ada (radio): Nora, find the bloody bat. Lily is flickering between the hall and the living room.")
-	elif not has_mira_key:
-		radio_message("Ada (radio): Mira's key is close to the corridor entrance. She is Abel's wife. Don't let her draw you in.")
+		radio_message("Ada (radio): Find the bloody bat in the study. Father hears running, so crouch when he is close.")
+	elif girl_alive:
+		radio_message("Ada (radio): Lily holds Father's key. Wait until her transparent body flickers into view, then strike.")
+	elif not has_father_key:
+		radio_message("Ada (radio): Lily dropped Father's brass key where she vanished. Pick it up before you go to the slaughterhouse.")
 	elif not has_bible:
-		radio_message("Ada (radio): Father's room is behind the slaughterhouse door. Take the Devil's Bible from the altar.")
+		radio_message("Ada (radio): Unlock Father's slaughterhouse. The Devil's Bible is on the altar. Mira's corridor key is optional, but she needs your help too.")
+	elif not _family_at_peace():
+		radio_message("Ada (radio): You can escape now — or recover four memories, free me and Mira, and comfort Pearl to break every chain.")
 	else:
-		radio_message("Ada (radio): Abel heard you take the book! Run through the tunnel, Nora!")
+		radio_message("Ada (radio): You freed us all! Run through the tunnel, Nora. Dawn is waiting.")
 
 func _use_blood_bag() -> void:
 	if blood_bags <= 0:
@@ -1154,15 +1353,60 @@ func complete_mission(mid: String) -> void:
 	for m in missions:
 		if m.id == mid and not m.done:
 			m.done = true
-			play("stinger", -12.0)
+			play("objective", -5.0)
 			say("OBJECTIVE COMPLETE: " + m.text, 5.0)
+
+func mission_done(mid: String) -> bool:
+	for m in missions:
+		if m.id == mid: return m.done
+	return false
+
+func _collect_lore(it: Dictionary) -> void:
+	var page: Dictionary = it.page
+	if lore_found.has(page.id): return
+	it.taken = true
+	(it.node as Node3D).visible = false
+	lore_found.append(page.id)
+	battery = minf(1.0, battery + 0.25)
+	stamina = 1.0
+	play("book")
+	if lore_found.size() == Story.LORE_PAGES.size():
+		complete_mission("memories")
+	state = "reading"
+	_show_overlay(page.title.to_upper() + "\n\n" + page.text + "\n\n[ENTER] Close memory")
+
+func _close_reading() -> void:
+	if state != "reading": return
+	state = "play"
+	overlay.visible = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if lore_found.size() < Story.LORE_PAGES.size():
+		say("Memory recovered (%d/4). The page restores 25%% flashlight charge." % lore_found.size())
+	else:
+		say("All four memories recovered. Free Ada and Mira, then comfort Pearl for the true ending.", 7.0)
+
+func _comfort_pearl() -> void:
+	if pearl_comforted:
+		say("Pearl sleeps quietly. Her porcelain tears have dried.")
+		return
+	if not lore_found.has("pearl_drawing"):
+		say("Pearl keeps crying. Her crayon drawing in the bedroom may explain why.", 6.0)
+		return
+	pearl_comforted = true
+	p_doll_cry.stop()
+	play("heal")
+	complete_mission("pearl")
+	say("You return Pearl's drawing and promise to free her family. The doll stops crying.", 7.0)
+
+func _family_at_peace() -> bool:
+	return mission_done("ada") and mission_done("mira") and mission_done("memories") and mission_done("pearl")
 
 # ------------------------------------------------------------------- run
 func _reset_run() -> void:
-	# Start inside the tunnel facing back toward the house; escape uses this same route.
-	player.position = Vector3(25.0, 0.05, 22.0)
+	# Start inside the underground tunnel facing North directly toward the house entrance
+	player.position = Vector3(18.0, 0.05, 23.5)
 	player.velocity = Vector3.ZERO
-	yaw = 0.0
+	yaw = PI
 	pitch = 0.0
 	health = 100.0
 	stamina = 1.0
@@ -1177,22 +1421,42 @@ func _reset_run() -> void:
 	has_walkie = false
 	blood_bags = 0
 	batteries = 0
+	entered_house = false
+	lore_found.clear()
+	pearl_comforted = false
+	short_circuits = 0
+	exhausted = false
+	girl_hit_cd = 0.0
+	girl_manifest_cd = 0.0
+	rat_squeak_cd = 0.0
 	enraged = false
-	house_power = true
+	house_power = false
+	short_circuit_t = 0.0
 	girl_alive = true
+	girl.position = Vector3(4.2, 0, 5.9)
+	girl.visible = true
+	girl_flicker_t = 0.0
 	ghost_alive = true
 	ghost.visible = true
 	woman_alive = true
 	woman.visible = true
 	rat_alive = true
+	rat.visible = true
+	rat.position = Vector3(15.0, 0, 3.8)
 	b_state = "patrol"
 	b_path = []
+	b_stun = 0.0
+	b_lose = 0.0
+	b_footstep_t = 0.0
 	butcher.position = Vector3(24.0, 0.05, 8.6)
 	b_wait = 20.0
 	for d in doors:
 		d.target = 0.0
 		d.amount = 0.0
 		d.locked = d.lock != ""
+	for b in bulbs:
+		b.mode = "on"
+		b.t = 0.0
 	for m in missions: m.done = false
 	post_mat.set_shader_parameter("flash", 0.0)
 	post_mat.set_shader_parameter("desat", 0.0)
@@ -1202,7 +1466,7 @@ func _start() -> void:
 	state = "play"
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	p_amb.play()
-	say("The radio whispers from the living room: 'Nora... come find me.'", 7.0)
+	say("Follow the lanterns. Switch on the main breaker beside the dining room entrance.", 8.0)
 
 func _die() -> void:
 	state = "dead"
@@ -1213,10 +1477,17 @@ func _die() -> void:
 func _win() -> void:
 	state = "won"
 	complete_mission("escape")
-	_show_overlay("YOU ESCAPED\n\nYou fled through the collapsing underground tunnel.\nThe Devil's Bible burns behind you in the ruins of the Hollis estate.\n\n[ENTER] Play Again     [G] Gallery")
+	play("ritual", -3.0)
+	if _family_at_peace():
+		_show_overlay("FAMILY RESTORED — TRUE ENDING\n\nThe four memories break the Bible's hold.\nAda, Mira, Lily and Pearl are finally at peace.\nYou escape as dawn reaches the Hollis estate.\n\n[ENTER] Play Again     [G] Gallery")
+	else:
+		_show_overlay("YOU ESCAPED\n\nYou fled through the collapsing underground tunnel with the Devil's Bible.\nSome spirits remain trapped in the Hollis estate. Recover their memories and free them for the true ending.\n\n[ENTER] Play Again     [G] Gallery")
 
 func noise(pos: Vector3, radius: float) -> void:
 	if state != "play": return
+	if butcher_confined:
+		var p_room: String = room_of.get(cell_key_at(pos), {}).get("id", "")
+		if p_room != "slaughter": return
 	var d := butcher.position.distance_to(pos)
 	if not _los(butcher.position + Vector3(0, 1.5, 0), pos + Vector3(0, 1.2, 0)): radius *= 0.6
 	if d < radius and b_state != "chase":
@@ -1241,6 +1512,7 @@ func _input(event: InputEvent) -> void:
 		match event.physical_keycode:
 			KEY_ENTER, KEY_KP_ENTER:
 				if state == "menu": _start()
+				elif state == "reading": _close_reading()
 				elif state == "dead" or state == "won":
 					autostart = true
 					get_tree().reload_current_scene()
@@ -1254,6 +1526,8 @@ func _input(event: InputEvent) -> void:
 					state = "play"
 					overlay.visible = false
 					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+				elif state == "reading":
+					_close_reading()
 			KEY_F:
 				if state == "play": _toggle_flash()
 			KEY_E:
@@ -1278,7 +1552,7 @@ func _toggle_flash() -> void:
 func _bat_can_hit(target: Vector3, max_distance: float, fwd: Vector3) -> bool:
 	var to_target := target - player.position
 	var distance := to_target.length()
-	return distance > 0.05 and distance <= max_distance and fwd.dot(to_target / distance) > 0.4
+	return distance > 0.05 and distance <= max_distance and fwd.dot(to_target / distance) > 0.4 and _los(cam.global_position, target)
 
 func _bat_attack() -> void:
 	if not has_bat or bat_swinging: return
@@ -1290,7 +1564,7 @@ func _bat_attack() -> void:
 	# Raycast forward to check hit
 	var fwd := -cam.global_transform.basis.z
 	# 1. Hit Lily (Horror Girl)
-	if girl_alive and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 2.5, fwd):
+	if girl_alive and girl.visible and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 2.5, fwd):
 		girl_alive = false
 		play("ghost_hit", 4.0)
 		say("You struck Lily! Her spirit dissolves into ash...")
@@ -1308,7 +1582,7 @@ func _bat_attack() -> void:
 		say("Ada's blood-stained spirit breaks apart and is finally at peace.")
 		complete_mission("ada")
 		return
-	if woman_alive and _bat_can_hit(woman.position + Vector3(0, 0.8, 0), 2.7, fwd):
+	if woman_alive and _corridor_unlocked() and _bat_can_hit(woman.position + Vector3(0, 0.8, 0), 2.7, fwd):
 		woman_alive = false
 		woman.visible = false
 		play("ghost_hit", 4.0)
@@ -1321,6 +1595,7 @@ func _bat_attack() -> void:
 		rat_alive = false
 		rat.visible = false
 		play("rat_squeak", 4.0)
+		complete_mission("rat")
 		say("You crushed the vicious street rat!")
 		return
 
@@ -1331,6 +1606,21 @@ func _bat_attack() -> void:
 		shake = 1.0
 		say("You staggered the Butcher with the bat! RUN!", 4.0)
 		noise(player.position, 14.0)
+
+func _corridor_unlocked() -> bool:
+	for door in doors:
+		if door.lock == "corridor": return not door.locked
+	return false
+
+func _interaction_visible(it: Dictionary, pos: Vector3) -> bool:
+	var query := PhysicsRayQueryParameters3D.create(cam.global_position, pos, 1)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty(): return true
+	if it.kind == "door" and hit.collider == it.door.body: return true
+	var node = it.get("node", null)
+	if node is Node and hit.collider is Node:
+		return hit.collider == node or (node as Node).is_ancestor_of(hit.collider)
+	return false
 
 func _find_focus():
 	var f := -cam.global_transform.basis.z
@@ -1344,9 +1634,9 @@ func _find_focus():
 			pos = it.pos
 		var to := pos - cam.global_position
 		var d := to.length()
-		if d > 2.3: continue
+		if d < 0.05 or d > 2.3: continue
 		var cs := f.dot(to / d)
-		if cs < 0.84: continue
+		if cs < 0.84 or not _interaction_visible(it, pos): continue
 		var score := d * 0.6 + (1.0 - cs) * 6.0
 		if score < best_score:
 			best_score = score
@@ -1387,8 +1677,14 @@ func _interact() -> void:
 					say("The front door is sealed. The tunnel is the only way out.")
 					play("click", -6.0)
 					return
-			if d.target > 0.0: d.close()
-			else: d.open_from(player.position)
+			if d.target > 0.0:
+				d.close()
+			else:
+				d.open_from(player.position)
+				if d.tag == "tunnel_entry" and not entered_house:
+					entered_house = true
+					complete_mission("enter")
+					say("You entered the Hollis house. Find the study and Ada's living room.", 6.0)
 			play("door")
 			noise(d.pos, 6.0)
 
@@ -1422,6 +1718,7 @@ func _interact() -> void:
 			it.taken = true
 			(it.node as Node3D).visible = false
 			play("click")
+			complete_mission("father_key")
 			say("Found Father's Brass Key! You can now unlock the Slaughterhouse.")
 
 		"meat":
@@ -1454,7 +1751,8 @@ func _interact() -> void:
 			enraged = true
 			complete_mission("bible")
 			for b in bulbs: b.mode = "flicker"
-			play("stinger", 4.0)
+			play("ritual", 2.0)
+			play("butcher_growl", -2.0)
 			b_state = "chase"
 			b_last_seen = player.position
 			say("The Butcher roars in fury! ESCAPE THROUGH THE TUNNEL!", 8.0)
@@ -1477,45 +1775,81 @@ func _interact() -> void:
 				say("Flipped light switch: " + ("ON" if it.on else "OFF"))
 
 		"main_switch":
-			house_power = not house_power
-			play("spark")
-			girl_flicker_t = 3.5
-			if house_power:
-				say("Main Breaker ENGAGED. House power restored.")
-				complete_mission("breaker")
-				for b in bulbs:
-					if b.mode != "off":
-						b.mode = "flicker"
-				play("stinger", -8.0)
-			else:
-				say("Main Breaker TRIPPED. The house plunges into darkness.")
+			_toggle_main_power()
+
+		"pearl":
+			_comfort_pearl()
+
+		"lore":
+			_collect_lore(it)
 
 		"tunnel_exit":
-			if has_bible:
-				_win()
-			else:
-				say("You cannot leave without the Devil's Bible! It holds your family's souls.")
+			_try_tunnel_exit()
+
+func _toggle_main_power() -> void:
+	house_power = not house_power
+	play("spark")
+	_manifest_girl(4.5)
+	if house_power:
+		complete_mission("power")
+		if short_circuits > 0: complete_mission("breaker")
+		for b in bulbs:
+			if b.mode != "off": b.mode = "flicker"
+		say("Main Breaker ENGAGED. The whole house flickers awake — and Lily heard it.", 6.0)
+	else:
+		say("Main Breaker TRIPPED. The whole house is dark. Something is moving closer.", 6.0)
+	noise(player.position, 18.0)
+
+func _try_tunnel_exit() -> void:
+	if not has_bible:
+		say("You cannot leave without the Devil's Bible! It holds your family's souls.")
+	elif not has_walkie:
+		say("Ada is still calling from the living room. Find her walkie-talkie before you leave.", 6.0)
+	else:
+		_win()
+
+func _manifest_girl(duration := 4.0) -> void:
+	if not girl_alive: return
+	girl_flicker_t = maxf(girl_flicker_t, duration)
+	girl.visible = true
+	p_girl.stream = snd["ghost_hit"]
+	p_girl.volume_db = -13.0
+	p_girl.play()
+	if girl_manifest_cd > 0.0: return
+	girl_manifest_cd = 2.0
+	var best_pos := girl.position
+	var best_distance := 1e9
+	for haunt in [Vector3(18, 0, 10), Vector3(8, 0, 6), Vector3(4.2, 0, 5.9), Vector3(16, 0, 6), Vector3(23, 0, 5.8)]:
+		var distance: float = haunt.distance_to(player.position)
+		if distance > 3.0 and distance < 14.0 and distance < best_distance:
+			best_distance = distance
+			best_pos = haunt
+	girl.position = best_pos
 
 func _trigger_short_circuit() -> void:
 	house_power = false
+	short_circuits += 1
 	short_circuit_t = 12.0
 	play("spark", 4.0)
 	shake = 1.4
 	post_mat.set_shader_parameter("flash", 0.7)
-	say("SHORT CIRCUIT! The fuse blew - entire house current is OFF! Reset at Main Breaker.", 6.0)
-	# Preserve individual room switch states while the whole house loses power.
-	# Lily flickers into existence during darkness!
-	girl_flicker_t = 5.0
+	say("SHORT CIRCUIT! The whole house current is OFF. Reset the outside main breaker.", 7.0)
+	_manifest_girl(5.0)
+	noise(player.position, 22.0)
 
 # -------------------------------------------------------------- main loop
 func _physics_process(dt: float) -> void:
+	var paused := state != "play"
+	p_amb.stream_paused = paused
+	p_fan.stream_paused = paused or not house_power
+	p_doll_cry.stream_paused = paused or pearl_comforted
+	p_girl.stream_paused = paused
+	p_butcher.stream_paused = paused
+	if paused: return
 	time += dt
-	if fan != null: fan.rotation.y += dt * 1.6
+	if fan != null and house_power: fan.rotation.y += dt * 1.6
 	for d in doors: d.update(dt)
 	_update_lights(dt)
-	if state != "play":
-		_animate_idle(dt)
-		return
 	_update_player(dt)
 	_update_butcher(dt)
 	_update_characters(dt)
@@ -1540,10 +1874,6 @@ func _update_lights(dt: float) -> void:
 			_: k = 0.96 + sin(time * 9.0 + b.pos.x * 3.0) * 0.03
 		(b.light as OmniLight3D).light_energy = b.base * k
 
-func _animate_idle(_dt: float) -> void:
-	if ghost != null: ghost.position.y = 0.35 + sin(time * 1.3) * 0.08
-	if b_model != null: b_model.rotation.z = sin(time * 0.8) * 0.02
-
 func _update_player(dt: float) -> void:
 	var fwd := Vector3(-sin(yaw), 0, -cos(yaw))
 	var right := Vector3(cos(yaw), 0, -sin(yaw))
@@ -1554,7 +1884,9 @@ func _update_player(dt: float) -> void:
 	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): mv.x -= 1
 
 	var crouch := Input.is_physical_key_pressed(KEY_C) or Input.is_physical_key_pressed(KEY_CTRL)
-	var sprint := Input.is_physical_key_pressed(KEY_SHIFT) and mv.y > 0.0 and stamina > 0.0 and not crouch
+	if stamina <= 0.0: exhausted = true
+	elif stamina >= 0.35: exhausted = false
+	var sprint := Input.is_physical_key_pressed(KEY_SHIFT) and mv.y > 0.0 and not exhausted and not crouch
 
 	if sprint: stamina = maxf(0.0, stamina - 0.22 * dt)
 	else: stamina = minf(1.0, stamina + 0.14 * dt)
@@ -1610,16 +1942,22 @@ func _update_player(dt: float) -> void:
 	if health <= 0.0: _die()
 
 func _update_ui(dt: float) -> void:
-	hud_obj.text = "THE LAST REVENGE | Flashlight: %s | Bat: %s | Blood Bags: %d" % ["ON" if flash_on else "OFF", "EQUIPPED" if has_bat else "NONE", blood_bags]
+	hud_obj.text = "THE LAST REVENGE | Power: %s | Bat: %s | Blood Bags: %d" % ["ON" if house_power else "OFF", "EQUIPPED" if has_bat else "NONE", blood_bags]
 	bar_health.value = health
 	bar_stam.value = stamina
 	bar_batt.value = battery
 
-	# Build missions summary
-	var m_str := "MISSIONS:\n"
+	var objective := "Escape through the tunnel."
 	for m in missions:
-		m_str += "%s %s\n" % ["[X]" if m.done else "[ ]", m.text]
-	hud_missions.text = m_str
+		if m.required and not m.done:
+			objective = m.text
+			break
+	hud_missions.text = "OBJECTIVE: %s\nSIDE: Ada %s  Mira %s  Pearl %s  Rat %s\nSECRETS: Memories %d/4  Mira's Key %s  Breaker %s" % [
+		objective,
+		"[X]" if mission_done("ada") else "[ ]", "[X]" if mission_done("mira") else "[ ]",
+		"[X]" if mission_done("pearl") else "[ ]", "[X]" if mission_done("rat") else "[ ]",
+		lore_found.size(), "[X]" if mission_done("mira_key") else "[ ]", "[X]" if mission_done("breaker") else "[ ]",
+	]
 
 	var f = _find_focus()
 	if f == null: hud_prompt.text = ""
@@ -1645,6 +1983,7 @@ func _update_ui(dt: float) -> void:
 		heart_t -= dt
 		if heart_t <= 0.0:
 			heart_t = 1.0 / (1.0 + threat * 1.9)
+			p_heart.stream = snd["heart_fast"] if threat > 0.65 else snd["heart"]
 			p_heart.volume_db = -14.0 + threat * 12.0
 			p_heart.play()
 
@@ -1680,7 +2019,9 @@ func _update_butcher(dt: float) -> void:
 
 	var seen := _can_see_player()
 	if seen:
-		if b_state != "chase": play("stinger", -8.0)
+		if b_state != "chase":
+			play("stinger", -8.0)
+			play("butcher_growl", -5.0)
 		b_state = "chase"
 		b_last_seen = player.position
 		b_lose = 0.0
@@ -1704,6 +2045,7 @@ func _update_butcher(dt: float) -> void:
 			if butcher.position.distance_to(b_target) < 1.4:
 				b_state = "search"; b_wait = 3.5
 		"search":
+			speed = 1.15
 			if b_wait > 0.0: b_wait -= dt
 			else: b_state = "patrol"; b_path = []; b_wait = 1.0
 		"chase":
@@ -1726,10 +2068,15 @@ func _update_butcher(dt: float) -> void:
 	b_model.rotation.x = 0.12 * float(b_state == "chase")
 	var carry: OmniLight3D = butcher.get_meta("eye_light")
 	carry.light_energy = 1.2 if b_state == "chase" else 0.0
-	if moving and sin(b_step) > 0.98 and b_step - floorf(b_step) < 0.5:
-		p_butcher.stream = snd["bstep"]
-		if not p_butcher.playing: p_butcher.play()
-	p_butcher.volume_db = 4.0
+	if moving:
+		b_footstep_t += dt * speed
+		if b_footstep_t >= 1.5:
+			b_footstep_t = 0.0
+			p_butcher.stream = snd["bstep"]
+			p_butcher.play()
+	else:
+		b_footstep_t = 0.0
+	p_butcher.volume_db = 1.0
 
 func _pick_patrol() -> void:
 	if butcher_confined:
@@ -1748,6 +2095,15 @@ func player_cell_bias(keys: Array) -> String:
 	return keys[rng.randi() % keys.size()]
 
 func _walk_to(target: Vector3, speed: float, dt: float) -> void:
+	if butcher_confined:
+		var target_k := cell_key_at(target)
+		var t_room: String = room_of.get(target_k, {}).get("id", "")
+		if t_room != "slaughter":
+			b_path = []
+			b_state = "patrol"
+			b_wait = 1.0
+			butcher.velocity = Vector3.ZERO
+			return
 	var goal := target
 	if b_state == "chase" or b_state == "investigate" or b_path.size() == 0:
 		var from_k := cell_key_at(butcher.position)
@@ -1795,6 +2151,9 @@ func _looking_at(p: Vector3, cos_min := 0.6) -> bool:
 	return f.dot(to.normalized()) > cos_min
 
 func _update_characters(dt: float) -> void:
+	girl_hit_cd = maxf(0.0, girl_hit_cd - dt)
+	girl_manifest_cd = maxf(0.0, girl_manifest_cd - dt)
+	rat_squeak_cd = maxf(0.0, rat_squeak_cd - dt)
 	# 1. Lily (Horror Girl - transparent coming and going motion)
 	if girl_alive:
 		if girl_flicker_t > 0.0:
@@ -1818,12 +2177,13 @@ func _update_characters(dt: float) -> void:
 			girl.position += Vector3(to_p.x, 0, to_p.z).normalized() * 1.2 * dt
 			girl.rotation.y = lerp_angle(girl.rotation.y, atan2(to_p.x, to_p.z), minf(1.0, 4.0 * dt))
 
-		if gd < 1.2:
+		if gd < 1.2 and girl_hit_cd <= 0.0:
+			girl_hit_cd = 2.0
 			shake = 1.2
 			post_mat.set_shader_parameter("flash", 0.5)
 			play("stinger", -4.0)
 			health = maxf(0.0, health - 15.0)
-			say("Lily's ghostly cold hand tore into your chest (-15 HP)!")
+			say("Lily's ghostly cold hand tore into your chest (-15 HP)! Strike only when she is visible!", 5.0)
 			girl.position = Vector3(4.2, 0, 5.9)
 
 	# 2. Pearl (Cursed Doll watches player & cries)
@@ -1845,8 +2205,15 @@ func _update_characters(dt: float) -> void:
 		var rd := rat.position.distance_to(player.position)
 		if rd < 8.0:
 			var rdir := (player.position - rat.position).normalized()
-			rat.position += Vector3(rdir.x, 0, rdir.z) * 2.2 * dt
+			rat.velocity = Vector3(rdir.x, 0, rdir.z) * 2.2
+			rat.velocity.y = -2.0
+			rat.move_and_slide()
 			rat.rotation.y = atan2(rdir.x, rdir.z)
+			if rat_squeak_cd <= 0.0:
+				rat_squeak_cd = 2.8
+				play_at("rat_squeak", rat.position + Vector3(0, 0.2, 0), -2.0)
+		else:
+			rat.velocity = Vector3.ZERO
 
 		rat_bite_cd -= dt
 		if rd < 0.9 and rat_bite_cd <= 0.0:
@@ -1864,7 +2231,15 @@ func _update_director(dt: float) -> void:
 		p_clock.stream = snd["clock_tick"]
 		p_clock.play()
 
-	# Random house fright events
-	if rng.randf() < 0.003:
-		play("door", -4.0)
-		say("A door slammed in the darkness...", 3.0)
+	if short_circuit_t > 0.0:
+		short_circuit_t = maxf(0.0, short_circuit_t - dt)
+		if rng.randf() < dt * 1.3:
+			play("spark", -10.0)
+			shake = maxf(shake, 0.35)
+			post_mat.set_shader_parameter("flash", 0.22)
+
+	# Sparse house fright events keep the ambience unpredictable without spamming the player.
+	if rng.randf() < dt * 0.025:
+		play("door", -8.0)
+		say("A door slammed somewhere in the house...", 3.0)
+		if not house_power: _manifest_girl(2.5)

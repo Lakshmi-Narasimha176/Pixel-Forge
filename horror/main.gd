@@ -77,7 +77,7 @@ const DOORS := [
 ]
 const WINDOWS := [
 	[2, 1, "N"], [4, 1, "N"], [1, 2, "W"], [5, 1, "N"], [8, 1, "N"], [11, 1, "N"], [13, 1, "N"],
-	[1, 3, "W"], [13, 3, "E"], [2, 6, "S"], [4, 6, "S"], [10, 6, "S"], [12, 6, "S"], [13, 5, "E"],
+	[13, 3, "E"], [2, 6, "S"], [4, 6, "S"], [10, 6, "S"], [12, 6, "S"], [13, 5, "E"],
 ]
 const BULBS := [
 	[3, 3, 1.0], [7, 3, 1.0], [11, 3, 1.0], [7, 5, 1.0], [11, 2, 0.9], [9, 5, 0.8],
@@ -351,6 +351,8 @@ func fit(key_or_path: String, height := 0.0, target_length := 0.0, face_x := fal
 	var rot := Node3D.new()
 	holder.add_child(rot)
 	rot.add_child(inst)
+	if key_or_path == "corridor":
+		inst.rotation.x = -PI / 2.0
 	var bb := _aabb(inst, Transform3D.IDENTITY)
 	var k := 1.0
 	if height > 0.0 and bb.size.y > 0.0: k = height / bb.size.y
@@ -650,21 +652,27 @@ func _build_furniture() -> void:
 
 func _build_dressing() -> void:
 	# Hanging dead pigs in the Slaughterhouse
-	for p in [[22.6, 8.0], [25.6, 11.8], [22.4, 11.0]]:
+	for p in [[23.2, 9.0], [25.8, 11.8], [23.5, 12.0]]:
 		var pig := fit("pig", 1.25)
 		pig.position = Vector3(p[0], 3.0 - 1.55, p[1])
 		add_child(pig)
 
 	# Meat hook rail hung from the ceiling of the Slaughterhouse
 	var hook := fit("hook", 0, 3.4)
-	hook.position = Vector3(24.0, 2.5, 10.5)
+	hook.position = Vector3(24.5, 2.5, 10.5)
 	add_child(hook)
+
+	# Slaughterhouse diorama environment props
+	var diorama := fit("diorama", 1.8)
+	diorama.position = Vector3(24.8, 0, 9.5)
+	add_child(diorama)
 
 	# Blood-soaked walls continue through the house, not just the slaughter room.
 	for bpos in [
 		Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8),
 		Vector3(22.0, 0, 12.5), Vector3(26.4, 0, 8.5), Vector3(3.0, 0, 4.0), Vector3(17.0, 0, 4.0),
 		Vector3(6.0, 0, 6.8), Vector3(12.0, 0, 6.8), Vector3(20.0, 0, 6.8), Vector3(4.0, 0, 11.8),
+		Vector3(0.5, 0, 6.0), Vector3(-4.0, 0, 6.0), Vector3(-8.0, 0, 6.0),
 	]:
 		var bw := fit("bloodwall", 0, 4.8)
 		bw.position = bpos
@@ -674,6 +682,7 @@ func _build_dressing() -> void:
 		[Vector3(15.0, 0.018, 6.2), Vector2(1.6, 0.8)], [Vector3(7.0, 0.018, 5.5), Vector2(1.0, 1.5)],
 		[Vector3(4.5, 0.018, 9.2), Vector2(1.5, 1.1)], [Vector3(16.2, 0.018, 2.6), Vector2(0.8, 1.3)],
 		[Vector3(20.0, 0.018, 5.8), Vector2(1.0, 0.7)], [Vector3(5.6, 0.018, 2.4), Vector2(1.2, 0.8)],
+		[Vector3(-3.0, 0.018, 6.0), Vector2(1.4, 1.4)], [Vector3(-6.5, 0.018, 6.0), Vector2(1.8, 1.0)],
 	]:
 		_add_blood_pool(pool[0], pool[1])
 
@@ -702,34 +711,39 @@ func _build_dressing() -> void:
 	toilet.rotation.y = PI
 	add_child(toilet)
 
-	# Vintage Living Room set (Ada's parlor domain)
-	var parlor := fit("parlor", 2.7)
+	# Vintage Living Room set (Ada's parlor domain) - hide exterior walls so doors are fully open
+	var parlor := fit("parlor", 2.6)
 	parlor.position = Vector3(5.0, 0, 9.8)
+	for mesh in parlor.find_children("*", "MeshInstance3D", true, false):
+		var mname: String = mesh.name.to_lower()
+		if "duvar" in mname or "zemin" in mname or "tavan" in mname or "giris" in mname:
+			(mesh as MeshInstance3D).visible = false
 	add_child(parlor)
 
-	# Horror Corridor 5 (Mira's domain extending West from hallway)
+	# Horror Corridor 5 (Mira's domain extending West from hallway door at x=1.0, z=6.0)
 	var corr := fit("corridor", 2.8)
-	corr.position = Vector3(-3.5, 0, 6.0)
+	corr.position = Vector3(-7.5, 0, 6.0)
 	corr.rotation.y = PI / 2.0
 	add_child(corr)
 
-	# Underground Tunnel (The secret exit route)
-	var tunnel := fit("tunnel", 3.0)
-	tunnel.position = Vector3(25.0, -0.2, 18.0)
+	# Underground Tunnel (The secret entrance and exit route connecting to south house door)
+	var tunnel := fit("tunnel", 3.2)
+	tunnel.position = Vector3(18.0, 0.0, 20.0)
+	tunnel.rotation.y = PI / 2.0
 	add_child(tunnel)
 
-	# Underground Tunnel Exit trigger
+	# Underground Tunnel Exit trigger (return here with Devil's Bible to escape)
 	tunnel_zone = Node3D.new()
-	tunnel_zone.position = Vector3(25.0, 0, 26.0)
+	tunnel_zone.position = Vector3(18.0, 0, 24.5)
 	add_child(tunnel_zone)
 	interact.append({
 		"kind": "tunnel_exit",
-		"pos": Vector3(25.0, 0.8, 26.0),
+		"pos": Vector3(18.0, 0.8, 24.5),
 		"label": "Escape Through Tunnel to Surface"
 	})
 
-	# A readable, unobstructed route from the spawn tunnel to the unlocked dining entrance.
-	for lamp_pos in [Vector3(24.0, 0, 20.0), Vector3(22.0, 0, 17.5), Vector3(20.0, 0, 15.2), Vector3(19.2, 0, 14.0)]:
+	# Path lanterns guiding player from inside the tunnel directly to the house entrance
+	for lamp_pos in [Vector3(18.0, 0, 23.5), Vector3(18.0, 0, 20.5), Vector3(18.0, 0, 17.5), Vector3(18.0, 0, 15.0), Vector3(18.6, 0, 13.5)]:
 		_add_path_lantern(lamp_pos)
 
 func _add_blood_pool(pos: Vector3, pool_size: Vector2) -> void:
@@ -854,7 +868,7 @@ func _build_characters() -> void:
 
 	# 5. Mira (The Woman - Mother in Horror Corridor)
 	woman = fit("woman", 1.7)
-	woman.position = Vector3(-3.2, 0, 6.0)
+	woman.position = Vector3(-6.5, 0, 6.0)
 	woman.visible = true
 	add_child(woman)
 
@@ -874,15 +888,21 @@ func _build_characters() -> void:
 	add_child(rat)
 
 func _build_items() -> void:
-	# 1. Bloody Baseball Bat (Weapon pickup)
+	# 1. Bloody Baseball Bat (Weapon pickup) in Study
 	var bat_pickup := fit("bat", 0, 0.9)
-	bat_pickup.position = Vector3(15.2, 0.1, 2.5)
+	bat_pickup.position = Vector3(16.0, 0.82, 2.5)
 	bat_pickup.rotation.z = 1.2
 	add_child(bat_pickup)
+	var b_glow := OmniLight3D.new()
+	b_glow.light_color = Color(1.0, 0.2, 0.15)
+	b_glow.light_energy = 1.5
+	b_glow.omni_range = 3.0
+	b_glow.position = Vector3(16.0, 1.1, 2.5)
+	add_child(b_glow)
 	interact.append({
 		"kind": "bat_pickup",
 		"node": bat_pickup,
-		"pos": Vector3(15.2, 0.3, 2.5),
+		"pos": Vector3(16.0, 0.85, 2.5),
 		"label": "Take Bloody Baseball Bat (Weapon)"
 	})
 
@@ -897,20 +917,23 @@ func _build_items() -> void:
 		"label": "Take Ada's Walkie-Talkie"
 	})
 
-	# 3. Mira's Key (in Horror Corridor area)
-	# Mira key torus
+	# 3. Mira's Key (near Horror Corridor entrance in hallway)
 	var tm := TorusMesh.new()
-	tm.inner_radius = 0.03
-	tm.outer_radius = 0.06
+	tm.inner_radius = 0.035
+	tm.outer_radius = 0.07
 	var mi := MeshInstance3D.new()
 	mi.mesh = tm
-	mi.material_override = _mat(Color(0.8, 0.3, 0.3), 0.3, 0.8)
-	mi.position = Vector3(1.4, 0.6, 5.8)
+	var mk_mat := _mat(Color(0.9, 0.3, 0.3), 0.3, 0.8)
+	mk_mat.emission_enabled = true
+	mk_mat.emission = Color(0.9, 0.2, 0.2)
+	mk_mat.emission_energy_multiplier = 1.6
+	mi.material_override = mk_mat
+	mi.position = Vector3(2.2, 0.65, 6.0)
 	add_child(mi)
 	interact.append({
 		"kind": "mira_key",
 		"node": mi,
-		"pos": Vector3(1.4, 0.6, 5.8),
+		"pos": Vector3(2.2, 0.65, 6.0),
 		"label": "Take Mira's Corridor Key"
 	})
 
@@ -1380,10 +1403,10 @@ func _family_at_peace() -> bool:
 
 # ------------------------------------------------------------------- run
 func _reset_run() -> void:
-	# Start inside the tunnel facing back toward the house; escape uses this same route.
-	player.position = Vector3(25.0, 0.05, 22.0)
+	# Start inside the underground tunnel facing North directly toward the house entrance
+	player.position = Vector3(18.0, 0.05, 23.5)
 	player.velocity = Vector3.ZERO
-	yaw = 0.45
+	yaw = PI
 	pitch = 0.0
 	health = 100.0
 	stamina = 1.0
@@ -1462,6 +1485,9 @@ func _win() -> void:
 
 func noise(pos: Vector3, radius: float) -> void:
 	if state != "play": return
+	if butcher_confined:
+		var p_room: String = room_of.get(cell_key_at(pos), {}).get("id", "")
+		if p_room != "slaughter": return
 	var d := butcher.position.distance_to(pos)
 	if not _los(butcher.position + Vector3(0, 1.5, 0), pos + Vector3(0, 1.2, 0)): radius *= 0.6
 	if d < radius and b_state != "chase":
@@ -2069,6 +2095,15 @@ func player_cell_bias(keys: Array) -> String:
 	return keys[rng.randi() % keys.size()]
 
 func _walk_to(target: Vector3, speed: float, dt: float) -> void:
+	if butcher_confined:
+		var target_k := cell_key_at(target)
+		var t_room: String = room_of.get(target_k, {}).get("id", "")
+		if t_room != "slaughter":
+			b_path = []
+			b_state = "patrol"
+			b_wait = 1.0
+			butcher.velocity = Vector3.ZERO
+			return
 	var goal := target
 	if b_state == "chase" or b_state == "investigate" or b_path.size() == 0:
 		var from_k := cell_key_at(butcher.position)
