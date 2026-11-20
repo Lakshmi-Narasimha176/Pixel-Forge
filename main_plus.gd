@@ -124,14 +124,14 @@ func _build_furniture() -> void:
 	block(26.0, 10.2, 0.9, 0.9, 0.9, steel)                      # table under the 2nd blood bag
 
 func _add_battery(pos: Vector3) -> void:
-	var remap := {
+	var b_remap := {
 		Vector3(22.0, 0.94, 4.4): Vector3(24.9, 0.94, 3.6),
 		Vector3(14.0, 0.84, 7.5): Vector3(16.6, 0.84, 7.6),
 		Vector3(4.6, 0.6, 1.55): Vector3(6.2, 0.58, 3.0),
 	}
-	for k in remap:
+	for k in b_remap:
 		if (k as Vector3).is_equal_approx(pos):
-			pos = remap[k]
+			pos = b_remap[k]
 	super(pos)
 
 func _build_items() -> void:
