@@ -1,0 +1,70 @@
+shader_type canvas_item;
+// Cinematic film look over the whole screen.
+// Existing uniforms (vignette, grain, aberration, desat, flash, flash_color) keep their meaning.
+// New: colour grade, halation, memory-flashback sepia, VHS glitch, scanlines, film-gate flicker.
+uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
+uniform float vignette = 1.0;
+uniform float grain = 0.06;
+uniform float aberration = 0.0025;
+uniform float desat = 0.0;
+uniform float flash = 0.0;
+uniform vec3 flash_color = vec3(0.6, 0.0, 0.0);
+uniform float grade = 0.85;        // teal shadows / warm highlights strength
+uniform float halation = 0.30;     // warm glow bleeding off bright lights
+uniform float flashback = 0.0;     // 0..1 sepia memory look
+uniform float glitch = 0.0;        // 0..1 VHS tracking bursts
+uniform float scanlines = 0.03;
+uniform float gate_flicker = 0.02;
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+void fragment() {
+	vec2 uv = SCREEN_UV;
+
+	// VHS tracking glitch: horizontal bands that slide sideways.
+	if (glitch > 0.001) {
+		float band = floor(uv.y * 38.0);
+		float n = hash(vec2(band, floor(TIME * 14.0)));
+		float on = step(1.0 - glitch * 0.55, n);
+		uv.x += on * (hash(vec2(band, TIME)) - 0.5) * 0.09 * glitch;
+	}
+	// Memory waver.
+	uv += flashback * vec2(sin(uv.y * 40.0 + TIME * 2.0), cos(uv.x * 30.0 + TIME * 1.7)) * 0.0012;
+
+	vec2 c = uv - 0.5;
+	float r = length(c);
+	float ab = aberration * (0.4 + 2.4 * r * r) + glitch * 0.006;
+	vec3 col;
+	col.r = texture(screen_tex, uv + c * ab).r;
+	col.g = texture(screen_tex, uv).g;
+	col.b = texture(screen_tex, uv - c * ab).b;
+
+	// Halation: bright lights bleed a warm halo.
+	vec3 blur = textureLod(screen_tex, uv, 3.5).rgb;
+	float bl = dot(blur, vec3(0.299, 0.587, 0.114));
+	col += vec3(1.0, 0.42, 0.18) * max(bl - 0.45, 0.0) * halation;
+
+	float l = dot(col, vec3(0.299, 0.587, 0.114));
+
+	// Split-tone grade: cold shadows, warm highlights.
+	vec3 cold = vec3(0.86, 1.0, 1.12);
+	vec3 warm = vec3(1.10, 1.0, 0.88);
+	col = mix(col, col * mix(cold, warm, smoothstep(0.12, 0.7, l)), grade);
+
+	// Fear desaturation, then the sepia memory look.
+	col = mix(col, vec3(l), desat);
+	vec3 sepia = vec3(l) * vec3(1.18, 0.92, 0.66) + vec3(0.03, 0.015, 0.0);
+	col = mix(col, sepia, flashback * 0.88);
+
+	// Film grain, heavier in the shadows.
+	col += (hash(uv * vec2(1731.0, 977.0) + fract(TIME) * 91.7) * 2.0 - 1.0) * grain * (1.15 - clamp(l, 0.0, 1.0)) * (1.0 + flashback);
+
+	// Scanlines and projector flicker.
+	col *= 1.0 - scanlines * (0.5 + 0.5 * sin(FRAGCOORD.y * 1.5708)) * (0.4 + glitch + flashback * 0.8);
+	col *= 1.0 + (hash(vec2(floor(TIME * 24.0), 3.0)) - 0.5) * gate_flicker * (1.0 + flashback * 2.0);
+
+	// Vignette and damage flash.
+	col *= 1.0 - smoothstep(0.28, 0.92, r * vignette * 1.45);
+	col = mix(col, flash_color, flash * (0.35 + 0.65 * smoothstep(0.1, 0.8, r)));
+	COLOR = vec4(col, 1.0);
+}
