@@ -1393,9 +1393,9 @@ func _use_blood_bag() -> void:
 		say("You are already at full health. Save the blood bag for later.")
 		return
 	blood_bags -= 1
-	health = minf(max_health, health + 35.0)
+	health = minf(max_health, health + 50.0)
 	play("heal")
-	say("Used a collected blood bag (+35 HP). Blood bags remaining: %d." % blood_bags)
+	say("Used a collected blood bag (+50 HP). Blood bags remaining: %d." % blood_bags)
 
 func complete_mission(mid: String) -> void:
 	for m in missions:
@@ -1467,7 +1467,7 @@ func _reset_run() -> void:
 	has_bible = false
 	has_bat = false
 	has_walkie = false
-	blood_bags = 0
+	blood_bags = 1
 	batteries = 0
 	entered_house = false
 	lore_found.clear()
@@ -1602,7 +1602,7 @@ func _toggle_flash() -> void:
 func _bat_can_hit(target: Vector3, max_distance: float, fwd: Vector3) -> bool:
 	var to_target := target - player.position
 	var distance := to_target.length()
-	return distance > 0.05 and distance <= max_distance and fwd.dot(to_target / distance) > 0.4 and _los(cam.global_position, target)
+	return distance > 0.05 and distance <= max_distance and fwd.dot(to_target / distance) > 0.25 and _los(cam.global_position, target)
 
 func _bat_attack() -> void:
 	if not has_bat or bat_swinging: return
@@ -1614,7 +1614,7 @@ func _bat_attack() -> void:
 	# Raycast forward to check hit
 	var fwd := -cam.global_transform.basis.z
 	# 1. Hit Lily (Horror Girl)
-	if girl_alive and girl.visible and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 2.5, fwd):
+	if girl_alive and girl.visible and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 3.0, fwd):
 		girl_alive = false
 		play("ghost_hit", 4.0)
 		say("You struck Lily! Her spirit dissolves into ash...")
@@ -1650,8 +1650,8 @@ func _bat_attack() -> void:
 		return
 
 	# 3. Hit Butcher (Father) -> Stun him!
-	if _bat_can_hit(butcher.position + Vector3(0, 0.9, 0), 2.6, fwd):
-		b_stun = 3.0
+	if _bat_can_hit(butcher.position + Vector3(0, 0.9, 0), 3.2, fwd):
+		b_stun = 5.0
 		play("ghost_hit", 4.0)
 		shake = 1.0
 		say("You staggered the Butcher with the bat! RUN!", 4.0)
@@ -1775,9 +1775,9 @@ func _interact() -> void:
 		"meat":
 			it.taken = true
 			(it.node as Node3D).visible = false
-			health = minf(max_health, health + 15.0)
+			health = minf(max_health, health + 25.0)
 			play("eat")
-			say("Ate raw meat pack (+15 HP). You swallow down the nausea.")
+			say("Ate raw meat pack (+25 HP). You swallow down the nausea.")
 
 		"bloodbag":
 			it.taken = true
@@ -1943,10 +1943,10 @@ func _update_player(dt: float) -> void:
 	elif stamina >= 0.35: exhausted = false
 	var sprint := Input.is_physical_key_pressed(KEY_SHIFT) and mv.y > 0.0 and not exhausted and not crouch
 
-	if sprint: stamina = maxf(0.0, stamina - 0.22 * dt)
-	else: stamina = minf(1.0, stamina + 0.14 * dt)
+	if sprint: stamina = maxf(0.0, stamina - 0.14 * dt)
+	else: stamina = minf(1.0, stamina + 0.22 * dt)
 
-	var speed := 4.3 if sprint else (1.15 if crouch else 2.2)
+	var speed := 4.5 if sprint else (1.2 if crouch else 2.4)
 	var wish := (fwd * mv.y + right * mv.x)
 	if wish.length() > 0.0: wish = wish.normalized() * speed
 	player.velocity.x = lerpf(player.velocity.x, wish.x, minf(1.0, 12.0 * dt))
@@ -1967,7 +1967,7 @@ func _update_player(dt: float) -> void:
 
 	# Flashlight logic
 	if flash_on:
-		battery = maxf(0.0, battery - 0.0042 * dt)
+		battery = maxf(0.0, battery - 0.002 * dt)
 		if battery <= 0.0:
 			flash_on = false
 			flash.visible = false
@@ -2229,7 +2229,7 @@ func _update_characters(dt: float) -> void:
 
 		# Player flashlight slows and deters Lily from rushing
 		var being_lit := flash_on and _looking_at(girl.position) and _los(cam.global_position, girl.position + Vector3(0, 1.2, 0))
-		var walk_speed := 0.6 if being_lit else (1.1 if not has_bat else 1.35)
+		var walk_speed := 0.45 if being_lit else (1.0 if not has_bat else 1.3)
 
 		# Lily walks toward the entry / player with procedural walking stride motion
 		if gd < 24.0 and gd > 1.15:
@@ -2248,7 +2248,7 @@ func _update_characters(dt: float) -> void:
 
 		# 4 bites kill the human (each bite deals exactly 25 HP) with fair recovery window
 		if gd <= 1.25 and girl_hit_cd <= 0.0:
-			girl_hit_cd = 5.0
+			girl_hit_cd = 5.5
 			shake = 1.5
 			post_mat.set_shader_parameter("flash", 0.7)
 			play("ghost_bite", 4.0)
@@ -2263,8 +2263,8 @@ func _update_characters(dt: float) -> void:
 			else:
 				say("Lily delivered the 4th fatal bite! You collapsed...", 5.0)
 			# Flicker and retreat into shadows so player has time to maneuver
-			girl_flicker_t = 3.5
-			girl.position += (girl.position - player.position).normalized() * 8.5
+			girl_flicker_t = 4.5
+			girl.position += (girl.position - player.position).normalized() * 9.5
 
 	# 2. Pearl (Cursed Doll watches player & cries)
 	var dd := player.position - doll.global_position
@@ -2297,8 +2297,8 @@ func _update_characters(dt: float) -> void:
 
 		rat_bite_cd -= dt
 		if rd < 0.9 and rat_bite_cd <= 0.0:
-			rat_bite_cd = 2.5
-			health = maxf(0.0, health - 5.0)
+			rat_bite_cd = 3.5
+			health = maxf(0.0, health - 2.0)
 			play("rat_bite", 2.0)
 			play("rat_squeak", 0.0)
 			shake = 0.5
