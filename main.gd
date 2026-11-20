@@ -227,7 +227,6 @@ var missions := [
 	{"id": "breaker", "text": "Restore power after causing a short circuit", "required": false, "done": false},
 	{"id": "memories", "text": "Recover all four family memories", "required": false, "done": false},
 	{"id": "pearl", "text": "Find Pearl's drawing, then comfort the crying doll", "required": false, "done": false},
-	{"id": "rat", "text": "Stop the street rat terrorizing the house", "required": false, "done": false},
 ]
 
 # ui
@@ -280,7 +279,7 @@ func _ready() -> void:
 	_build_audio()
 	_build_hud()
 	_reset_run()
-	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt     [G]  Asset Gallery\n\nWASD Move  |  Mouse Look  |  Shift Sprint  |  C Crouch\nF Flashlight  |  E Interact  |  R Radio  |  Q Blood Bag\nLMB / T Bat Attack  |  Esc Pause\n\nSTORY:\nYour father Abel is the Butcher. His wife Mira haunts the west corridor.\nYour younger sister Ada is the blood-stained spirit in the vintage living room.\nLily flickers between worlds with Father's key; Pearl cries in the bedroom.\n\nMISSION:\nFollow the tunnel lanterns and switch on the outside main breaker.\nFind the bat and radio, defeat Lily while visible, and take Father's key.\nUnlock the slaughterhouse, seize the Devil's Bible, and escape via the tunnel.\n\nOPTIONAL:\nRecover four memories, free Ada and Mira, and comfort Pearl for the true ending.\nCollect blood bags and batteries, eat raw meat, and beware the biting street rat.\nRoom switches can kill the whole house current. Every power change draws Lily near.")
+	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt     [G]  Asset Gallery\n\nWASD Move  |  Mouse Look  |  Shift Sprint  |  C Crouch\nF Flashlight  |  E Interact  |  R Radio  |  Q Blood Bag\nLMB / T Bat Attack  |  Esc Pause\n\nSTORY:\nYour father Abel is the Butcher. His wife Mira haunts the west corridor.\nYour younger sister Ada is the blood-stained spirit in the vintage living room.\nLily flickers between worlds with Father's key; Pearl cries in the bedroom.\n\nMISSION:\nFollow the tunnel lanterns and switch on the outside main breaker.\nFind the bat and radio, defeat Lily while visible, and take Father's key.\nUnlock the slaughterhouse, seize the Devil's Bible, and escape via the tunnel.\n\nOPTIONAL:\nRecover four memories, free Ada and Mira, and comfort Pearl for the true ending.\nCollect blood bags and batteries, and eat raw meat to restore health.\nRoom switches can kill the whole house current. Every power change draws Lily near.")
 	if autostart:
 		autostart = false
 		_start()
@@ -919,20 +918,8 @@ func _build_characters() -> void:
 	woman.visible = true
 	add_child(woman)
 
-	# 6. Street Rat (Runs and bites human)
-	rat = CharacterBody3D.new()
-	rat.collision_layer = 4
-	rat.collision_mask = 1
-	var r_cs := CollisionShape3D.new()
-	var r_box := BoxShape3D.new()
-	r_box.size = Vector3(0.3, 0.2, 0.5)
-	r_cs.shape = r_box
-	r_cs.position.y = 0.1
-	rat.add_child(r_cs)
-	var r_mesh := fit("rat", 0, 0.45, true)
-	rat.add_child(r_mesh)
-	rat.position = Vector3(15.0, 0, 3.8)
-	add_child(rat)
+	# Street Rat removed per request
+	rat_alive = false
 
 func _build_items() -> void:
 	# 1. Bloody Baseball Bat (Weapon pickup) in Study
@@ -1490,9 +1477,7 @@ func _reset_run() -> void:
 	ghost.visible = true
 	woman_alive = true
 	woman.visible = true
-	rat_alive = true
-	rat.visible = true
-	rat.position = Vector3(15.0, 0, 3.8)
+	rat_alive = false
 	b_state = "patrol"
 	b_path = []
 	b_stun = 0.0
@@ -2007,10 +1992,10 @@ func _update_ui(dt: float) -> void:
 		if m.required and not m.done:
 			objective = m.text
 			break
-	hud_missions.text = "OBJECTIVE: %s\nSIDE: Ada %s  Mira %s  Pearl %s  Rat %s\nSECRETS: Memories %d/4  Mira's Key %s  Breaker %s" % [
+	hud_missions.text = "OBJECTIVE: %s\nSIDE: Ada %s  Mira %s  Pearl %s\nSECRETS: Memories %d/4  Mira's Key %s  Breaker %s" % [
 		objective,
 		"[X]" if mission_done("ada") else "[ ]", "[X]" if mission_done("mira") else "[ ]",
-		"[X]" if mission_done("pearl") else "[ ]", "[X]" if mission_done("rat") else "[ ]",
+		"[X]" if mission_done("pearl") else "[ ]",
 		lore_found.size(), "[X]" if mission_done("mira_key") else "[ ]", "[X]" if mission_done("breaker") else "[ ]",
 	]
 
@@ -2280,30 +2265,7 @@ func _update_characters(dt: float) -> void:
 		var wp := player.position - woman.position
 		woman.rotation.y = atan2(wp.x, wp.z)
 
-	# 5. Street Rat (Runs toward player and bites!)
-	if rat_alive:
-		var rd := rat.position.distance_to(player.position)
-		if rd < 8.0:
-			var rdir := (player.position - rat.position).normalized()
-			rat.velocity = Vector3(rdir.x, 0, rdir.z) * 2.2
-			rat.velocity.y = -2.0
-			rat.move_and_slide()
-			rat.rotation.y = atan2(rdir.x, rdir.z)
-			if rat_squeak_cd <= 0.0:
-				rat_squeak_cd = 2.8
-				play_at("rat_squeak", rat.position + Vector3(0, 0.2, 0), -2.0)
-		else:
-			rat.velocity = Vector3.ZERO
-
-		rat_bite_cd -= dt
-		if rd < 0.9 and rat_bite_cd <= 0.0:
-			rat_bite_cd = 3.5
-			health = maxf(0.0, health - 2.0)
-			play("rat_bite", 2.0)
-			play("rat_squeak", 0.0)
-			shake = 0.5
-			post_mat.set_shader_parameter("flash", 0.25)
-			say("The street rat bit your ankle! (-5 HP)", 3.0)
+	# Street Rat removed
 
 func _update_director(dt: float) -> void:
 	# Periodic clock tick sound

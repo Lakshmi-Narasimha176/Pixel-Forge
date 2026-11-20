@@ -521,7 +521,8 @@ func _build_emitters() -> void:
 	_emitter(self, "drip", Vector3(11.0, 1.8, 2.6), -3.0, 2.0, 12.0)
 	_emitter(self, "wind", Vector3(18.0, 2.0, 16.0), -6.0, 6.0, 24.0)
 	p_hum = _emitter(self, "power_hum", Vector3(17.2, 1.3, 13.4), -10.0, 1.5, 8.0)
-	p_rat = _emitter(rat, "scurry", Vector3(0, 0.1, 0), -2.0, 1.5, 10.0, false)
+	if rat != null:
+		p_rat = _emitter(rat, "scurry", Vector3(0, 0.1, 0), -2.0, 1.5, 10.0, false)
 	p_lily_g = _emitter(girl, "giggle", Vector3(0, 1.4, 0), -3.0, 3.0, 20.0, false)
 
 # ------------------------------------------------------------------ per-frame
@@ -581,11 +582,12 @@ func _plus_update(dt: float) -> void:
 				play("static", -14.0 + (9.0 - gd))
 
 	# Rat scurry only while it moves
-	var rat_moving := rat_alive and Vector2(rat.velocity.x, rat.velocity.z).length() > 0.3
-	if rat_moving and not p_rat.playing:
-		p_rat.play()
-	elif not rat_moving and p_rat.playing:
-		p_rat.stop()
+	if rat != null and p_rat != null:
+		var rat_moving := rat_alive and Vector2(rat.velocity.x, rat.velocity.z).length() > 0.3
+		if rat_moving and not p_rat.playing:
+			p_rat.play()
+		elif not rat_moving and p_rat.playing:
+			p_rat.stop()
 
 	# Freed spirits go quiet
 	if not ghost_alive and p_ada.playing:
