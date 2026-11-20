@@ -746,6 +746,30 @@ func _build_dressing() -> void:
 	for lamp_pos in [Vector3(18.0, 0, 23.5), Vector3(18.0, 0, 20.5), Vector3(18.0, 0, 17.5), Vector3(18.0, 0, 15.0), Vector3(18.6, 0, 13.5)]:
 		_add_path_lantern(lamp_pos)
 
+	# Abandoned swamp shack in the outer yard near the tunnel
+	var shack := fit("swamp", 4.2)
+	shack.position = Vector3(6.0, 0.0, 24.0)
+	shack.rotation.y = 0.4
+	add_child(shack)
+
+	# Weathered red saltbox farmhouse exterior in the backdrop
+	var fhouse := fit("farm", 8.0)
+	fhouse.position = Vector3(-20.0, 0.0, -15.0)
+	fhouse.rotation.y = -0.3
+	add_child(fhouse)
+
+	# Jason cursed hockey mask relic on the Slaughterhouse prep table
+	var jmask := fit("mask", 0, 0.35)
+	jmask.position = Vector3(24.8, 0.95, 12.5)
+	jmask.rotation.x = -PI / 2.0
+	add_child(jmask)
+	interact.append({
+		"kind": "mask",
+		"node": jmask,
+		"pos": Vector3(24.8, 1.0, 12.5),
+		"label": "Inspect Jason Cursed Hockey Mask"
+	})
+
 func _add_blood_pool(pos: Vector3, pool_size: Vector2) -> void:
 	var pool := MeshInstance3D.new()
 	var mesh := PlaneMesh.new()
@@ -1776,6 +1800,10 @@ func _interact() -> void:
 
 		"main_switch":
 			_toggle_main_power()
+
+		"mask":
+			play("stinger", -4.0)
+			say("A bloody hockey mask stained with decades of slaughter. The Butcher venerates it like a god.", 6.0)
 
 		"pearl":
 			_comfort_pearl()
