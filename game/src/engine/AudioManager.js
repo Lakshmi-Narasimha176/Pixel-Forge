@@ -85,7 +85,7 @@ export class AudioManager {
     this._idCounter = 0;
 
     /** Base path for audio assets. */
-    this.basePath = '../assets/audio/';
+    this.basePath = `${import.meta.env.BASE_URL}assets/audio/`;
   }
 
   /* ────────────────────────────────────────────────────────

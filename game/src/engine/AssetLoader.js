@@ -49,7 +49,7 @@ export class AssetLoader {
     this._cache = new Map();
 
     /** Base path for asset resolution */
-    this.basePath = '/';
+    this.basePath = import.meta.env.BASE_URL;
   }
 
   /**
@@ -60,9 +60,8 @@ export class AssetLoader {
   resolvePath(rawPath) {
     if (!rawPath) return '/';
     if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) return rawPath;
-    let clean = rawPath.replace(/^(\.\.\/)+/, '').replace(/^\.\//, '');
-    if (!clean.startsWith('/')) clean = '/' + clean;
-    return clean;
+    const clean = rawPath.replace(/^(\.\.\/)+/, '').replace(/^\.\//, '').replace(/^\/+/, '');
+    return `${this.basePath}${clean}`;
   }
 
   /**
