@@ -64,7 +64,10 @@ jobs:
         run: >-
           git lfs pull --include="a_horror_girl_character.glb,abandoned_horror_wall_with_blood_splatter.glb,abandoned_shack_in_the_swamp.glb,baseball_bat_covered_in_blood.glb,blood_bag.glb,butcher_meat_hook_rail_-_cured_ham__sausages.glb,cursed_porcelain_doll_-_antique_horror_prop.glb,dead_pig.glb,devils_bible_-_dark_fantasy_book.glb,horror_butcher_fat_killer_bloody_cleaver.glb,horror_corridor_5.glb,horror_game_flashlight_download_game-ready.glb,horror_ghost_character_-_blood_stained_spirit.glb,horror_room.glb,horror_soviet_room.glb,horror_woman.glb,jeson_horror_fan_art.glb,modular_vintage_living_room_-_game_ready_pbr.glb,old_rusty_ceiling_fan.glb,old_wooden_toilet_house_2.glb,psx-style_horror_walkie-talkie.glb,psx_raw_meat_pack__low-poly_2_types.glb,street_rat.glb,textured_game_environment.glb,tunnel.glb,vintage_wooden_wall_clock_-.glb,weathered_red_saltbox_farmhouse.glb,PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_door.glb,PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_wall.glb,PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/house_floor.glb,assets/audio/**"
       - name: Include shared audio assets
-        run: mkdir -p game/public/assets/audio && cp -R assets/audio/. game/public/assets/audio/
+        run: |
+          if [ -L game/public/assets/audio ]; then unlink game/public/assets/audio; fi
+          mkdir -p game/public/assets/audio
+          cp -R assets/audio/. game/public/assets/audio/
       - run: npm ci
         working-directory: game
       - run: npm run build
