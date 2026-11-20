@@ -71,6 +71,7 @@ const DOORS := [
 	{"i": 8, "j": 5, "s": "E", "k": "arch", "n": ""},
 	{"i": 10, "j": 5, "s": "E", "k": "door", "lock": "slaughter", "n": "Slaughter room door (Father's Room)"},
 	{"i": 13, "j": 4, "s": "N", "k": "door", "lock": "slaughter", "n": "Slaughter room back door"},
+	{"i": 9, "j": 6, "s": "S", "k": "door", "tag": "tunnel_entry", "n": "Tunnel-side Dining Room Entrance"},
 	{"i": 1, "j": 3, "s": "W", "k": "door", "lock": "corridor", "n": "Corridor door (Mira's Wing)"},
 	{"i": 7, "j": 6, "s": "S", "k": "door", "lock": "front", "n": "Front door"},
 ]
@@ -98,6 +99,7 @@ class MainDoor extends RefCounted:
 	var speed := 2.6
 	var locked := false
 	var lock := ""
+	var tag := ""
 	var label := "Door"
 	var pos := Vector3.ZERO
 	var kind := "door"
@@ -149,6 +151,14 @@ var has_bible := false
 var has_bat := false
 var has_walkie := false
 var blood_bags := 0
+var entered_house := false
+var lore_found: Array[String] = []
+var pearl_comforted := false
+var short_circuits := 0
+var exhausted := false
+var girl_hit_cd := 0.0
+var girl_manifest_cd := 0.0
+var rat_squeak_cd := 0.0
 var bat_in_hand: Node3D = null
 var bat_swinging := false
 var bat_swing_t := 0.0
@@ -187,6 +197,7 @@ var ghost_alive := true
 var woman_alive := true
 var doll: Node3D                 # Pearl (Cursed Doll - weeping)
 var p_doll_cry: AudioStreamPlayer3D
+var p_girl: AudioStreamPlayer3D
 var ghost: Node3D                # Ada (Sister Spirit - Living Room)
 var woman: Node3D                # Mira (The Woman - Corridor)
 var rat: CharacterBody3D         # Street Rat - bites player
@@ -198,17 +209,23 @@ var clock: Node3D                # Vintage Wall Clock - ticking
 var p_clock: AudioStreamPlayer3D
 var tunnel_zone: Node3D
 
-# mini-missions checklist
+# Required story objectives and optional mini-missions.
 var missions := [
-	{"id": "bat", "text": "Find the Bloody Baseball Bat in the house", "done": false},
-	{"id": "walkie", "text": "Find Ada's Walkie-Talkie and call your younger sister [R]", "done": false},
-	{"id": "lily", "text": "Defeat Lily (Horror Girl) with the bat to claim Father's Key", "done": false},
-	{"id": "ada", "text": "Lay Ada's blood-stained spirit to rest with the bat", "done": false},
-	{"id": "mira", "text": "Free Mira, the Butcher's wife, from the corridor", "done": false},
-	{"id": "breaker", "text": "Restore power at the master breaker after a short circuit", "done": false},
-	{"id": "mira_key", "text": "Collect Mira's Key in the Horror Corridor wing", "done": false},
-	{"id": "bible", "text": "Unlock Slaughterhouse & seize the Devil's Bible", "done": false},
-	{"id": "escape", "text": "Escape through the Underground Tunnel to freedom", "done": false},
+	{"id": "power", "text": "Switch on the master breaker beside the tunnel entrance", "required": true, "done": false},
+	{"id": "enter", "text": "Follow the lanterns and enter the dining room", "required": true, "done": false},
+	{"id": "bat", "text": "Find the bloody baseball bat in the study", "required": true, "done": false},
+	{"id": "walkie", "text": "Find Ada's walkie-talkie in the vintage living room", "required": true, "done": false},
+	{"id": "lily", "text": "Defeat Lily while she is visible to release Father's key", "required": true, "done": false},
+	{"id": "father_key", "text": "Collect Father's slaughterhouse key", "required": true, "done": false},
+	{"id": "bible", "text": "Unlock the slaughterhouse and take the Devil's Bible", "required": true, "done": false},
+	{"id": "escape", "text": "Return to the underground tunnel and escape", "required": true, "done": false},
+	{"id": "ada", "text": "Free Ada's blood-stained spirit with the bat", "required": false, "done": false},
+	{"id": "mira_key", "text": "Find Mira's key beside the west corridor", "required": false, "done": false},
+	{"id": "mira", "text": "Unlock the west corridor and free the Butcher's wife", "required": false, "done": false},
+	{"id": "breaker", "text": "Restore power after causing a short circuit", "required": false, "done": false},
+	{"id": "memories", "text": "Recover all four family memories", "required": false, "done": false},
+	{"id": "pearl", "text": "Find Pearl's drawing, then comfort the crying doll", "required": false, "done": false},
+	{"id": "rat", "text": "Stop the street rat terrorizing the house", "required": false, "done": false},
 ]
 
 # ui
@@ -456,6 +473,7 @@ func _build_level() -> void:
 				d.kind = "door"
 				d.label = e.def.n
 				d.lock = e.def.get("lock", "")
+				d.tag = e.def.get("tag", "")
 				d.locked = d.lock != ""
 				d.cx = e.cx; d.cz = e.cz; d.rot = e.rot
 				d.pos = Vector3(e.cx, 1.0, e.cz)
@@ -511,13 +529,15 @@ func _build_level() -> void:
 	_build_switches()
 
 func _build_switches() -> void:
-	# Main Master Breaker at entrance foyer
-	var main_sw := _create_switch_node(Vector3(13.2, 1.4, 7.8), "Main Power Breaker")
+	# The whole-house breaker is outside, beside the tunnel-side dining room entrance.
+	var breaker_pos := Vector3(19.15, 1.35, 13.18)
+	var main_sw := _create_switch_node(breaker_pos, "Main Power Breaker")
+	main_sw.rotation.y = PI
 	interact.append({
 		"kind": "main_switch",
 		"node": main_sw,
-		"pos": Vector3(13.2, 1.4, 7.8),
-		"label": "Toggle Main Breaker",
+		"pos": breaker_pos,
+		"label": "Toggle Whole-House Main Breaker",
 	})
 
 	# Room switches placed on walls
@@ -628,14 +648,22 @@ func _build_dressing() -> void:
 	hook.position = Vector3(24.0, 2.5, 10.5)
 	add_child(hook)
 
-	# Multiple gruesome blood wall splatters
+	# Blood-soaked walls continue through the house, not just the slaughter room.
 	for bpos in [
 		Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8),
 		Vector3(22.0, 0, 12.5), Vector3(26.4, 0, 8.5), Vector3(3.0, 0, 4.0), Vector3(17.0, 0, 4.0),
+		Vector3(6.0, 0, 6.8), Vector3(12.0, 0, 6.8), Vector3(20.0, 0, 6.8), Vector3(4.0, 0, 11.8),
 	]:
 		var bw := fit("bloodwall", 0, 4.8)
 		bw.position = bpos
 		add_child(bw)
+	for pool in [
+		[Vector3(23.4, 0.018, 9.0), Vector2(2.2, 1.2)], [Vector3(25.2, 0.018, 11.4), Vector2(1.4, 2.0)],
+		[Vector3(15.0, 0.018, 6.2), Vector2(1.6, 0.8)], [Vector3(7.0, 0.018, 5.5), Vector2(1.0, 1.5)],
+		[Vector3(4.5, 0.018, 9.2), Vector2(1.5, 1.1)], [Vector3(16.2, 0.018, 2.6), Vector2(0.8, 1.3)],
+		[Vector3(20.0, 0.018, 5.8), Vector2(1.0, 0.7)], [Vector3(5.6, 0.018, 2.4), Vector2(1.2, 0.8)],
+	]:
+		_add_blood_pool(pool[0], pool[1])
 
 	# Vintage wooden wall clock (with functional ticking sound)
 	clock = fit("clock", 0, 0.6)
@@ -688,6 +716,54 @@ func _build_dressing() -> void:
 		"label": "Escape Through Tunnel to Surface"
 	})
 
+	# A readable, unobstructed route from the spawn tunnel to the unlocked dining entrance.
+	for lamp_pos in [Vector3(24.0, 0, 20.0), Vector3(22.0, 0, 17.5), Vector3(20.0, 0, 15.2), Vector3(19.2, 0, 14.0)]:
+		_add_path_lantern(lamp_pos)
+
+func _add_blood_pool(pos: Vector3, pool_size: Vector2) -> void:
+	var pool := MeshInstance3D.new()
+	var mesh := PlaneMesh.new()
+	mesh.size = pool_size
+	pool.mesh = mesh
+	var material := _mat(Color(0.24, 0.002, 0.006, 0.9), 0.22)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	pool.material_override = material
+	pool.position = pos
+	pool.rotation.y = rng.randf() * TAU
+	level_root.add_child(pool)
+
+func _add_path_lantern(pos: Vector3) -> void:
+	var root := Node3D.new()
+	root.position = pos
+	level_root.add_child(root)
+	var post := MeshInstance3D.new()
+	var post_mesh := CylinderMesh.new()
+	post_mesh.top_radius = 0.035
+	post_mesh.bottom_radius = 0.055
+	post_mesh.height = 1.15
+	post.mesh = post_mesh
+	post.material_override = _mat(Color(0.09, 0.07, 0.05), 0.8, 0.4)
+	post.position.y = 0.575
+	root.add_child(post)
+	var lamp := MeshInstance3D.new()
+	var lamp_mesh := SphereMesh.new()
+	lamp_mesh.radius = 0.09
+	lamp_mesh.height = 0.18
+	lamp.mesh = lamp_mesh
+	var glow_material := _mat(Color(1.0, 0.52, 0.16), 0.4)
+	glow_material.emission_enabled = true
+	glow_material.emission = Color(1.0, 0.24, 0.04)
+	glow_material.emission_energy_multiplier = 2.0
+	lamp.material_override = glow_material
+	lamp.position.y = 1.18
+	root.add_child(lamp)
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.42, 0.16)
+	light.light_energy = 0.85
+	light.omni_range = 5.0
+	light.position.y = 1.18
+	root.add_child(light)
+
 func _build_characters() -> void:
 	# 1. The Butcher (Father: Abel Crane)
 	butcher = CharacterBody3D.new()
@@ -739,6 +815,10 @@ func _build_characters() -> void:
 		girl_meshes.append(apparition_mesh)
 	girl.position = Vector3(4.2, 0, 5.9)
 	add_child(girl)
+	p_girl = AudioStreamPlayer3D.new()
+	p_girl.unit_size = 3.0
+	p_girl.max_distance = 24.0
+	girl.add_child(p_girl)
 
 	# 3. Pearl (Cursed Porcelain Doll - in bedroom, continuously weeping)
 	doll = fit("doll", 0.55)
@@ -748,6 +828,12 @@ func _build_characters() -> void:
 	p_doll_cry.unit_size = 2.0
 	p_doll_cry.max_distance = 16.0
 	doll.add_child(p_doll_cry)
+	interact.append({
+		"kind": "pearl",
+		"node": doll,
+		"pos": Vector3(1.75, 1.1, 4.6),
+		"label": "Comfort the Crying Porcelain Doll",
+	})
 
 	# 4. Ada (Ghost - Sister spirit in Vintage Living Room)
 	ghost = fit("ghost", 1.7, 0, true)
@@ -873,6 +959,39 @@ func _build_items() -> void:
 	]
 	bspots.shuffle()
 	for i in 4: _add_battery(bspots[i])
+	_build_lore_pages()
+
+func _build_lore_pages() -> void:
+	var placements := {
+		"abel_ledger": [Vector3(24.0, 0.94, 12.5), 0.2],
+		"ada_note": [Vector3(4.8, 0.54, 8.0), -0.4],
+		"mira_letter": [Vector3(1.25, 0.18, 6.5), 0.5],
+		"pearl_drawing": [Vector3(6.0, 0.54, 2.5), -0.2],
+	}
+	for page in Story.LORE_PAGES:
+		var placement: Array = placements[page.id]
+		_add_lore_page(page, placement[0], placement[1])
+
+func _add_lore_page(page: Dictionary, pos: Vector3, angle: float) -> void:
+	var paper := MeshInstance3D.new()
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(0.34, 0.012, 0.46)
+	paper.mesh = mesh
+	var material := _mat(Color(0.72, 0.65, 0.48), 0.95)
+	material.emission_enabled = true
+	material.emission = Color(0.2, 0.14, 0.06)
+	material.emission_energy_multiplier = 0.35
+	paper.material_override = material
+	paper.position = pos
+	paper.rotation.y = angle
+	level_root.add_child(paper)
+	interact.append({
+		"kind": "lore",
+		"node": paper,
+		"pos": pos + Vector3(0, 0.08, 0),
+		"label": "Read " + page.title,
+		"page": page,
+	})
 
 func _add_battery(pos: Vector3) -> void:
 	var mi := MeshInstance3D.new()
