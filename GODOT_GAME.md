@@ -1,24 +1,27 @@
-# THE LAST REVENGE - Godot 4.3 horror game
+# Godot Game Notes
 
-Open this folder in **Godot 4.3+** and press **F5**. Run `git lfs pull` first so the `.glb` files are real
-(without it they are tiny LFS stubs; the game shows a warning and uses placeholder boxes).
-The first open imports ~800 MB of models, so give it a few minutes.
+## Run
 
-No existing asset was changed or moved. New files only: `project.godot`, `horror/`, this file, and a few `.gitignore` lines.
+Open this repository's `project.godot` in Godot 4.3 or newer and press **F5**. The main scene is `res://horror/main.tscn`. Run `git lfs pull` before opening so the GLB assets are downloaded; without them, the game reports the missing models.
 
-## Play
-Find the brass key -> unlock the slaughter room -> take the Devil's Bible -> escape by the front door.
-WASD move, Shift run (loud), C crouch (quiet), F flashlight, E interact, Esc pause, G asset gallery.
-The Butcher hunts by sight (light makes you visible) and by sound.
+## Game loop
 
-## Characters (static meshes, animated by code in real time)
-Butcher (AI patrol / investigate / search / chase), Horror girl (moves only when unseen), Cursed doll (watches you),
-Ghost (drifts), Woman (appears at the end of the hall), Street rat (scurries).
-Environment: kit house pieces (walls, doors that swing, windows, ceiling lights with flicker), pigs, meat, clock,
-spinning fan, blood wall, volumetric fog + flashlight shadows.
+Nora begins in the underground tunnel outside the Hollis house. Find a bloody baseball bat, contact her younger sister Ada through the walkie-talkie, defeat the translucent Horror Girl Lily to get Abel Crane's slaughterhouse key, and collect Mira's corridor key near the west hall entrance. Search the slaughterhouse for the Devil's Bible, then return to the tunnel to escape. The barred front door is not an alternate exit.
 
-## Gallery (`G` from the menu)
-Every character, prop and environment GLB in the repo, turning on pedestals, with a free-fly camera.
+## Controls
 
-## Not included
-Mixamo animations need an Adobe login, so rigged animation was not added; the repo's characters have no skeleton.
+- **WASD / mouse:** move and look
+- **Shift / C:** sprint loudly / crouch quietly
+- **F:** flashlight
+- **E:** interact, open doors, collect items, and use switches
+- **R:** contact Ada after collecting the walkie-talkie
+- **Q:** use a collected blood bag (+35 health)
+- **Left mouse / T:** swing the bloody bat; it frees spirits, kills the rat, and stuns the Butcher
+- **Esc:** pause
+- **G:** open the asset gallery from the menu
+
+## Systems
+
+Room lights start on and have individual switches. Turning a room light on shorts the whole-house circuit; the foyer's master breaker restores it. Main power changes make Lily flicker into view. Battery pickups recharge the flashlight. Raw meat restores a smaller amount of health than a blood bag.
+
+The house includes a furnished vintage living room, Mira's horror corridor, a bathroom outhouse, a slaughterhouse meat-hook rail and blood-splashed walls, a crying porcelain doll, a squeaking rusted ceiling fan, a ticking wall clock, a biting street rat, and spatial sound cues. The HUD lists the main and optional missions.

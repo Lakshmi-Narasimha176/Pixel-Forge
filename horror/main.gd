@@ -1,15 +1,15 @@
 extends Node3D
-## THE LAST REVENGE - An 8-part survival-horror campaign built from Pixel-Forge GLB assets.
+## THE LAST REVENGE - A first-person survival-horror story built from Pixel-Forge GLB assets.
 ##
 ## Abel Crane (The Butcher / Father): Hunts by sight and sound in the slaughterhouse.
-## Ada (Ghost / Sister): In the vintage living room, communicates via walkie-talkie.
-## Mira (The Woman / Mother): Haunts the horror corridor, key near her area.
+## Ada (Blood-Stained Ghost / Younger Sister): In the vintage living room, communicates by walkie-talkie.
+## Mira (The Woman / Butcher's Wife): Haunts the horror corridor; her key is near its entrance.
 ## Pearl (Cursed Doll): Sits on dresser, weeping & crying with 3D audio, watching Nora.
-## Lily (Horror Girl / Little Sister): Transparent coming-and-going motion; holds Father's Key!
+## Lily (Horror Girl): Transparent coming-and-going apparition; holds Father's Key!
 ## Bat: Slay Lily with the bloody baseball bat to get Father's Key.
 ## Street Rat: Scurries and bites player dealing damage.
-## Light Switches & Breaker: Flipping switches can cause short circuit; main breaker restores power.
-## Tunnel: Underground exit behind the slaughterhouse.
+## Light Switches & Breaker: Turning room lights on shorts the house; main breaker restores power.
+## Tunnel: The player begins inside it and must return there to escape.
 
 const Story = preload("res://horror/story.gd")
 const KIT := "res://PSX_Anomaly_Horror_Modular_Kit_Free_Sampler/GLB/House/"
@@ -72,7 +72,7 @@ const DOORS := [
 	{"i": 10, "j": 5, "s": "E", "k": "door", "lock": "slaughter", "n": "Slaughter room door (Father's Room)"},
 	{"i": 13, "j": 4, "s": "N", "k": "door", "lock": "slaughter", "n": "Slaughter room back door"},
 	{"i": 1, "j": 3, "s": "W", "k": "door", "lock": "corridor", "n": "Corridor door (Mira's Wing)"},
-	{"i": 7, "j": 6, "s": "S", "k": "door", "lock": "exit", "exit": true, "n": "Front door"},
+	{"i": 7, "j": 6, "s": "S", "k": "door", "lock": "front", "n": "Front door"},
 ]
 const WINDOWS := [
 	[2, 1, "N"], [4, 1, "N"], [1, 2, "W"], [5, 1, "N"], [8, 1, "N"], [11, 1, "N"], [13, 1, "N"],
@@ -101,7 +101,6 @@ class MainDoor extends RefCounted:
 	var label := "Door"
 	var pos := Vector3.ZERO
 	var kind := "door"
-	var exit := false
 	var cx := 0.0
 	var cz := 0.0
 	var rot := 0.0
@@ -149,6 +148,7 @@ var has_mira_key := false
 var has_bible := false
 var has_bat := false
 var has_walkie := false
+var blood_bags := 0
 var bat_in_hand: Node3D = null
 var bat_swinging := false
 var bat_swing_t := 0.0
@@ -178,9 +178,12 @@ var enraged := false
 # apparitions & entities
 var girl: CharacterBody3D       # Lily (Horror Girl - holds Father's Key)
 var girl_model: Node3D
+var girl_meshes: Array = []
 var girl_alpha := 0.0
 var girl_alive := true
 var girl_flicker_t := 0.0
+var ghost_alive := true
+var woman_alive := true
 var doll: Node3D                 # Pearl (Cursed Doll - weeping)
 var p_doll_cry: AudioStreamPlayer3D
 var ghost: Node3D                # Ada (Sister Spirit - Living Room)
@@ -197,8 +200,11 @@ var tunnel_zone: Node3D
 # mini-missions checklist
 var missions := [
 	{"id": "bat", "text": "Find the Bloody Baseball Bat in the house", "done": false},
-	{"id": "walkie", "text": "Find Ada's Walkie-Talkie in the Vintage Living Room", "done": false},
+	{"id": "walkie", "text": "Find Ada's Walkie-Talkie and call your younger sister [R]", "done": false},
 	{"id": "lily", "text": "Defeat Lily (Horror Girl) with the bat to claim Father's Key", "done": false},
+	{"id": "ada", "text": "Lay Ada's blood-stained spirit to rest with the bat", "done": false},
+	{"id": "mira", "text": "Free Mira, the Butcher's wife, from the corridor", "done": false},
+	{"id": "breaker", "text": "Restore power at the master breaker after a short circuit", "done": false},
 	{"id": "mira_key", "text": "Collect Mira's Key in the Horror Corridor wing", "done": false},
 	{"id": "bible", "text": "Unlock Slaughterhouse & seize the Devil's Bible", "done": false},
 	{"id": "escape", "text": "Escape through the Underground Tunnel to freedom", "done": false},
@@ -243,7 +249,7 @@ func _ready() -> void:
 	_build_audio()
 	_build_hud()
 	_reset_run()
-	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt\n[G]  Asset Gallery\n\nCONTROLS:\nWASD: Move   |   Mouse: Look   |   Shift: Sprint   |   C: Crouch\nF: Flashlight   |   E: Interact   |   LMB / T: Bat Attack   |   Esc: Pause\n\nLORE & OBJECTIVES:\n* Abel Crane (The Butcher / Father) hunts in the slaughterhouse.\n* Ada (Sister) speaks through the Walkie-Talkie in the Living Room.\n* Lily (Little Sister) flickers in the dark and holds Father's Key.\n* Slay Lily with the Bloody Bat to take the Key, then seize the Devil's Bible.\n* Beware: light switches trigger short circuits! Use the Master Breaker to reset power.\n* Escape through the secret Underground Tunnel!")
+	_show_overlay("THE LAST REVENGE\n\n[ENTER]  Start The Hunt\n[G]  Asset Gallery\n\nCONTROLS:\nWASD: Move   |   Mouse: Look   |   Shift: Sprint   |   C: Crouch\nF: Flashlight   |   E: Interact   |   R: Radio   |   Q: Use Blood Bag\nLMB / T: Bat Attack   |   Esc: Pause\n\nLORE & OBJECTIVES:\n* Abel Crane, your father, hunts the Hollis house as the Butcher.\n* Mira is his wife. Your younger sister Ada is the blood-stained ghost in the living room.\n* Find the Bloody Bat, defeat Lily for Father's key, then search the slaughterhouse for the Devil's Bible.\n* Collect blood bags; use Q when hurt. Eat raw meat to restore health.\n* Room switches can short the whole house. Use the main breaker; every power change draws Lily near.\n* Begin in the tunnel, search the house, and escape back through it!")
 	if autostart:
 		autostart = false
 		_start()
@@ -450,7 +456,6 @@ func _build_level() -> void:
 				d.label = e.def.n
 				d.lock = e.def.get("lock", "")
 				d.locked = d.lock != ""
-				d.exit = e.def.get("exit", false)
 				d.cx = e.cx; d.cz = e.cz; d.rot = e.rot
 				d.pos = Vector3(e.cx, 1.0, e.cz)
 				var frame := Node3D.new()
@@ -623,7 +628,10 @@ func _build_dressing() -> void:
 	add_child(hook)
 
 	# Multiple gruesome blood wall splatters
-	for bpos in [Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8)]:
+	for bpos in [
+		Vector3(24.0, 0, 7.2), Vector3(25.8, 0, 10.0), Vector3(14.0, 0, 5.8), Vector3(8.0, 0, 7.8),
+		Vector3(22.0, 0, 12.5), Vector3(26.4, 0, 8.5), Vector3(3.0, 0, 4.0), Vector3(17.0, 0, 4.0),
+	]:
 		var bw := fit("bloodwall", 0, 4.8)
 		bw.position = bpos
 		add_child(bw)
@@ -723,6 +731,11 @@ func _build_characters() -> void:
 	girl.add_child(g_cs)
 	girl_model = fit("girl", 1.68)
 	girl.add_child(girl_model)
+	girl_meshes.clear()
+	for mesh in girl_model.find_children("*", "MeshInstance3D", true, false):
+		var apparition_mesh := mesh as MeshInstance3D
+		apparition_mesh.transparency = 0.5
+		girl_meshes.append(apparition_mesh)
 	girl.position = Vector3(4.2, 0, 5.9)
 	add_child(girl)
 
@@ -793,12 +806,12 @@ func _build_items() -> void:
 	var mi := MeshInstance3D.new()
 	mi.mesh = tm
 	mi.material_override = _mat(Color(0.8, 0.3, 0.3), 0.3, 0.8)
-	mi.position = Vector3(-4.0, 0.6, 6.0)
+	mi.position = Vector3(1.4, 0.6, 5.8)
 	add_child(mi)
 	interact.append({
 		"kind": "mira_key",
 		"node": mi,
-		"pos": Vector3(-4.0, 0.6, 6.0),
+		"pos": Vector3(1.4, 0.6, 5.8),
 		"label": "Take Mira's Corridor Key"
 	})
 
@@ -813,7 +826,7 @@ func _build_items() -> void:
 		"label": "Eat Raw Meat (+15 HP)"
 	})
 
-	# 5. Blood Bags (Restores +35 HP)
+	# 5. Blood Bags (collect now, use with Q when injured)
 	var bb1 := fit("bloodbag", 0, 0.32)
 	bb1.position = Vector3(11.2, 0.85, 1.6)
 	add_child(bb1)
@@ -821,17 +834,17 @@ func _build_items() -> void:
 		"kind": "bloodbag",
 		"node": bb1,
 		"pos": Vector3(11.2, 0.85, 1.6),
-		"label": "Use Blood Bag (+35 HP)"
+		"label": "Collect Blood Bag"
 	})
 
 	var bb2 := fit("bloodbag", 0, 0.32)
-	bb2.position = Vector3(24.8, 0.92, 10.1)
+	bb2.position = Vector3(26.0, 0.92, 10.2)
 	add_child(bb2)
 	interact.append({
 		"kind": "bloodbag",
 		"node": bb2,
-		"pos": Vector3(24.8, 0.92, 10.1),
-		"label": "Use Blood Bag (+35 HP)"
+		"pos": Vector3(26.0, 0.92, 10.2),
+		"label": "Collect Blood Bag"
 	})
 
 	# 6. Devil's Bible (Altar in Slaughterhouse)
@@ -1109,6 +1122,33 @@ func radio_message(msg: String) -> void:
 	play("radio", 0.0)
 	say(msg, 7.0)
 
+func _use_walkie() -> void:
+	if not has_walkie:
+		say("You need Ada's walkie-talkie to reach her.")
+		return
+	if not girl_alive:
+		radio_message("Ada (radio): Lily's curse is broken. The Father's key is yours. Get the Devil's Bible and come back to the tunnel.")
+	elif not has_bat:
+		radio_message("Ada (radio): Nora, find the bloody bat. Lily is flickering between the hall and the living room.")
+	elif not has_mira_key:
+		radio_message("Ada (radio): Mira's key is close to the corridor entrance. She is Abel's wife. Don't let her draw you in.")
+	elif not has_bible:
+		radio_message("Ada (radio): Father's room is behind the slaughterhouse door. Take the Devil's Bible from the altar.")
+	else:
+		radio_message("Ada (radio): Abel heard you take the book! Run through the tunnel, Nora!")
+
+func _use_blood_bag() -> void:
+	if blood_bags <= 0:
+		say("You have no blood bags. Collect one from the house.")
+		return
+	if health >= max_health:
+		say("You are already at full health. Save the blood bag for later.")
+		return
+	blood_bags -= 1
+	health = minf(max_health, health + 35.0)
+	play("heal")
+	say("Used a collected blood bag (+35 HP). Blood bags remaining: %d." % blood_bags)
+
 func complete_mission(mid: String) -> void:
 	for m in missions:
 		if m.id == mid and not m.done:
@@ -1118,9 +1158,10 @@ func complete_mission(mid: String) -> void:
 
 # ------------------------------------------------------------------- run
 func _reset_run() -> void:
-	player.position = Vector3(5.0, 0.05, 3.9)
+	# Start inside the tunnel facing back toward the house; escape uses this same route.
+	player.position = Vector3(25.0, 0.05, 22.0)
 	player.velocity = Vector3.ZERO
-	yaw = PI
+	yaw = 0.0
 	pitch = 0.0
 	health = 100.0
 	stamina = 1.0
@@ -1132,10 +1173,15 @@ func _reset_run() -> void:
 	has_bible = false
 	has_bat = false
 	has_walkie = false
+	blood_bags = 0
 	batteries = 0
 	enraged = false
 	house_power = true
 	girl_alive = true
+	ghost_alive = true
+	ghost.visible = true
+	woman_alive = true
+	woman.visible = true
 	rat_alive = true
 	b_state = "patrol"
 	b_path = []
@@ -1210,6 +1256,10 @@ func _input(event: InputEvent) -> void:
 				if state == "play": _toggle_flash()
 			KEY_E:
 				if state == "play": _interact()
+			KEY_R:
+				if state == "play": _use_walkie()
+			KEY_Q:
+				if state == "play": _use_blood_bag()
 			KEY_T, KEY_B:
 				if state == "play": _bat_attack()
 	if event is InputEventKey and event.pressed and (event.physical_keycode == KEY_ENTER) and state == "pause":
@@ -1223,6 +1273,11 @@ func _toggle_flash() -> void:
 	flash.visible = flash_on
 	play("click")
 
+func _bat_can_hit(target: Vector3, max_distance: float, fwd: Vector3) -> bool:
+	var to_target := target - player.position
+	var distance := to_target.length()
+	return distance > 0.05 and distance <= max_distance and fwd.dot(to_target / distance) > 0.4
+
 func _bat_attack() -> void:
 	if not has_bat or bat_swinging: return
 	bat_swinging = true
@@ -1232,23 +1287,35 @@ func _bat_attack() -> void:
 
 	# Raycast forward to check hit
 	var fwd := -cam.global_transform.basis.z
-	# ray start
-	# raycast sweep
-
 	# 1. Hit Lily (Horror Girl)
-	if girl_alive and girl.position.distance_to(player.position) < 2.5:
-		if fwd.dot((girl.position - player.position).normalized()) > 0.4:
-			girl_alive = false
-			play("ghost_hit", 4.0)
-			say("You struck Lily! Her spirit dissolves into ash...")
-			_spawn_father_key(girl.position + Vector3(0, 0.4, 0))
-			girl.visible = false
-			complete_mission("lily")
-			radio_message("Ada (radio): Lily is free now... take Father's key and burn the Bible.")
-			return
+	if girl_alive and girl.visible and _bat_can_hit(girl.position + Vector3(0, 0.8, 0), 2.5, fwd):
+		girl_alive = false
+		play("ghost_hit", 4.0)
+		say("You struck Lily! Her spirit dissolves into ash...")
+		_spawn_father_key(girl.position + Vector3(0, 0.4, 0))
+		girl.visible = false
+		complete_mission("lily")
+		radio_message("Ada (radio): Lily is free now... take Father's key and burn the Bible.")
+		return
+
+	# Blood-stained ghost and the Butcher's wife are spirits too; the bat can free them.
+	if ghost_alive and _bat_can_hit(ghost.position + Vector3(0, 0.8, 0), 2.7, fwd):
+		ghost_alive = false
+		ghost.visible = false
+		play("ghost_hit", 4.0)
+		say("Ada's blood-stained spirit breaks apart and is finally at peace.")
+		complete_mission("ada")
+		return
+	if woman_alive and _bat_can_hit(woman.position + Vector3(0, 0.8, 0), 2.7, fwd):
+		woman_alive = false
+		woman.visible = false
+		play("ghost_hit", 4.0)
+		say("Mira's apparition fades. The Butcher's wife is free.")
+		complete_mission("mira")
+		return
 
 	# 2. Hit Street Rat
-	if rat_alive and rat.position.distance_to(player.position) < 2.0:
+	if rat_alive and _bat_can_hit(rat.position + Vector3(0, 0.2, 0), 2.0, fwd):
 		rat_alive = false
 		rat.visible = false
 		play("rat_squeak", 4.0)
@@ -1256,7 +1323,7 @@ func _bat_attack() -> void:
 		return
 
 	# 3. Hit Butcher (Father) -> Stun him!
-	if butcher.position.distance_to(player.position) < 2.6:
+	if _bat_can_hit(butcher.position + Vector3(0, 0.9, 0), 2.6, fwd):
 		b_stun = 3.0
 		play("ghost_hit", 4.0)
 		shake = 1.0
@@ -1310,16 +1377,10 @@ func _interact() -> void:
 						say("Locked. Mira's corridor key is needed.")
 						play("click", -6.0)
 						return
-				elif d.lock == "exit":
-					if has_bible:
-						d.locked = false
-					else:
-						say("The front door is barred from the outside. Find the underground tunnel exit!")
-						play("click", -6.0)
-						return
-			if d.exit and not d.locked:
-				_win()
-				return
+				elif d.lock == "front":
+					say("The front door is sealed. The tunnel is the only way out.")
+					play("click", -6.0)
+					return
 			if d.target > 0.0: d.close()
 			else: d.open_from(player.position)
 			play("door")
@@ -1367,9 +1428,9 @@ func _interact() -> void:
 		"bloodbag":
 			it.taken = true
 			(it.node as Node3D).visible = false
-			health = minf(max_health, health + 35.0)
-			play("heal")
-			say("Applied blood bag transfusion (+35 HP). Vitality restored!")
+			blood_bags += 1
+			play("click")
+			say("Collected a blood bag. Press Q to use it. Bags: %d." % blood_bags)
 
 		"battery":
 			it.taken = true
@@ -1386,9 +1447,6 @@ func _interact() -> void:
 			has_bible = true
 			enraged = true
 			complete_mission("bible")
-			for d in doors:
-				if d.lock == "exit": d.locked = false
-				if d.lock == "tunnel": d.locked = false
 			for b in bulbs: b.mode = "flicker"
 			play("stinger", 4.0)
 			b_state = "chase"
@@ -1397,10 +1455,17 @@ func _interact() -> void:
 			radio_message("Ada (radio): RUN NORA! THE TUNNEL UNDER THE SLAUGHTERHOUSE!")
 
 		"room_switch":
+			if not house_power:
+				play("click")
+				say("There is no current. Reset the main breaker first.")
+				return
 			it.on = not it.on
 			play("click")
-			# Short circuit trigger: 65% chance or when turning light on
-			if it.on and rng.randf() < 0.65:
+			for b in bulbs:
+				if b.room == it.room:
+					b.mode = "on" if it.on else "off"
+			# Turning a room light on blows the fuse for the whole house.
+			if it.on:
 				_trigger_short_circuit()
 			else:
 				say("Flipped light switch: " + ("ON" if it.on else "OFF"))
@@ -1408,14 +1473,16 @@ func _interact() -> void:
 		"main_switch":
 			house_power = not house_power
 			play("spark")
+			girl_flicker_t = 3.5
 			if house_power:
 				say("Main Breaker ENGAGED. House power restored.")
-				# Power restore triggers Lily's violent flickering!
-				girl_flicker_t = 3.5
+				complete_mission("breaker")
+				for b in bulbs:
+					if b.mode != "off":
+						b.mode = "flicker"
 				play("stinger", -8.0)
 			else:
 				say("Main Breaker TRIPPED. The house plunges into darkness.")
-				for b in bulbs: b.mode = "off"
 
 		"tunnel_exit":
 			if has_bible:
@@ -1430,7 +1497,7 @@ func _trigger_short_circuit() -> void:
 	shake = 1.4
 	post_mat.set_shader_parameter("flash", 0.7)
 	say("SHORT CIRCUIT! The fuse blew - entire house current is OFF! Reset at Main Breaker.", 6.0)
-	for b in bulbs: b.mode = "off"
+	# Preserve individual room switch states while the whole house loses power.
 	# Lily flickers into existence during darkness!
 	girl_flicker_t = 5.0
 
@@ -1537,7 +1604,7 @@ func _update_player(dt: float) -> void:
 	if health <= 0.0: _die()
 
 func _update_ui(dt: float) -> void:
-	hud_obj.text = "THE LAST REVENGE | Flashlight: %s | Bat: %s" % ["ON" if flash_on else "OFF", "EQUIPPED" if has_bat else "NONE"]
+	hud_obj.text = "THE LAST REVENGE | Flashlight: %s | Bat: %s | Blood Bags: %d" % ["ON" if flash_on else "OFF", "EQUIPPED" if has_bat else "NONE", blood_bags]
 	bar_health.value = health
 	bar_stam.value = stamina
 	bar_batt.value = battery
@@ -1713,12 +1780,16 @@ func _update_characters(dt: float) -> void:
 	if girl_alive:
 		if girl_flicker_t > 0.0:
 			girl_flicker_t -= dt
-			# Intense flickering
+			# Intense flickering with a translucent surface between appearances.
 			girl.visible = (sin(time * 24.0) > 0.0)
+			for apparition_mesh in girl_meshes:
+				(apparition_mesh as MeshInstance3D).transparency = 0.48
 		else:
 			# Gentle coming and going transparent motion
-			girl_alpha = 0.5 + sin(time * 2.0) * 0.5
+			girl_alpha = 0.52 + sin(time * 2.0) * 0.32
 			girl.visible = (girl_alpha > 0.3)
+			for apparition_mesh in girl_meshes:
+				(apparition_mesh as MeshInstance3D).transparency = 1.0 - girl_alpha
 
 		var gd := girl.position.distance_to(player.position)
 		var seen := _looking_at(girl.position) and _los(cam.global_position, girl.position + Vector3(0, 1.2, 0))
@@ -1741,11 +1812,12 @@ func _update_characters(dt: float) -> void:
 	doll.rotation.y = lerp_angle(doll.rotation.y, atan2(dd.x, dd.z), minf(1.0, 2.0 * dt))
 
 	# 3. Ada (Ghost drifts through Living Room)
-	ghost.position = Vector3(5.2 + sin(time * 0.5) * 1.4, 0.35 + sin(time * 1.2) * 0.1, 9.5 + cos(time * 0.4) * 1.8)
-	ghost.rotation.y = time * 0.5 + PI / 2.0
+	if ghost_alive:
+		ghost.position = Vector3(5.2 + sin(time * 0.5) * 1.4, 0.35 + sin(time * 1.2) * 0.1, 9.5 + cos(time * 0.4) * 1.8)
+		ghost.rotation.y = time * 0.5 + PI / 2.0
 
 	# 4. Mira (The Woman in Horror Corridor)
-	if woman.visible:
+	if woman_alive:
 		var wp := player.position - woman.position
 		woman.rotation.y = atan2(wp.x, wp.z)
 
